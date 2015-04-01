@@ -4,7 +4,7 @@ sudo add-apt-repository ppa:ethanak/milena
 
 sudo apt-get update && sudo apt-get upgrade -y
 
-sudo apt-get install -y git xdg-user-dirs
+sudo apt-get install -y git xdg-user-dirs wget
 
 sudo apt-get install -y gir1.2-clutter-1.0 gir1.2-clutter-gst-2.0 gir1.2-mx-1.0 gir1.2-rsvg-2.0 libmx-1.0-2 libclutter-1.0-0 gir1.2-webkit-3.0 gir1.2-gtkclutter-1.0
 
@@ -26,6 +26,8 @@ sudo pip3 install pressagio configobj pydenticon ezodf python-wordpress-xmlrpc
 #     cd ~/
 #     git clone http://github.com/BrainTech/pisak.git
 # fi
+
+wget download.pisak.org/n_grams.sqlite -P ~/pisak/pisak/res 
 
 if [ -d ~/.pisak ]; then
    echo "Directory ~/.pisak already exists."

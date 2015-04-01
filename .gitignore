@@ -1,0 +1,8 @@
+*.pyc
+\#*\#
+*~
+.\#*
+*build-pisak-eyetracker-*
+*.pro.user
+*.so
+*sdk*

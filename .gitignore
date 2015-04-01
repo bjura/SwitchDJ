@@ -6,3 +6,4 @@
 *.pro.user
 *.so
 *sdk*
+n_grams.sqlite

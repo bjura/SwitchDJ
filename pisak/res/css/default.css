@@ -1050,3 +1050,40 @@ MxButton.PisakEmailSpellerMessageContentPrediction:disabled {
     color: grey;
     border-image: url("grey_frame.png") 5;
 }
+
+PisakButton.PisakEmailFlatButton {
+  color: white;
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  font-weight: bold;
+  border-image: url("black_flat.png");
+
+}
+
+PisakButton.PisakEmailFlatButton:hover {
+  color: white;
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  font-weight: bold;
+  border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakEmailFlatButton:frozen {
+  border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailFlatButton:lag_hilite {
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailFlatButton:disabled{
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}
+
+MxLabel.PisakEmailTitle {
+  font-size: 30pt;
+  font-family: Kelson Sans;
+  color: black;
+  font-weight: lighter;
+}

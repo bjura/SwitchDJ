@@ -980,3 +980,73 @@ MxButton.PisakBlogSpellerCommentPrediction:disabled {
     color: grey;
     border-image: url("grey_frame.png") 5;
 }
+
+
+/*Email*/
+
+PisakScrolledText.PisakEmailSpellerMessageContentText {
+    border-image: url("fence_frame.png");
+}
+
+MxLabel.PisakEmailSpellerMessageContentHeader {
+   color: black;
+   font-size: 35px;
+   font-family: Kelson Sans;
+}
+
+MxLabel.PisakEmailSpellerMessageContentText {
+    color: black;
+    font-size: 50px;
+    font-family: Kelson Sans;
+}
+
+PisakButton.PisakEmailSpellerMessageContentButton, 
+PisakSpellerKey.PisakEmailSpellerMessageContentKey, 
+PisakSpellerPrediction.PisakEmailSpellerMessageContentPrediction {
+    color: black;
+    font-size: 18pt;
+    font-family: Kelson Sans;
+    font-weight: bold;
+    border-image: url("black_frame.png") 5;
+}
+
+PisakButton.PisakEmailSpellerMessageContentButton:hover, 
+PisakSpellerKey.PisakEmailSpellerMessageContentKey:hover, 
+PisakSpellerPrediction.PisakEmailSpellerMessageContentPrediction:hover {
+    color: white;
+    border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageContentButton:frozen, 
+PisakSpellerKey.PisakEmailSpellerMessageContentKey:frozen, 
+PisakSpellerPrediction.PisakEmailSpellerMessageContentPrediction:frozen {
+    color: white;
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageContentButton:lag_hilite,
+PisakSpellerKey.PisakEmailSpellerMessageContentKey:lag_hilite,
+PisakSpellerPrediction.PisakEmailSpellerMessageContentPrediction:lag_hilite {
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageContentButton:active,
+PisakSpellerKey.PisakEmailSpellerMessageContentKey:active,
+PisakSpellerPrediction.PisakEmailSpellerMessageContentPrediction:active {
+    color: white;
+    border-image: url("grey_flat.png");
+}
+
+MxButton.PisakEmailSpellerMessageContentButton:scanning, 
+MxButton.PisakEmailSpellerMessageContentKey:scanning, 
+MxButton.PisakEmailSpellerMessageContentPrediction:scanning {
+    color: white;
+    border-image: url("black_flat.png");
+}
+
+MxButton.PisakEmailSpellerMessageContentButton:disabled, 
+MxButton.PisakEmailSpellerMessageContentKey:disabled, 
+MxButton.PisakEmailSpellerMessageContentPrediction:disabled {
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}

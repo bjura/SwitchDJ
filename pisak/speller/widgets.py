@@ -700,7 +700,7 @@ class Dictionary(text_tools.Predictor):
             self.content = predictor.get_predictions(context)
         if len(self.content) == 1:
             self.content[0] = self.content[0] + ' '  # automatic space if only one suggestion
-        Clutter.threads_add_idle(0, self.emit, "content-update")
+        self.notify_content_update()
 
     @staticmethod
     def get_prediction_context(text):

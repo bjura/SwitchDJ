@@ -23,18 +23,6 @@ class AddressBook(text_tools.Predictor):
         self._load_book()
         self.apply_props()
 
-    def _load_book(self):
-        self.book = configobj.ConfigObj(EMAIL_ADDRESS_BOOK, encoding="UTF-8")
-        self.all = self.book.get("all") or []
-
-    def _book_lookup(self, feed):
-        return [record for record in self.all if record.startswith(feed)]
-
-    def do_prediction(self, text, position):
-        feed = text[0 : position]
-        self.content = self._book_lookup(feed)
-        Clutter.threads_add_idle(0, self.emit, "content-update")
-
     def add_address(self, address):
         """
         Add address to the book. If already in, then nothing happens.
@@ -43,5 +31,36 @@ class AddressBook(text_tools.Predictor):
         """
         if address not in self.all:
             self.all.append(address)
-            self.book["all"] = self.all
-            self.book.write()
+            self.all.sort()
+            self._update_book(self.all)
+
+    def remove_address(self, address):
+        """
+        Remove address from the book. If the book does not contain
+        the given address then nothing happens.
+
+        :param address: address to be removed
+        """
+        if address in self.all:
+            self.all.remove(address)
+            self._update_book(self.all)
+
+    def _update_book(self, contacts):
+        self.book["all"] = contacts
+        self.book.write()
+
+    def _load_book(self):
+        self.book = configobj.ConfigObj(EMAIL_ADDRESS_BOOK, encoding="UTF-8")
+        self.all = self.book.get("all") or []
+
+    def _book_lookup(self, feed):
+        matched = [record for record in self.all if record.startswith(feed)]
+        not_matched = set(self.all) - set(match)
+        # we do not care about sorting the not matched records, sorting of
+        # the matched records is always ensured
+        return matched + list(not_matched)
+
+    def do_prediction(self, text, position):
+        feed = text[0 : position]
+        self.content = self._book_lookup(feed)
+        self.notify_content_update()

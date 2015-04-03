@@ -1093,3 +1093,70 @@ MxLabel.PisakEmailAddressTile {
   font-size: 20pt;
   color: black;
 }
+
+PisakScrolledText.PisakEmailSpellerMessageToText {
+    border-image: url("fence_frame.png");
+}
+
+MxLabel.PisakEmailSpellerMessageToHeader {
+   color: black;
+   font-size: 35px;
+   font-family: Kelson Sans;
+}
+
+MxLabel.PisakEmailSpellerMessageToText {
+    color: black;
+    font-size: 50px;
+    font-family: Kelson Sans;
+}
+
+PisakButton.PisakEmailSpellerMessageToButton,
+PisakSpellerKey.PisakEmailSpellerMessageToKey,
+PisakSpellerPrediction.PisakEmailSpellerMessageToPrediction {
+    color: black;
+    font-size: 18pt;
+    font-family: Kelson Sans;
+    font-weight: bold;
+    border-image: url("black_frame.png") 5;
+}
+
+PisakButton.PisakEmailSpellerMessageToButton:hover,
+PisakSpellerKey.PisakEmailSpellerMessageToKey:hover,
+PisakSpellerPrediction.PisakEmailSpellerMessageToPrediction:hover {
+    color: white;
+    border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageToButton:frozen,
+PisakSpellerKey.PisakEmailSpellerMessageToKey:frozen,
+PisakSpellerPrediction.PisakEmailSpellerMessageToPrediction:frozen {
+    color: white;
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageToButton:lag_hilite,
+PisakSpellerKey.PisakEmailSpellerMessageToKey:lag_hilite,
+PisakSpellerPrediction.PisakEmailSpellerMessageToPrediction:lag_hilite {
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageToButton:active,
+PisakSpellerKey.PisakEmailSpellerMessageToKey:active,
+PisakSpellerPrediction.PisakEmailSpellerMessageToPrediction:active {
+    color: white;
+    border-image: url("grey_flat.png");
+}
+
+MxButton.PisakEmailSpellerMessageToButton:scanning,
+MxButton.PisakEmailSpellerMessageToKey:scanning,
+MxButton.PisakEmailSpellerMessageToPrediction:scanning {
+    color: white;
+    border-image: url("black_flat.png");
+}
+
+MxButton.PisakEmailSpellerMessageToButton:disabled,
+MxButton.PisakEmailSpellerMessageToKey:disabled,
+MxButton.PisakEmailSpellerMessageToPrediction:disabled {
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}

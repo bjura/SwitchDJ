@@ -3,6 +3,8 @@ Email application main module.
 """
 from pisak import launcher, handlers
 
+from pisak.email import address_book  #@UnusedImport
+
 
 def prepare_main_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")

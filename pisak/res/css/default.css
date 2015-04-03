@@ -1429,3 +1429,52 @@ MxButton.PisakEmailSpellerContactAddressPrediction:disabled {
     color: grey;
     border-image: url("grey_frame.png") 5;
 }
+
+MxProgressBar.PisakEmailViewerContactProgressBar {
+  border-image: url("black_flat.png");
+}
+
+MxProgressBarFill.PisakEmailViewerContactProgressBar {
+  border-image: url("cyan_flat.png");
+}
+
+MxLabel.PisakEmailViewerContactProgressBar {
+  font-family: Kelson Sans;
+  font-size: 30pt;
+  color: white;
+}
+
+PisakButton.PisakEmailViewerContactButton {
+  color: white;
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  font-weight: bold;
+  border-image: url("black_flat.png");
+}
+
+PisakButton.PisakEmailViewerContactButton:hover {
+  color: white;
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  font-weight: bold;
+  border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakEmailViewerContactButton:lag_hilite {
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailViewerContactButton:frozen {
+  border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailViewerContactButton:disabled{
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}
+
+MxLabel.PisakEmailViewerContactAlbumHeader {
+  font-size: 40pt;
+  font-family: Kelson Sans;
+  color: black;
+}

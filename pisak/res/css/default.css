@@ -1277,3 +1277,9 @@ PisakButton.PisakEmailButton:disabled{
 PisakFrame.PisakEmailAddressTile {
   border-image: url("black_frame.png") 5;
 }
+
+MxLabel.PisakEmailInboxTile {
+  font-family: Kelson Sans;
+  font-size: 20pt;
+  color: black;
+}

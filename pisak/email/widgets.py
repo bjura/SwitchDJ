@@ -21,3 +21,21 @@ class AddressTileSource(pager.DataSource):
         tile.connect("clicked", self.item_handler, address)
         tile.label_text = address
         return tile
+
+
+class InboxTileSource(pager.DataSource):
+    """
+    Data source that provides tiles representing messages in the inbox folder.
+    """
+    __gtype_name__ = "PisakEmailInboxTileSource"
+
+    def __init__(self):
+        super().__init__()
+
+    def _produce_item(self, message):
+        tile = widgets.PhotoTile()
+        self._prepare_item(tile)
+        tile.style_class = "PisakEmailInboxTile"
+        tile.hilite_tool = widgets.Aperture()
+        tile.connect("clicked", self.item_handler, message)
+        return tile

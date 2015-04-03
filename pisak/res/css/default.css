@@ -1479,9 +1479,22 @@ MxLabel.PisakEmailViewerContactAlbumHeader {
   color: black;
 }
 
-MxLabel.PisakBlogContact {
+MxLabel.PisakEmailContact {
   font-size: 35pt;
   font-family: Kelson Sans;
   color: black;
   font-weight: lighter;
+}
+
+MxLabel.PisakEmailSingleMessageTitle {
+  font-size: 30pt;
+  font-family: Kelson Sans;
+  color: black;
+  font-weight: lighter;
+}
+
+MxLabel.PisakEmailSingleMessage {
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  color: black;
 }

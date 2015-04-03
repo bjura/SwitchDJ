@@ -1,12 +1,12 @@
 '''
 Definitions of widgets specific to speller applet
 '''
-import threading
 import re
 
 from gi.repository import Clutter, Mx, GObject, Pango
 
-from pisak import unit, layout, properties, scanning, res, configurator, style
+from pisak import unit, layout, properties, scanning, res, configurator, \
+    style, text_tools
 from pisak.speller.prediction import predictor
 import pisak.widgets
 
@@ -669,30 +669,12 @@ class Key(pisak.widgets.Button, configurator.Configurable):
         self._target = value
 
 
-class Dictionary(GObject.GObject, properties.PropertyAdapter,
-                 configurator.Configurable):
+class Dictionary(text_tools.Predictor):
     """
-    Object that follows changes in the given target and updates its content
+    Object that follows changes in the text field and updates its content
     in a reaction to these changes.
-    
-    Properties:
-
-    * :attr:`target`
     """
     __gtype_name__ = "PisakSpellerDictionary"
-    __gsignals__ = {
-        "content_update": (
-            GObject.SIGNAL_RUN_FIRST, None, ()),
-        "processing_on": (
-            GObject.SIGNAL_RUN_FIRST, None, ())
-    }
-    __gproperties__ = {
-        "target": (
-            Text.__gtype__,
-            "target to follow",
-            "id of text box to follow",
-            GObject.PARAM_READWRITE)
-    }
 
     LAST_CONTEXT_SRC = """
        \s*  # greedy leading whitespace
@@ -704,16 +686,10 @@ class Dictionary(GObject.GObject, properties.PropertyAdapter,
 
     def __init__(self):
         super().__init__()
-        self.target = None
         self.basic_content = ['Chciałbym', 'Czy', 'Jak', 'Jestem',
                               'Nie', 'Niestety', 'Rzeczywiście',
                               'Super', 'Witam']  # this is subject to change, perhaps should be a class argument
-        self.content = []
         self.apply_props()
-
-    def get_suggestion(self, accuracy_level):
-        if accuracy_level < len(self.content):
-            return self.content[accuracy_level]
 
     def do_prediction(self, text, position):
         text_segment = text[0:position]
@@ -736,37 +712,6 @@ class Dictionary(GObject.GObject, properties.PropertyAdapter,
         context = Dictionary.LAST_CONTEXT.search(text)
         if context:
             return context.group(1)
-
-    def _update_content(self, *args):
-        self.emit("processing-on")
-        text = self.target.get_text()
-        position = self.target.get_cursor_position()
-        worker = threading.Thread(
-            target=self.do_prediction, args=(text, position), daemon=True)
-        worker.start()
-
-    def _follow_target(self):
-        if self.target is not None:
-            text_field = self.target.clutter_text
-            text_field.connect("text-changed", self._update_content)
-
-    def _stop_following_target(self):
-        try:
-            if self.target is not None:
-                text_field = self.target.clutter_text
-                text_field.disconnect_by_func("text-changed", self._update_content)
-        except AttributeError:
-            return None
-
-    @property
-    def target(self):
-        return self._target
-
-    @target.setter
-    def target(self, value):
-        self._stop_following_target()
-        self._target = value
-        self._follow_target()
 
 
 class Prediction(pisak.widgets.Button, configurator.Configurable):

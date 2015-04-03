@@ -14,6 +14,8 @@ class AddressTileSource(pager.DataSource):
     def _produce_item(self, address):
         tile = widgets.PhotoTile()
         self._prepare_item(tile)
+        frame = widgets.Frame()
+        tile.add_child(frame)
         tile.style_class = "PisakEmailAddressTile"
         tile.hilite_tool = widgets.Aperture()
         tile.connect("clicked", self.item_handler, address)

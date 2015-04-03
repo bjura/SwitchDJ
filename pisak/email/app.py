@@ -45,6 +45,30 @@ def prepare_address_book_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
 
 
+def prepare_contact_view(stage, script, data):
+    handlers.button_to_view(stage, script, "button_exit")
+
+
+def prepare_speller_contact_name_view(stage, script, data):
+    handlers.button_to_view(stage, script, "button_exit")
+
+
+def prepare_speller_contact_address_view(stage, script, data):
+    handlers.button_to_view(stage, script, "button_exit")
+
+
+def prepare_viewer_contact_library_view(stage, script, data):
+    handlers.button_to_view(stage, script, "button_exit")
+
+
+def prepare_viewer_contact_album_view(stage, script, data):
+    handlers.button_to_view(stage, script, "button_exit")
+
+
+def prepare_single_message_view(stage, script, data):
+    handlers.button_to_view(stage, script, "button_exit")
+
+
 if __name__ == "__main__":
     email_app = {
         "app": "email",
@@ -54,10 +78,16 @@ if __name__ == "__main__":
             ("drafts", prepare_drafts_view),
             ("inbox", prepare_inbox_view),
             ("sent", prepare_sent_view),
+            ("single_message", prepare_single_message_view),
             ("address_book", prepare_address_book_view),
+            ("contact", prepare_contact_view),
             ("speller_message_body", prepare_speller_message_body_view),
             ("speller_message_to", prepare_speller_message_to_view),
-            ("speller_message_subject", prepare_speller_message_subject_view)
+            ("speller_message_subject", prepare_speller_message_subject_view),
+            ("speller_contact_name", prepare_speller_contact_name_view),
+            ("speller_contact_address", prepare_speller_contact_address_view),
+            ("viewer_contact_library", prepare_viewer_contact_library_view),
+            ("viewer_contact_album", prepare_viewer_contact_album_view)
         ]
     }
     launcher.run(email_app)

@@ -1227,3 +1227,53 @@ MxButton.PisakEmailSpellerMessageSubjectPrediction:disabled {
     color: grey;
     border-image: url("grey_frame.png") 5;
 }
+
+MxProgressBar.PisakEmailProgressBar {
+  border-image: url("white_flat.png");
+}
+
+MxProgressBarFill.PisakEmailProgressBar {
+  border-image: url("cyan_flat.png");
+}
+
+MxLabel.PisakEmailProgressBar {
+  font-family: Kelson Sans;
+  font-size: 30pt;
+  color: black;
+}
+
+MxLabel.PisakEmailHeader {
+  font-family: Kelson Sans;
+  font-size: 25pt;
+  color: white;
+}
+
+PisakButton.PisakEmailButton {
+   color: black;
+   font-size: 15pt;
+   font-family: Kelson Sans;
+   font-weight: bold;
+   border-image: url("black_frame.png") 5;
+}
+
+PisakButton.PisakEmailButton:hover {
+   color: black;
+   border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakEmailButton:lag_hilite {
+   color: black;
+   border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailButton:toggled {
+}
+
+PisakButton.PisakEmailButton:disabled{
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}
+
+PisakFrame.PisakEmailAddressTile {
+  border-image: url("black_frame.png") 5;
+}

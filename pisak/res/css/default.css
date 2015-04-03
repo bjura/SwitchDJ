@@ -1160,3 +1160,70 @@ MxButton.PisakEmailSpellerMessageToPrediction:disabled {
     color: grey;
     border-image: url("grey_frame.png") 5;
 }
+
+PisakScrolledText.PisakEmailSpellerMessageSubjectText {
+    border-image: url("fence_frame.png");
+}
+
+MxLabel.PisakEmailSpellerMessageSubjectHeader {
+   color: black;
+   font-size: 35px;
+   font-family: Kelson Sans;
+}
+
+MxLabel.PisakEmailSpellerMessageSubjectText {
+    color: black;
+    font-size: 50px;
+    font-family: Kelson Sans;
+}
+
+PisakButton.PisakEmailSpellerMessageSubjectButton,
+PisakSpellerKey.PisakEmailSpellerMessageSubjectKey,
+PisakSpellerPrediction.PisakEmailSpellerMessageSubjectPrediction {
+    color: black;
+    font-size: 18pt;
+    font-family: Kelson Sans;
+    font-weight: bold;
+    border-image: url("black_frame.png") 5;
+}
+
+PisakButton.PisakEmailSpellerMessageSubjectButton:hover,
+PisakSpellerKey.PisakEmailSpellerMessageSubjectKey:hover,
+PisakSpellerPrediction.PisakEmailSpellerMessageSubjectPrediction:hover {
+    color: white;
+    border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageSubjectButton:frozen,
+PisakSpellerKey.PisakEmailSpellerMessageSubjectKey:frozen,
+PisakSpellerPrediction.PisakEmailSpellerMessageSubjectPrediction:frozen {
+    color: white;
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageSubjectButton:lag_hilite,
+PisakSpellerKey.PisakEmailSpellerMessageSubjectKey:lag_hilite,
+PisakSpellerPrediction.PisakEmailSpellerMessageSubjectPrediction:lag_hilite {
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakEmailSpellerMessageSubjectButton:active,
+PisakSpellerKey.PisakEmailSpellerMessageSubjectKey:active,
+PisakSpellerPrediction.PisakEmailSpellerMessageSubjectPrediction:active {
+    color: white;
+    border-image: url("grey_flat.png");
+}
+
+MxButton.PisakEmailSpellerMessageSubjectButton:scanning,
+MxButton.PisakEmailSpellerMessageSubjectKey:scanning,
+MxButton.PisakEmailSpellerMessageSubjectPrediction:scanning {
+    color: white;
+    border-image: url("black_flat.png");
+}
+
+MxButton.PisakEmailSpellerMessageSubjectButton:disabled,
+MxButton.PisakEmailSpellerMessageSubjectKey:disabled,
+MxButton.PisakEmailSpellerMessageSubjectPrediction:disabled {
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}

@@ -1,11 +1,18 @@
 """
 Email application main module.
 """
-from pisak import launcher
+from pisak import launcher, handlers
 
 
 def prepare_main_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(stage, script, "button_inbox", "email/inbox")
+    handlers.button_to_view(stage, script, "button_sent", "email/sent")
+    handlers.button_to_view(stage, script, "button_drafts", "email/drafts")
+    handlers.button_to_view(
+        stage, script, "button_address_book", "email/address_book")
+    handlers.button_to_view(
+        stage, script, "button_new_message", "email/speller_message_to")
 
 
 def prepare_drafts_view(stage, script, data):

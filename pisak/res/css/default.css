@@ -1289,3 +1289,9 @@ MxLabel.PisakEmailSentTile {
   font-size: 20pt;
   color: black;
 }
+
+MxLabel.PisakEmailDraftsTile {
+  font-family: Kelson Sans;
+  font-size: 20pt;
+  color: black;
+}

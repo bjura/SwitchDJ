@@ -18,31 +18,31 @@ def prepare_main_view(stage, script, data):
 
 
 def prepare_drafts_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 def prepare_inbox_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 def prepare_sent_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 def prepare_speller_message_content_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 def prepare_speller_message_subject_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 def prepare_speller_message_to_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 def prepare_address_book_view(stage, script, data):
-    pass
+    handlers.button_to_view(stage, script, "button_exit")
 
 
 if __name__ == "__main__":

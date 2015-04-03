@@ -114,6 +114,12 @@ credentials, blog address etc.
 HOME_BLOG_CONFIG = os.path.join(HOME_PISAK_DIR, "blog_config.ini")
 
 
+"""
+Path to a file where all the neccessary setting of an email account are stored.
+"""
+HOME_EMAIL_SETUP = os.path.join(HOME_PISAK_DIR, "email_setup.ini")
+
+
 #---------------------------
 
 # Default system directories

@@ -3,13 +3,7 @@ Email settings.
 """
 import configobj
 
-from pisak import res
-
-
-"""
-Path to a file where all the neccessary setting of an email account are stored.
-"""
-EMAIL_SETUP = res.get("email_setup.ini")
+from pisak import dirs
 
 
 def get_account_setup():
@@ -18,7 +12,7 @@ def get_account_setup():
 
     :returns: config object with email settings
     """
-    setup = configobj.ConfigObj(EMAIL_SETUP, encoding='UTF8')
+    setup = configobj.ConfigObj(dirs.HOME_EMAIL_SETUP, encoding='UTF8')
     encrypted = setup.get("password")
     if encrypted:
         setup["password"] = decrypt_password(encrypted)
@@ -38,7 +32,7 @@ def save_account_setup(server_address, user_address, port_out=587, port_in=993,
     :param key file: path to the file containing key
     :param certfile: path to the file containing certificate
     """
-    setup = configobj.ConfigObj(EMAIL_SETUP, encoding='UTF8')
+    setup = configobj.ConfigObj(dirs.HOME_EMAIL_SETUP, encoding='UTF8')
     setup["server_address"] = server_address
     setup["user_address"] = user_address
     setup["port_out"] = port_out

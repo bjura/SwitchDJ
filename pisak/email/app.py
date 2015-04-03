@@ -4,6 +4,9 @@ Email application main module.
 from pisak import launcher, handlers
 
 from pisak.email import address_book, widgets  #@UnusedImport
+import pisak.speller.handlers  #@UnusedImport
+import pisak.speller.widgets  #@UnusedImport
+import pisak.viewer.widgets  #@UnusedImport
 
 
 def prepare_main_view(stage, script, data):

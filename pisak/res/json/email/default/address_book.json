@@ -9,8 +9,6 @@
     {
         "id": "background_box",
         "type": "PisakBackgroundPattern",
-        "background-color": "rgba(0, 0, 0, 1)",
-        "rgba": "1, 1, 1, 0.3",
         "x-expand": true,
         "y-expand": true
     },
@@ -25,12 +23,16 @@
         "ratio-margin-bottom": 0.02,
         "ratio-spacing": 0.025,
         "orientation": "vertical",
-        "children": ["progress_bar", "middle_box_group"]
+        "children": ["progress_bar", "middle_box_group", "header"]
     },
     {
         "id": "header",
         "type": "MxLabel",
-        "style-class": "PisakEmailHeader"
+        "style-class": "PisakEmailHeader",
+		"text": "KONTAKTY",
+		"x-expand": true,
+        "margin-right": 100,
+        "x-align": "end"
     },
     {
         "id": "middle_box_group",

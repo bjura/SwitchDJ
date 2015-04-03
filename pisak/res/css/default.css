@@ -1229,7 +1229,7 @@ MxButton.PisakEmailSpellerMessageSubjectPrediction:disabled {
 }
 
 MxProgressBar.PisakEmailProgressBar {
-  border-image: url("white_flat.png");
+  border-image: url("black_flat.png");
 }
 
 MxProgressBarFill.PisakEmailProgressBar {
@@ -1245,7 +1245,7 @@ MxLabel.PisakEmailProgressBar {
 MxLabel.PisakEmailHeader {
   font-family: Kelson Sans;
   font-size: 25pt;
-  color: white;
+  color: black;
 }
 
 PisakButton.PisakEmailButton {

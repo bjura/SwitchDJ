@@ -3,7 +3,7 @@ Email application main module.
 """
 from pisak import launcher, handlers
 
-from pisak.email import address_book  #@UnusedImport
+from pisak.email import address_book, widgets  #@UnusedImport
 
 
 def prepare_main_view(stage, script, data):
@@ -29,7 +29,7 @@ def prepare_sent_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
 
 
-def prepare_speller_message_content_view(stage, script, data):
+def prepare_speller_message_body_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
 
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
             ("inbox", prepare_inbox_view),
             ("sent", prepare_sent_view),
             ("address_book", prepare_address_book_view),
-            ("speller_message_content", prepare_speller_message_content_view),
+            ("speller_message_body", prepare_speller_message_body_view),
             ("speller_message_to", prepare_speller_message_to_view),
             ("speller_message_subject", prepare_speller_message_subject_view)
         ]

@@ -18,7 +18,11 @@ def get_account_setup():
 
     :returns: config object with email settings
     """
-    return configobj.ConfigObj(EMAIL_SETUP, encoding='UTF8')
+    setup = configobj.ConfigObj(EMAIL_SETUP, encoding='UTF8')
+    encrypted = setup.get("password")
+    if encrypted:
+        setup["password"] = decrypt_password(encrypted)
+    return setup
 
 
 def save_account_setup(server_address, user_address, port_out=587, port_in=993,

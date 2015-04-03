@@ -1087,3 +1087,9 @@ MxLabel.PisakEmailTitle {
   color: black;
   font-weight: lighter;
 }
+
+MxLabel.PisakEmailAddressTile {
+  font-family: Kelson Sans;
+  font-size: 20pt;
+  color: black;
+}

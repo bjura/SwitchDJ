@@ -55,7 +55,7 @@ class AddressBook(text_tools.Predictor):
 
     def _book_lookup(self, feed):
         matched = [record for record in self.all if record.startswith(feed)]
-        not_matched = set(self.all) - set(match)
+        not_matched = set(self.all) - set(matched)
         # we do not care about sorting the not matched records, sorting of
         # the matched records is always ensured
         return matched + list(not_matched)

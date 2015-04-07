@@ -46,7 +46,8 @@
         "type": "MxLabel",
 		"style-class": "PisakEmailTitle",
 	    "x-align": "end",
-	    "x-expand": true
+	    "x-expand": true,
+        "text": "POCZTA EMAIL"
     },
     {
         "id": "menu_group",
@@ -65,8 +66,8 @@
 	    "x-align": "start",
         "x-expand": true,
         "y-align": "center",
-        "children": ["button_exit", "button_drafts", "button_sent",
-		     "button_inbox", "button_address_book", "button_new_message"]
+        "children": ["button_exit", "button_address_book", "button_drafts",
+          "button_sent", "button_inbox", "button_new_message"]
     },
 	{
 		"id": "button_new_message",
@@ -77,7 +78,7 @@
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "edytuj_opis"
 	},
 	{
 		"id": "button_address_book",
@@ -88,7 +89,7 @@
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "edytuj_zdjecie"
 	},
     {
         "id": "button_exit",
@@ -110,7 +111,7 @@
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "edytuj2"
     },
     {
         "id": "button_sent",
@@ -121,7 +122,7 @@
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "komentuj"
     },
     {
         "id": "button_inbox",
@@ -132,7 +133,7 @@
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "nawigator_ebook"
     },
     {
 	    "id": "photo_widget",
@@ -143,6 +144,6 @@
     },
     {
 	    "id": "photo",
-	    "type": "ClutterActor"
+	    "type": "MxImage"
     }
 ]

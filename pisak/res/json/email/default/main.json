@@ -32,7 +32,7 @@
         "x-expand": true,
 	    "orientation": "horizontal",
         "ratio-spacing": 0.001,
-        "children": ["photo_widget", "left_box"]
+        "children": ["photo", "left_box"]
     },
     {
         "id": "left_box",
@@ -136,14 +136,11 @@
         "icon-name": "nawigator_ebook"
     },
     {
-	    "id": "photo_widget",
-	    "type": "PisakBinLayout",
-	    "ratio-width": 0.3,
-        "ratio-height": 0.445,
-	    "children": ["photo"]
-    },
-    {
 	    "id": "photo",
-	    "type": "MxImage"
+	    "type": "PisakMenuHeader",
+        "ratio-width": 0.3,
+        "ratio-height": 0.445,
+        "color": "rgb(90, 110, 105)",
+        "name": "wyslij"
     }
 ]

@@ -68,13 +68,12 @@ void TobiiEyetracker::initialize()
         return;
     }
 
-    QString url(m_params["tobii_url"].value<QString>());
-    if(url.isEmpty())
-        url = getConnectedEyeTracker();
+    if(m_tobiiUrl.isEmpty())
+        m_tobiiUrl = getConnectedEyeTracker();
 
-    qDebug() << "Tobii URL:" << url;
+    qDebug() << "Tobii URL:" << m_tobiiUrl;
 
-    if(url.isEmpty())
+    if(m_tobiiUrl.isEmpty())
     {
         emit initialized(false, tr("no eyetracker detected"));
         return;
@@ -82,7 +81,7 @@ void TobiiEyetracker::initialize()
 
     tobiigaze_error_code error_code;
 
-    m_eye_tracker = tobiigaze_create(url.toUtf8().data(), &error_code);
+    m_eye_tracker = tobiigaze_create(m_tobiiUrl.toUtf8().data(), &error_code);
     if(error_code)
     {
         if(m_eye_tracker)
@@ -156,12 +155,12 @@ void TobiiEyetracker::shutdown()
     }
 }
 
-bool TobiiEyetracker::loadCalibration()
+bool TobiiEyetracker::loadConfig()
 {
     if(!m_eye_tracker)
         return false;
 
-    const QString fileName(getCalibrationFilePath());
+    const QString fileName(getBaseConfigPath() + ".bin");
 
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly))
@@ -198,12 +197,12 @@ bool TobiiEyetracker::loadCalibration()
     }
 }
 
-bool TobiiEyetracker::saveCalibration()
+bool TobiiEyetracker::saveConfig() const
 {
     if(!m_eye_tracker)
         return false;
 
-    const QString fileName(getCalibrationFilePath());
+    const QString fileName(getBaseConfigPath() + ".bin");
 
     tobiigaze_calibration calib;
     tobiigaze_error_code error_code;

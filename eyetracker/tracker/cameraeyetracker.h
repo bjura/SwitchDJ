@@ -22,13 +22,13 @@ public:
 
     Q_INVOKABLE QString getBackend() const override;
 
+    Q_INVOKABLE bool loadConfig() override;
+    Q_INVOKABLE bool saveConfig() const override;
+
     Q_INVOKABLE void runCameraSetup() override;
 
     Q_INVOKABLE bool startTracking() override;
     Q_INVOKABLE bool stopTracking() override;
-
-    Q_INVOKABLE bool loadCalibration() override;
-    Q_INVOKABLE bool saveCalibration() override;
 
 public slots:
     void initialize() override;
@@ -45,6 +45,7 @@ protected:
 private:
     bool addDataPoint(std::vector<cv::Point2d> & v, const cv::Point2d & pt);
 
+    int m_cameraIndex;
     Capture m_capture;
     FramePupilDetector m_pupilDetector;
 

@@ -88,10 +88,10 @@ ApplicationWindow {
                 return
             }
 
-            if(calibration.saveParameters()) {
-                console.log("tracker parameters saved")
+            if(calibration.saveConfig()) {
+                console.log("tracker config saved")
             } else {
-                console.log("error saving tracker parameters")
+                console.log("error saving tracker config")
             }
 
             infoText.visible = false
@@ -120,10 +120,10 @@ ApplicationWindow {
             trackingDot.visible = true
             exitText.visible = true
             exitText.focus = true
-            if(calibration.saveCalibration()) {
-                console.log("successfully saved calibration")
+            if(calibration.saveConfig()) {
+                console.log("successfully saved config")
             } else {
-                console.log("error saving calibration")
+                console.log("error saving config")
             }
             calibration.startTracking()
         }
@@ -179,10 +179,10 @@ ApplicationWindow {
 
         Keys.onPressed: {
             focus = false
-            if(calibration.loadParameters()) {
-                console.log("tracker parameters loaded")
+            if(calibration.loadConfig()) {
+                console.log("tracker config loaded")
             } else {
-                console.log("error loading tracker parameters")
+                console.log("error loading tracker config")
             }
             calibration.initialize()
         }

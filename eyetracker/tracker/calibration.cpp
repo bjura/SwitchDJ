@@ -79,14 +79,13 @@ bool EyeTrackerCalibration::estimateParameters(
 
     const size_t dataCounter = eyeData.size();
 
-    qDebug() << "Calibration data:";
+    qDebug() << "Screen points:";
     for(size_t i = 0; i < dataCounter; i++)
-    {
-        qDebug() << "calib point:"
-                 << calPointData[i].x << " " << calPointData[i].y
-                 << "- pupil pos:"
-                 << eyeData[i].x << " " <<  eyeData[i].y;
-    }
+        qDebug() << calPointData[i].x << " " << calPointData[i].y;
+
+    qDebug() << "Pupil positions:";
+    for(size_t i = 0; i < dataCounter; i++)
+        qDebug() << eyeData[i].x << " " <<  eyeData[i].y;
 
     if(dataCounter <= 0)
     {
@@ -163,4 +162,14 @@ void EyeTrackerCalibration::load(QSettings & settings)
     m_paramY[0] = settings.value("param_y_0", 0.0).toDouble();
     m_paramY[1] = settings.value("param_y_1", 0.0).toDouble();
     m_paramY[2] = settings.value("param_y_2", 0.0).toDouble();
+}
+
+void EyeTrackerCalibration::setToZero()
+{
+    m_paramX[0] = 0.0;
+    m_paramX[1] = 0.0;
+    m_paramX[2] = 0.0;
+    m_paramY[0] = 0.0;
+    m_paramY[1] = 0.0;
+    m_paramY[2] = 0.0;
 }

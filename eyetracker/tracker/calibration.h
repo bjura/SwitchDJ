@@ -21,6 +21,8 @@ public:
     void save(QSettings & settings) const;
     void load(QSettings & settings);
 
+    void setToZero();
+
 private:
     bool estimateParameters(const std::vector<cv::Point2d> & eyeData,
                             const std::vector<cv::Point2d> & calPointData);

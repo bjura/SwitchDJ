@@ -112,8 +112,8 @@ void FramePupilDetector::processFrame(cv::Mat & frame)
     if(m_mirrored)
         cv::flip(frame, frame, 1); // horizontal flip
 
-    if(m_equalizeHistogram)
-        frame = equalizeIntensity(frame);
+    //if(m_equalizeHistogram)
+    //    frame = equalizeIntensity(frame);
 
     frame.convertTo(frame, -1, m_contrast, m_brightness);
 
@@ -122,8 +122,8 @@ void FramePupilDetector::processFrame(cv::Mat & frame)
     cv::Mat monoFrame;
     cv::cvtColor(frame, monoFrame, CV_BGR2GRAY);
 
-    //if(m_equalizeHistogram)
-    //    cv::equalizeHist(monoFrame, monoFrame);
+    if(m_equalizeHistogram)
+        cv::equalizeHist(monoFrame, monoFrame);
 
     cv::Mat thresholded;
     // find areas darker than threshold
@@ -153,6 +153,16 @@ void FramePupilDetector::processFrame(cv::Mat & frame)
                    m_pupilX,
                    m_pupilY,
                    m_pupilSize);
+
+    /*
+    if(frame.cols == 0.0 || frame.rows == 0.0)
+        emit pupilData(false, -1, -1, 0);
+    else
+        emit pupilData(result == Ok,
+                       m_pupilX / double(frame.cols),
+                       m_pupilY / double(frame.rows),
+                       m_pupilSize);
+    */
 }
 
 FramePupilDetector::PupilDetectionResult FramePupilDetector::detect(const cv::Mat & frame,
@@ -161,10 +171,10 @@ FramePupilDetector::PupilDetectionResult FramePupilDetector::detect(const cv::Ma
     cv::Mat tmp;
     frame.copyTo(tmp);
 
-    const float xFrom = m_leftMargin * frame.cols;
-    const float xTo   = frame.cols * (1.0 - m_rightMargin);
-    const float yFrom = m_topMargin * frame.rows;
-    const float yTo   = frame.rows * (1.0 - m_bottomMargin);
+    const double xFrom = m_leftMargin * frame.cols;
+    const double xTo   = frame.cols * (1.0 - m_rightMargin);
+    const double yFrom = m_topMargin * frame.rows;
+    const double yTo   = frame.rows * (1.0 - m_bottomMargin);
 
     if(!drawFrame.empty())
     {
@@ -350,49 +360,49 @@ PupilDetectorSetupWindow::PupilDetectorSetupWindow(QWidget * parent)
     });
 
     connect(m_gui.contrastSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_contrastCoeff;
+        const double v = double(value) / m_contrastCoeff;
         m_gui.contrastValueLabel->setText(QString::number(v, 'f', 1));
         if(m_pupilDetector)
             m_pupilDetector->setContrast(v);
     });
 
     connect(m_gui.brightnessSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_brightnessCoeff;
+        const double v = double(value) / m_brightnessCoeff;
         m_gui.brightnessValueLabel->setText(QString::number(v, 'f', 0));
         if(m_pupilDetector)
             m_pupilDetector->setBrightness(v);
     });
 
     connect(m_gui.gammaSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_gammaCoeff;
+        const double v = double(value) / m_gammaCoeff;
         m_gui.gammaValueLabel->setText(QString::number(v, 'f', 1));
         if(m_pupilDetector)
             m_pupilDetector->setGamma(v);
     });
 
     connect(m_gui.marginTopSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_marginCoeff;
+        const double v = double(value) / m_marginCoeff;
         m_gui.marginTopValueLabel->setText(QString::number(v, 'f', 1));
         if(m_pupilDetector)
             m_pupilDetector->setTopMargin(v);
     });
 
     connect(m_gui.marginBottomSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_marginCoeff;
+        const double v = double(value) / m_marginCoeff;
         m_gui.marginBottomValueLabel->setText(QString::number(v, 'f', 1));
         if(m_pupilDetector)
             m_pupilDetector->setBottomMargin(v);
     });
 
     connect(m_gui.marginRightSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_marginCoeff;
+        const double v = double(value) / m_marginCoeff;
         m_gui.marginRightValueLabel->setText(QString::number(v, 'f', 1));
         if(m_pupilDetector)
             m_pupilDetector->setRightMargin(v);
     });
 
     connect(m_gui.marginLeftSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_marginCoeff;
+        const double v = double(value) / m_marginCoeff;
         m_gui.marginLeftValueLabel->setText(QString::number(v, 'f', 1));
         if(m_pupilDetector)
             m_pupilDetector->setLeftMargin(v);
@@ -411,14 +421,14 @@ PupilDetectorSetupWindow::PupilDetectorSetupWindow(QWidget * parent)
     });
 
     connect(m_gui.oblatenessLowSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_oblatenessCoeff;
+        const double v = double(value) / m_oblatenessCoeff;
         m_gui.oblatenessLowValueLabel->setText(QString::number(v, 'f', 2));
         if(m_pupilDetector)
             m_pupilDetector->setOblatenessLow(v);
     });
 
     connect(m_gui.oblatenessHighSlider, &QSlider::valueChanged, [&](int value){
-        const float v = float(value) / m_oblatenessCoeff;
+        const double v = double(value) / m_oblatenessCoeff;
         m_gui.oblatenessHighValueLabel->setText(QString::number(v, 'f', 2));
         if(m_pupilDetector)
             m_pupilDetector->setOblatenessHigh(v);

@@ -5,6 +5,7 @@
 
 CameraEyetracker::CameraEyetracker(QObject * parent)
     : Eyetracker(parent)
+    , m_cameraIndex(0)
     , m_captureThread(nullptr)
     , m_detectorThread(nullptr)
     , m_tracking(false)
@@ -61,31 +62,25 @@ QString CameraEyetracker::getBackend() const
 
 void CameraEyetracker::runCameraSetup()
 {
-    QVariant v = m_params["camera_index"];
-    bool ok;
-    v.toInt(&ok);
-    if(!ok)
-        v.setValue(0);
-
-    m_cameraSetupWindow.setVideoSource(&m_pupilDetector, v.toInt());
+    m_cameraSetupWindow.setVideoSource(&m_pupilDetector, m_cameraIndex);
     m_cameraSetupWindow.show();
 }
 
 void CameraEyetracker::cameraSetupDialogFinished(int result)
 {
     if(result == QDialog::Accepted)
+    {
+        saveConfig();
         emit cameraSetupFinished(true, QString());
+    }
     else
         emit cameraSetupFinished(false, tr("camera setup cancelled"));
 }
 
 void CameraEyetracker::setCameraIndex(int cameraIndex)
 {
-    m_params["camera_index"].setValue(cameraIndex);
-    if(m_captureThread)
-        QMetaObject::invokeMethod(&m_capture,
-                                  "start",
-                                  Q_ARG(int, cameraIndex));
+    m_cameraIndex = cameraIndex;
+    QMetaObject::invokeMethod(&m_capture, "start", Q_ARG(int, cameraIndex));
 }
 
 void CameraEyetracker::initialize()
@@ -93,9 +88,7 @@ void CameraEyetracker::initialize()
     // Everything runs at the same priority as the gui, so it won't supply useless frames.
     m_pupilDetector.setProcessAll(false);
 
-    QMetaObject::invokeMethod(&m_capture,
-                              "start",
-                              Q_ARG(int, m_params["camera_index"].value<int>()));
+    QMetaObject::invokeMethod(&m_capture, "start", Q_ARG(int, m_cameraIndex));
 
     emit initialized(true, QString());
 }
@@ -104,23 +97,21 @@ void CameraEyetracker::shutdown()
 {
 }
 
-bool CameraEyetracker::loadCalibration()
+bool CameraEyetracker::loadConfig()
 {
-    const QString fileName(getCalibrationFilePath());
-
-    QSettings settings(fileName, QSettings::IniFormat);
+    QSettings settings(getBaseConfigPath() + ".ini", QSettings::IniFormat);
     m_pupilDetector.loadSettings(settings);
     m_calibration.load(settings);
+    m_cameraIndex = settings.value("camera_index", 0).toInt();
     return settings.status() == QSettings::NoError;
 }
 
-bool CameraEyetracker::saveCalibration()
+bool CameraEyetracker::saveConfig() const
 {
-    const QString fileName(getCalibrationFilePath());
-
-    QSettings settings(fileName, QSettings::IniFormat);
+    QSettings settings(getBaseConfigPath() + ".ini", QSettings::IniFormat);
     m_pupilDetector.saveSettings(settings);
     m_calibration.save(settings);
+    settings.setValue("camera_index", m_cameraIndex);
     settings.sync();
     return settings.status() == QSettings::NoError;
 }
@@ -130,6 +121,8 @@ void CameraEyetracker::calibrationStart()
     m_calibrationData.clear();
     m_calibrating = true;
     m_calibrating_point = false;
+    m_calibration.setToZero();
+
     emit calibrationStarted(true, QString());
 
     // REMOVE ME: only for debug

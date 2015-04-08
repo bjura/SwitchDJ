@@ -29,13 +29,13 @@ public:
 
     Q_INVOKABLE QString getBackend() const override;
 
+    Q_INVOKABLE bool loadConfig() override;
+    Q_INVOKABLE bool saveConfig() const override;
+
     Q_INVOKABLE void runCameraSetup() override;
 
     Q_INVOKABLE bool startTracking() override;
     Q_INVOKABLE bool stopTracking() override;
-
-    Q_INVOKABLE bool loadCalibration() override;
-    Q_INVOKABLE bool saveCalibration() override;
 
 public slots:
     void initialize() override;
@@ -65,6 +65,7 @@ private slots:
 private:
     void cleanup();
 
+    QString m_tobiiUrl;
     tobiigaze_eye_tracker * m_eye_tracker = nullptr;
     EyetrackerEventLoopWorker * m_worker = nullptr;
 };

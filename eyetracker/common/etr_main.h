@@ -40,12 +40,6 @@ int etr_main(int argc, char * argv[])
                 else
                 {
                     std::cout << "tracker initialized" << std::endl;
-
-                    if(tracker.loadCalibration())
-                        std::cout << "calibration loaded" << std::endl;
-                    else
-                        std::cout << "error loading calibration" << std::endl;
-
                     tracker.startTracking();
                 }
             }
@@ -87,10 +81,10 @@ int etr_main(int argc, char * argv[])
             }
         );
 
-        if(tracker.loadParameters())
-            std::cout << "tracker parameters loaded" << std::endl;
+        if(tracker.loadConfig())
+            std::cout << "configuration loaded" << std::endl;
         else
-            std::cout << "error loading tracker parameters" << std::endl;
+            std::cout << "error loading configuration" << std::endl;
 
         tracker.initialize();
 

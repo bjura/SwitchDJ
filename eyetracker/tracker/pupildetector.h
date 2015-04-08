@@ -30,38 +30,38 @@ public:
     inline bool equalizeHistogram() const { return m_equalizeHistogram; }
     inline void setEqualizeHistogram(bool value) { m_equalizeHistogram = value; }
 
-    inline float contrast() const { return m_contrast; }
-    inline void setContrast(float value) { m_contrast = value; }
+    inline double contrast() const { return m_contrast; }
+    inline void setContrast(double value) { m_contrast = value; }
 
-    inline float brightness() const { return m_brightness; }
-    inline void setBrightness(float value) { m_brightness = value; }
+    inline double brightness() const { return m_brightness; }
+    inline void setBrightness(double value) { m_brightness = value; }
 
-    inline float gamma() const { return m_gamma; }
-    inline void setGamma(float value) { m_gamma = value; }
+    inline double gamma() const { return m_gamma; }
+    inline void setGamma(double value) { m_gamma = value; }
 
     inline int threshold() const { return m_threshold; }
     inline void setThreshold(int value) { m_threshold = value; }
 
-    inline float topMargin() const { return m_topMargin; }
-    inline void setTopMargin(float value)
+    inline double topMargin() const { return m_topMargin; }
+    inline void setTopMargin(double value)
     {
         m_topMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_bottomMargin);
     }
 
-    inline float bottomMargin() const { return m_bottomMargin; }
-    inline void setBottomMargin(float value)
+    inline double bottomMargin() const { return m_bottomMargin; }
+    inline void setBottomMargin(double value)
     {
         m_bottomMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_topMargin);
     }
 
-    inline float rightMargin() const { return m_rightMargin; }
-    inline void setRightMargin(float value)
+    inline double rightMargin() const { return m_rightMargin; }
+    inline void setRightMargin(double value)
     {
         m_rightMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_leftMargin);
     }
 
-    inline float leftMargin() const { return m_leftMargin; }
-    inline void setLeftMargin(float value)
+    inline double leftMargin() const { return m_leftMargin; }
+    inline void setLeftMargin(double value)
     {
         m_leftMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_rightMargin);
     }
@@ -72,11 +72,11 @@ public:
     inline int pointsMax() const { return m_pointsMax; }
     inline void setPointsMax(int value) { m_pointsMax = value; }
 
-    inline float oblatenessLow() const { return m_oblatenessLow; }
-    inline void setOblatenessLow(float value) { m_oblatenessLow = value; }
+    inline double oblatenessLow() const { return m_oblatenessLow; }
+    inline void setOblatenessLow(double value) { m_oblatenessLow = value; }
 
-    inline float oblatenessHigh() const { return m_oblatenessHigh; }
-    inline void setOblatenessHigh(float value) { m_oblatenessHigh = value; }
+    inline double oblatenessHigh() const { return m_oblatenessHigh; }
+    inline void setOblatenessHigh(double value) { m_oblatenessHigh = value; }
 
 signals:
     void pupilData(bool, double, double, double);
@@ -90,29 +90,29 @@ private:
     // image preprocessing parameters
     bool m_mirrored = true;
     bool m_equalizeHistogram = false;
-    float m_contrast = 1.0;
-    float m_brightness = 0.0;
-    float m_gamma = 1.0;
+    double m_contrast = 1.0;
+    double m_brightness = 0.0;
+    double m_gamma = 1.0;
     int m_threshold = 27;
 
     // search area margins - floats from 0.0 to 1.0
-    float m_topMargin    = 0.0;
-    float m_bottomMargin = 0.0;
-    float m_leftMargin   = 0.0;
-    float m_rightMargin  = 0.0;
+    double m_topMargin    = 0.0;
+    double m_bottomMargin = 0.0;
+    double m_leftMargin   = 0.0;
+    double m_rightMargin  = 0.0;
 
     // minimal and maximal number of points in contour
     unsigned int m_pointsMin = 25;
     unsigned int m_pointsMax = 690;
 
     // extra parameters
-    float m_oblatenessLow = 0.67;
-    float m_oblatenessHigh = 1.50;
+    double m_oblatenessLow = 0.67;
+    double m_oblatenessHigh = 1.50;
 
     // output data
-    float m_pupilX = -1.0;
-    float m_pupilY = -1.0;
-    float m_pupilSize = -1.0;
+    double m_pupilX = -1.0;
+    double m_pupilY = -1.0;
+    double m_pupilSize = -1.0;
 
     // pupil detection algorithm
     PupilDetectionResult detect(const cv::Mat & frame, cv::Mat & drawFrame);
@@ -139,11 +139,11 @@ protected:
 private:
     Ui::CameraSetupForm m_gui;
     QPointer<FramePupilDetector> m_pupilDetector;
-    const float m_marginCoeff = 100.0;
-    const float m_contrastCoeff = 100.0;
-    const float m_brightnessCoeff = 1.0;
-    const float m_gammaCoeff = 100.0;
-    const float m_oblatenessCoeff = 50.0;
+    const double m_marginCoeff = 100.0;
+    const double m_contrastCoeff = 100.0;
+    const double m_brightnessCoeff = 1.0;
+    const double m_gammaCoeff = 100.0;
+    const double m_oblatenessCoeff = 50.0;
 };
 
 #endif // PUPILDETECTOR_H

@@ -1,7 +1,7 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-#include <QDataStream>
+#include <QSettings>
 #include <opencv2/opencv.hpp>
 
 struct CalibrationPoint {
@@ -18,9 +18,9 @@ public:
 
     bool calibrate(const CalibrationData & calibrationData);
 
-    friend QDataStream & operator << (QDataStream & out, const EyeTrackerCalibration & painting);
-    friend QDataStream & operator >> (QDataStream & in, EyeTrackerCalibration & painting);
-    
+    void save(QSettings & settings) const;
+    void load(QSettings & settings);
+
 private:
     bool estimateParameters(const std::vector<cv::Point2d> & eyeData,
                             const std::vector<cv::Point2d> & calPointData);
@@ -31,8 +31,5 @@ private:
     double m_paramX[3] = { 0, 0, 0 };
     double m_paramY[3] = { 0, 0, 0 };
 };
-
-QDataStream & operator << (QDataStream & out, const EyeTrackerCalibration & painting);
-QDataStream & operator >> (QDataStream & in, EyeTrackerCalibration & painting);
 
 #endif // CALIBRATION_H

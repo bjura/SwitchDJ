@@ -6,94 +6,77 @@
 #include <QtWidgets>
 #include <QString>
 
-class PupilDetector
-{
-public:
-    enum Result { OK, NO_PUPIL_CANDIDATE, TOO_MANY_PUPIL_CANDIDATES };
-
-    Result detect(const cv::Mat & frame, cv::Mat & drawFrame);
-
-    // detection parameters
-    int threshold = 27;
-    int searchAreaHorizontal = 10;
-    int searchAreaVertical = 10;
-    unsigned int pointMin = 26;
-    unsigned int pointMax = 694;
-
-    // extra parameters
-    double oblatenessLow = 0.67;
-    double oblatenessHigh = 1.50;
-
-    // output data
-    double pupilX = -1;
-    double pupilY = -1;
-    double pupilSize = -1;
-
-private:
-    static constexpr size_t MAX_FIRST_CANDIDATES = 5;
-};
-
-QDataStream & operator << (QDataStream & out, const PupilDetector & painting);
-QDataStream & operator >> (QDataStream & in, PupilDetector & painting);
+#include <boost/algorithm/clamp.hpp>
 
 class FramePupilDetector : public FrameReceiver
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool grayscale READ isGrayscale WRITE setGrayscale)
-    Q_PROPERTY(bool drawDebug READ drawDebug WRITE setDrawDebug)
-    Q_PROPERTY(bool mirrored READ isMirrored WRITE setMirroring)
-
-    // detection parameters
-    Q_PROPERTY(int threshold READ getThreshold WRITE setThreshold)
-    Q_PROPERTY(int searchAreaVertical READ getSearchAreaVertical WRITE setSearchAreaVertical)
-    Q_PROPERTY(int searchAreaHorizontal READ getSearchAreaHorizontal WRITE setSearchAreaHorizontal)
-    Q_PROPERTY(int pointMin READ getPointMin WRITE setPointMin)
-    Q_PROPERTY(int pointMax READ getPointMax WRITE setPointMax)
-    Q_PROPERTY(double oblatenessLow READ getOblatenessLow WRITE setOblatenessLow)
-    Q_PROPERTY(double oblatenessHigh READ getOblatenessHigh WRITE setOblatenessHigh)
-
 public:
-    explicit FramePupilDetector(QObject * parent = 0)
-        : FrameReceiver(parent)
-        , m_grayscale(true)
-        , m_drawDebug(true)
-        , m_mirrored(false)
+    enum PupilDetectionResult { Ok, NoPupilCandidate, TooManyPupilCandidates };
+    enum PreviewType { PreviewColor, PreviewGrayscale, PreviewThreshold };
+
+    explicit FramePupilDetector(QObject * parent = 0);
+
+    void loadSettings(QSettings & settings);
+    void saveSettings(QSettings & settings) const;
+
+    inline PreviewType previewType() const { return m_previewType; }
+    inline void setPreviewType(PreviewType value) { m_previewType = value; }
+
+    inline bool mirrored() const { return m_mirrored; }
+    inline void setMirrored(bool value) { m_mirrored = value; }
+
+    inline bool equalizeHistogram() const { return m_equalizeHistogram; }
+    inline void setEqualizeHistogram(bool value) { m_equalizeHistogram = value; }
+
+    inline float contrast() const { return m_contrast; }
+    inline void setContrast(float value) { m_contrast = value; }
+
+    inline float brightness() const { return m_brightness; }
+    inline void setBrightness(float value) { m_brightness = value; }
+
+    inline float gamma() const { return m_gamma; }
+    inline void setGamma(float value) { m_gamma = value; }
+
+    inline int threshold() const { return m_threshold; }
+    inline void setThreshold(int value) { m_threshold = value; }
+
+    inline float topMargin() const { return m_topMargin; }
+    inline void setTopMargin(float value)
     {
+        m_topMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_bottomMargin);
     }
 
-    void serialize(QDataStream & stream);
-    bool deserialize(QDataStream & stream);
+    inline float bottomMargin() const { return m_bottomMargin; }
+    inline void setBottomMargin(float value)
+    {
+        m_bottomMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_topMargin);
+    }
 
-    inline bool isGrayscale() const { return m_grayscale; }
-    inline void setGrayscale(bool value) { m_grayscale = value; }
+    inline float rightMargin() const { return m_rightMargin; }
+    inline void setRightMargin(float value)
+    {
+        m_rightMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_leftMargin);
+    }
 
-    inline bool drawDebug() const { return m_drawDebug; }
-    inline void setDrawDebug(bool value) { m_drawDebug = value; }
+    inline float leftMargin() const { return m_leftMargin; }
+    inline void setLeftMargin(float value)
+    {
+        m_leftMargin = boost::algorithm::clamp(value, 0.0, 1.0 - m_rightMargin);
+    }
 
-    inline bool isMirrored() const { return m_mirrored; }
-    inline void setMirroring(bool value) { m_mirrored = value; }
+    inline int pointsMin() const { return m_pointsMin; }
+    inline void setPointsMin(int value) { m_pointsMin = value; }
 
-    inline int getThreshold() const { return m_pupilDetector.threshold; }
-    inline void setThreshold(int value) { m_pupilDetector.threshold = value; }
+    inline int pointsMax() const { return m_pointsMax; }
+    inline void setPointsMax(int value) { m_pointsMax = value; }
 
-    inline int getSearchAreaHorizontal() const { return m_pupilDetector.searchAreaHorizontal; }
-    inline void setSearchAreaHorizontal(int value) { m_pupilDetector.searchAreaHorizontal = value; }
+    inline float oblatenessLow() const { return m_oblatenessLow; }
+    inline void setOblatenessLow(float value) { m_oblatenessLow = value; }
 
-    inline int getSearchAreaVertical() const { return m_pupilDetector.searchAreaVertical; }
-    inline void setSearchAreaVertical(int value) { m_pupilDetector.searchAreaVertical = value; }
-
-    inline int getPointMin() const { return m_pupilDetector.pointMin; }
-    inline void setPointMin(int value) { m_pupilDetector.pointMin = value; }
-
-    inline int getPointMax() const { return m_pupilDetector.pointMax; }
-    inline void setPointMax(int value) { m_pupilDetector.pointMax = value; }
-
-    inline double getOblatenessLow() const { return m_pupilDetector.oblatenessLow; }
-    inline void setOblatenessLow(double value) { m_pupilDetector.oblatenessLow = value; }
-
-    inline double getOblatenessHigh() const { return m_pupilDetector.oblatenessHigh; }
-    inline void setOblatenessHigh(double value) { m_pupilDetector.oblatenessHigh = value; }
+    inline float oblatenessHigh() const { return m_oblatenessHigh; }
+    inline void setOblatenessHigh(float value) { m_oblatenessHigh = value; }
 
 signals:
     void pupilData(bool, double, double, double);
@@ -102,10 +85,38 @@ private:
     void processFrame(cv::Mat & frame) override;
 
 private:
-    PupilDetector m_pupilDetector;
-    bool m_grayscale;
-    bool m_drawDebug;
-    bool m_mirrored;
+    PreviewType m_previewType;
+
+    // image preprocessing parameters
+    bool m_mirrored = true;
+    bool m_equalizeHistogram = false;
+    float m_contrast = 1.0;
+    float m_brightness = 0.0;
+    float m_gamma = 1.0;
+    int m_threshold = 27;
+
+    // search area margins - floats from 0.0 to 1.0
+    float m_topMargin    = 0.0;
+    float m_bottomMargin = 0.0;
+    float m_leftMargin   = 0.0;
+    float m_rightMargin  = 0.0;
+
+    // minimal and maximal number of points in contour
+    unsigned int m_pointsMin = 25;
+    unsigned int m_pointsMax = 690;
+
+    // extra parameters
+    float m_oblatenessLow = 0.67;
+    float m_oblatenessHigh = 1.50;
+
+    // output data
+    float m_pupilX = -1.0;
+    float m_pupilY = -1.0;
+    float m_pupilSize = -1.0;
+
+    // pupil detection algorithm
+    PupilDetectionResult detect(const cv::Mat & frame, cv::Mat & drawFrame);
+    static constexpr size_t MAX_FIRST_CANDIDATES = 6;
 };
 
 class PupilDetectorSetupWindow : public QDialog
@@ -126,28 +137,13 @@ protected:
     void closeEvent(QCloseEvent * event) override;
 
 private:
-    void connectSignals();
-
-private:
     Ui::CameraSetupForm m_gui;
-    QPointer<Capture> m_capture;
     QPointer<FramePupilDetector> m_pupilDetector;
-    const double oblatenessUnit = 100.0;
-
-private slots:
-    void onGrayscaleCheckBoxStateChanged(int value);
-    void onDrawDebugCheckBoxStateChanged(int value);
-    void onMirrorCheckBoxStateChanged(int value);
-    void onThresholdSliderValueChanged(int value);
-    void onSearchAreaVerticalSliderValueChanged(int value);
-    void onSearchAreaHorizontalSliderValueChanged(int value);
-    void onPointMinSliderValueChanged(int value);
-    void onPointMaxSliderValueChanged(int value);
-    void onOblatenessLowSliderValueChanged(int value);
-    void onOblatenessHighSliderValueChanged(int value);
-    void onCameraIndexSpinBoxValueChanged(int value);
-    void onExitButtonClicked();
-    void onCalibrationButtonClicked();
+    const float m_marginCoeff = 100.0;
+    const float m_contrastCoeff = 100.0;
+    const float m_brightnessCoeff = 1.0;
+    const float m_gammaCoeff = 100.0;
+    const float m_oblatenessCoeff = 50.0;
 };
 
 #endif // PUPILDETECTOR_H

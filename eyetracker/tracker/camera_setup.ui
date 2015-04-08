@@ -109,10 +109,32 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="equalizeHistogramCheckBox">
          <property name="text">
-          <string>Show thresholded</string>
+          <string>Equalize histogram</string>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="previewTypeComboBox">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>Color</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Grayscale</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Thresholded</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>
@@ -133,12 +155,12 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>217</width>
-            <height>839</height>
+            <y>-7</y>
+            <width>242</width>
+            <height>846</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_14">
+          <layout class="QVBoxLayout" name="verticalLayout_15">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
@@ -164,17 +186,14 @@
              </item>
              <item>
               <widget class="QSlider" name="thresholdSlider">
+               <property name="minimum">
+                <number>1</number>
+               </property>
                <property name="maximum">
                 <number>255</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>20</number>
                </property>
               </widget>
              </item>
@@ -213,37 +232,24 @@
              <item>
               <widget class="QSlider" name="contrastSlider">
                <property name="minimum">
-                <number>-100</number>
+                <number>0</number>
                </property>
                <property name="maximum">
-                <number>100</number>
+                <number>200</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>20</number>
                </property>
               </widget>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="Line" name="line_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_13">
+            <layout class="QVBoxLayout" name="verticalLayout_14">
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
-                <widget class="QLabel" name="thresholdLabel_3">
+                <widget class="QLabel" name="thresholdLabel_4">
                  <property name="text">
                   <string>Brightness:</string>
                  </property>
@@ -264,19 +270,58 @@
              <item>
               <widget class="QSlider" name="brightnessSlider">
                <property name="minimum">
-                <number>-255</number>
+                <number>-100</number>
                </property>
                <property name="maximum">
-                <number>255</number>
+                <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_9">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <item>
+                <widget class="QLabel" name="thresholdLabel_3">
+                 <property name="text">
+                  <string>Gamma:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="gammaValueLabel">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QSlider" name="gammaSlider">
+               <property name="minimum">
+                <number>0</number>
                </property>
-               <property name="tickInterval">
-                <number>20</number>
+               <property name="maximum">
+                <number>200</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>
@@ -313,21 +358,15 @@
               </layout>
              </item>
              <item>
-              <widget class="QSlider" name="pointMinSlider">
+              <widget class="QSlider" name="pointsMinSlider">
                <property name="minimum">
-                <number>5</number>
+                <number>3</number>
                </property>
                <property name="maximum">
                 <number>500</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>100</number>
                </property>
               </widget>
              </item>
@@ -364,21 +403,15 @@
               </layout>
              </item>
              <item>
-              <widget class="QSlider" name="pointMaxSlider">
+              <widget class="QSlider" name="pointsMaxSlider">
                <property name="minimum">
                 <number>5</number>
                </property>
                <property name="maximum">
-                <number>500</number>
+                <number>1000</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>100</number>
                </property>
               </widget>
              </item>
@@ -398,12 +431,12 @@
                <item>
                 <widget class="QLabel" name="searchAreaVerticalLabel">
                  <property name="text">
-                  <string>Search Area Top:</string>
+                  <string>Margin Top:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="searchAreaTopValueLabel">
+                <widget class="QLabel" name="marginTopValueLabel">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -415,18 +448,12 @@
               </layout>
              </item>
              <item>
-              <widget class="QSlider" name="searchAreaTopSlider">
+              <widget class="QSlider" name="marginTopSlider">
                <property name="maximum">
                 <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>10</number>
                </property>
               </widget>
              </item>
@@ -446,12 +473,12 @@
                <item>
                 <widget class="QLabel" name="searchAreaVerticalLabel_2">
                  <property name="text">
-                  <string>Search Area Bottom:</string>
+                  <string>Margin Bottom:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="searchAreaBottomValueLabel">
+                <widget class="QLabel" name="marginBottomValueLabel">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -463,18 +490,12 @@
               </layout>
              </item>
              <item>
-              <widget class="QSlider" name="searchAreaBottomSlider">
+              <widget class="QSlider" name="marginBottomSlider">
                <property name="maximum">
                 <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>10</number>
                </property>
               </widget>
              </item>
@@ -494,12 +515,12 @@
                <item>
                 <widget class="QLabel" name="searchAreaHorizontalLabel">
                  <property name="text">
-                  <string>Search Area Left:</string>
+                  <string>Margin Left:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="searchAreaLeftValueLabel">
+                <widget class="QLabel" name="marginLeftValueLabel">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -511,18 +532,12 @@
               </layout>
              </item>
              <item>
-              <widget class="QSlider" name="searchAreaLeftSlider">
+              <widget class="QSlider" name="marginLeftSlider">
                <property name="maximum">
                 <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>10</number>
                </property>
               </widget>
              </item>
@@ -542,12 +557,12 @@
                <item>
                 <widget class="QLabel" name="searchAreaHorizontalLabel_2">
                  <property name="text">
-                  <string>Search Area Right:</string>
+                  <string>Margin Right:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="searchAreaRightValueLabel">
+                <widget class="QLabel" name="marginRightValueLabel">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -559,18 +574,12 @@
               </layout>
              </item>
              <item>
-              <widget class="QSlider" name="searchAreaRightSlider">
+              <widget class="QSlider" name="marginRightSlider">
                <property name="maximum">
                 <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>10</number>
                </property>
               </widget>
              </item>
@@ -612,16 +621,10 @@
                 <number>1</number>
                </property>
                <property name="maximum">
-                <number>200</number>
+                <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>50</number>
                </property>
               </widget>
              </item>
@@ -663,16 +666,10 @@
                 <number>1</number>
                </property>
                <property name="maximum">
-                <number>200</number>
+                <number>100</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="tickPosition">
-                <enum>QSlider::TicksBelow</enum>
-               </property>
-               <property name="tickInterval">
-                <number>50</number>
                </property>
               </widget>
              </item>
@@ -683,7 +680,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="calibrationButton">
+        <widget class="QPushButton" name="acceptButton">
          <property name="text">
           <string>Accept</string>
          </property>

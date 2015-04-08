@@ -108,26 +108,21 @@ bool CameraEyetracker::loadCalibration()
 {
     const QString fileName(getCalibrationFilePath());
 
-    QFile file(fileName);
-    if(!file.open(QIODevice::ReadOnly))
-        return false;
-
-    QDataStream in(&file);
-    return m_pupilDetector.deserialize(in);
+    QSettings settings(fileName, QSettings::IniFormat);
+    m_pupilDetector.loadSettings(settings);
+    m_calibration.load(settings);
+    return settings.status() == QSettings::NoError;
 }
 
 bool CameraEyetracker::saveCalibration()
 {
     const QString fileName(getCalibrationFilePath());
 
-    QFile file(fileName);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        return false;
-
-    QDataStream out(&file);
-    m_pupilDetector.serialize(out);
-
-    return true;
+    QSettings settings(fileName, QSettings::IniFormat);
+    m_pupilDetector.saveSettings(settings);
+    m_calibration.save(settings);
+    settings.sync();
+    return settings.status() == QSettings::NoError;
 }
 
 void CameraEyetracker::calibrationStart()

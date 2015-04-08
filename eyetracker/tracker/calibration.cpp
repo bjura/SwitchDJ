@@ -145,24 +145,22 @@ bool EyeTrackerCalibration::estimateParameters(
     return true;
 }
 
-QDataStream & operator << (QDataStream & out, const EyeTrackerCalibration & painting)
+void EyeTrackerCalibration::save(QSettings & settings) const
 {
-    out << painting.m_paramX[0]
-        << painting.m_paramX[1]
-        << painting.m_paramX[2]
-        << painting.m_paramY[0]
-        << painting.m_paramY[1]
-        << painting.m_paramY[2];
-    return out;
+    settings.setValue("param_x_0", m_paramX[0]);
+    settings.setValue("param_x_1", m_paramX[1]);
+    settings.setValue("param_x_2", m_paramX[2]);
+    settings.setValue("param_y_0", m_paramY[0]);
+    settings.setValue("param_y_1", m_paramY[1]);
+    settings.setValue("param_y_2", m_paramY[2]);
 }
 
-QDataStream & operator >> (QDataStream & in, EyeTrackerCalibration & painting)
+void EyeTrackerCalibration::load(QSettings & settings)
 {
-    in >> painting.m_paramY[2]
-       >> painting.m_paramY[1]
-       >> painting.m_paramY[0]
-       >> painting.m_paramX[2]
-       >> painting.m_paramX[1]
-       >> painting.m_paramX[0];
-    return in;
+    m_paramX[0] = settings.value("param_x_0", 0.0).toDouble();
+    m_paramX[1] = settings.value("param_x_1", 0.0).toDouble();
+    m_paramX[2] = settings.value("param_x_2", 0.0).toDouble();
+    m_paramY[0] = settings.value("param_y_0", 0.0).toDouble();
+    m_paramY[1] = settings.value("param_y_1", 0.0).toDouble();
+    m_paramY[2] = settings.value("param_y_2", 0.0).toDouble();
 }

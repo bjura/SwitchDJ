@@ -114,6 +114,12 @@ credentials, blog address etc.
 HOME_BLOG_CONFIG = os.path.join(HOME_PISAK_DIR, "blog_config.ini")
 
 
+"""
+Path to the file with email application address book.
+"""
+HOME_EMAIL_ADDRESS_BOOK = os.path.join(
+    HOME_PISAK_DIR, "email_address_book.ini")
+
 #---------------------------
 
 # Default system directories

@@ -18,7 +18,7 @@ class AddressBook(text_tools.Predictor):
         self.book = None
         self._load_book()
         self.basic_content = sorted([contact["address"]
-                for contact in self.book.values() if contact.get("address")])
+                for contact in self.book.values() if "address" in contact])
         self.apply_props()
 
     def add_contact(self, contact):
@@ -28,9 +28,8 @@ class AddressBook(text_tools.Predictor):
         :param contact: contact dictionary with optional 'name',
         'address' and 'photo' keys
         """
-        keys = self.book.keys()
-        contact_id = str(len(keys))
-        while contact_id in keys:
+        contact_id = str(len(self.book))
+        while contact_id in self.book:
             contact_id = str(int(contact_id + 1))
         self.book[contact_id] = contact
         self.book.write()
@@ -89,7 +88,7 @@ class AddressBook(text_tools.Predictor):
         return all
 
     def _edit_contact(self, contact_id, key, value):
-         if self.book.get(contact_id):
+         if contact_id in self.book:
             self.book[contact_id][key] = value
             self.book.write()
 
@@ -99,8 +98,8 @@ class AddressBook(text_tools.Predictor):
 
     def _book_lookup(self, feed):
         return sorted([contact["address"] for contact in self.book.values()
-                if (contact.get("address") and contact["address"].startswith(feed))
-                    or (contact.get("name") and contact["name"].startswith(feed))])
+                if ("address" in contact and contact["address"].startswith(feed))
+                    or ("name" in contact and contact["name"].startswith(feed))])
 
     def do_prediction(self, text, position):
         feed = text[0 : position]

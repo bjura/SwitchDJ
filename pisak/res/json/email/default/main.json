@@ -53,6 +53,7 @@
         "id": "menu_group",
         "type": "PisakScanningGroup",
         "children": ["menu_box"],
+        "scanning-hilite": true,
         "strategy": {
             "id": "menu_group_strategy",
             "type": "PisakRowStrategy"
@@ -72,7 +73,7 @@
 	{
 		"id": "button_new_message",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "NOWA WIADOMOŚĆ",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
@@ -83,7 +84,7 @@
 	{
 		"id": "button_address_book",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "KSIĄŻKA ADRESOWA",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
@@ -94,7 +95,7 @@
     {
         "id": "button_exit",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "PANEL STARTOWY",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
@@ -105,7 +106,7 @@
     {
         "id": "button_drafts",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "SZKICE",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
@@ -116,7 +117,7 @@
     {
         "id": "button_sent",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "WYSŁANE",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
@@ -127,7 +128,7 @@
     {
         "id": "button_inbox",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "ODEBRANE",
         "ratio-width": 0.5,
         "ratio-height": 0.10,

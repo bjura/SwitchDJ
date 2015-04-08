@@ -71,11 +71,11 @@
         "ratio-spacing": 0.015,
         "y-expand": true,
         "y-align": "end",
-        "children": ["button_start", "button_select_page", "button_next_page",
-                     "button_automatic"]
+        "children": ["button_exit", "button_back", "button_select_page",
+          "button_next_page", "button_automatic"]
     },
     {
-        "id": "button_start",
+        "id": "button_exit",
         "type": "PisakButton",
         "style-class": "PisakEmailViewerContactButton",
         "label": "PANEL STARTOWY",
@@ -83,6 +83,16 @@
         "ratio-height": 0.10,
         "icon-size": 50,
         "icon-name": "exit"
+    },
+    {
+        "id": "button_back",
+        "type": "PisakButton",
+        "style-class": "PisakEmailViewerContactButton",
+        "label": "POWRÓT",
+        "ratio-width": 0.24,
+        "ratio-height": 0.10,
+        "icon-size": 50,
+        "icon-name": "back"
     },
     {
         "id": "button_automatic",

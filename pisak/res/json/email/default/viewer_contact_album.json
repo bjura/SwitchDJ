@@ -78,7 +78,7 @@
         "ratio-spacing": 0.015,
         "y-expand": true,
         "y-align": "end",
-        "children": ["button_start", "button_library",  "button_select_page", "button_next_page",
+        "children": ["button_exit", "button_library",  "button_select_page", "button_next_page",
                      "button_automatic"]
     },
     {
@@ -92,7 +92,7 @@
         "icon-name": "bib"
     },
     {
-        "id": "button_start",
+        "id": "button_exit",
         "type": "PisakButton",
         "style-class": "PisakEmailViewerContactButton",
         "label": "PANEL STARTOWY",

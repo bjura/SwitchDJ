@@ -4,6 +4,7 @@ Email application main module.
 import time
 
 from pisak import launcher, handlers
+from pisak.viewer import model
 
 from pisak.email import address_book, widgets  #@UnusedImport
 import pisak.speller.handlers  #@UnusedImport
@@ -99,11 +100,24 @@ def prepare_speller_contact_address_view(stage, script, data):
 
 def prepare_viewer_contact_library_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
-
+    handlers.button_to_view(stage, script, "button_back", "email/contact")
+    tile_source = script.get_object("library_data")
+    tile_source.item_handler = lambda tile, album: stage.load_view(
+        "email/viewer_contact_album", {"album_id": album})
 
 def prepare_viewer_contact_album_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
-
+    handlers.button_to_view(
+        stage, script, "button_library", "email/viewer_contact_library")
+    album_id = data["album_id"]
+    library = model.get_library()
+    header = script.get_object("header")
+    header.set_text(library.get_category_by_id(album_id).name)
+    data_source = script.get_object("album_data")
+    def photo_tile_handler(tile, photo_id, album_id):
+        stage.load_view("email/contact")
+    data_source.item_handler = photo_tile_handler
+    data_source.data_set_id = album_id
 
 def prepare_single_message_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")

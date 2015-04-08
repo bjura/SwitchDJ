@@ -1,6 +1,8 @@
 """
 Email application main module.
 """
+import time
+
 from pisak import launcher, handlers
 
 from pisak.email import address_book, widgets  #@UnusedImport
@@ -22,14 +24,31 @@ def prepare_main_view(stage, script, data):
 
 def prepare_drafts_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(
+        stage, script, "button_new_message", "email/speller_message_subject")
+    handlers.button_to_view(stage, script, "button_back", "email/main")
+    date_widget = script.get_object("date")
+    today = "DATA:   " + time.strftime("%d-%m-%Y")
+    date_widget.set_text(today)
 
 
 def prepare_inbox_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
-
+    handlers.button_to_view(
+        stage, script, "button_new_message", "email/speller_message_subject")
+    handlers.button_to_view(stage, script, "button_back", "email/main")
+    date_widget = script.get_object("date")
+    today = "DATA:   " + time.strftime("%d-%m-%Y")
+    date_widget.set_text(today)
 
 def prepare_sent_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(
+        stage, script, "button_new_message", "email/speller_message_subject")
+    handlers.button_to_view(stage, script, "button_back", "email/main")
+    date_widget = script.get_object("date")
+    today = "DATA:   " + time.strftime("%d-%m-%Y")
+    date_widget.set_text(today)
 
 
 def prepare_speller_message_body_view(stage, script, data):
@@ -50,18 +69,32 @@ def prepare_speller_message_to_view(stage, script, data):
 
 def prepare_address_book_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(
+        stage, script, "button_new_contact", "email/contact")
+    handlers.button_to_view(stage, script, "button_back", "email/main")
+    date_widget = script.get_object("date")
+    today = "DATA:   " + time.strftime("%d-%m-%Y")
+    date_widget.set_text(today)
 
 
 def prepare_contact_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
-
+    handlers.button_to_view(stage, script, "button_back", "email/main")
+    handlers.button_to_view(stage, script, "button_edit_name",
+                            "email/speller_contact_name")
+    handlers.button_to_view(stage, script, "button_edit_address",
+                            "email/speller_contact_address")
+    handlers.button_to_view(stage, script, "button_edit_photo",
+                            "email/viewer_contact_library")
 
 def prepare_speller_contact_name_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(stage, script, "button_proceed", "email/contact")
 
 
 def prepare_speller_contact_address_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(stage, script, "button_proceed", "email/contact")
 
 
 def prepare_viewer_contact_library_view(stage, script, data):

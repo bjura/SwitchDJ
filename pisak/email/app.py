@@ -76,6 +76,17 @@ def prepare_address_book_view(stage, script, data):
     date_widget = script.get_object("date")
     today = "DATA:   " + time.strftime("%d-%m-%Y")
     date_widget.set_text(today)
+    data_source = script.get_object("data_source")
+    def on_contact_select(tile, contact):
+        """
+        On contact tile select.
+
+        :param tile: tile representing single contact
+        :param contact: contact dictionary
+        """
+        pass
+    data_source.item_handler =  lambda tile, contact: \
+        on_contact_select(tile, contact)
 
 
 def prepare_contact_view(stage, script, data):

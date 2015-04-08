@@ -76,7 +76,7 @@ class AddressBook(text_tools.Predictor):
         """
         self._edit_contact(contact_id, "address", address)
 
-    def list_book(self):
+    def list_all(self):
         """
         Get all contacts as a list of dictionaries with contact id as one of the keys.
 

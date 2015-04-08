@@ -43,6 +43,7 @@
         "id": "menu_group",
         "type": "PisakScanningGroup",
         "children": ["menu_box"],
+        "scanning-hilite": true,
         "strategy": {
             "id": "menu_group_strategy",
             "type": "PisakRowStrategy"
@@ -60,7 +61,7 @@
     {
         "id": "button_exit",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "PANEL STARTOWY",
         "ratio-width": 0.24,
         "ratio-height": 0.09,
@@ -70,8 +71,8 @@
     {
         "id": "button_back",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
-        "label": "STRONA TYTUŁOWA",
+        "style-class": "PisakEmailButton",
+        "label": "EKRAN GŁÓWNY",
         "ratio-width": 0.24,
         "ratio-height": 0.10,
         "icon-size": 50,
@@ -91,8 +92,8 @@
     {
         "id": "button_edit_address",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
-        "label": "EDYTUJ ADRES EMAIL",
+        "style-class": "PisakEmailButton",
+        "label": "EDYTUJ ADRES",
         "ratio-width": 0.24,
         "ratio-height": 0.10,
         "icon-size": 50,
@@ -101,8 +102,8 @@
     {
         "id": "button_edit_name",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
-        "label": "EDYTUJ IMIĘ I NAZWISKO",
+        "style-class": "PisakEmailButton",
+        "label": "EDYTUJ IMIĘ",
         "ratio-width": 0.24,
         "ratio-height": 0.10,
         "icon-size": 50,
@@ -111,7 +112,7 @@
     {
         "id": "button_edit_photo",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "EDYTUJ ZDJĘCIE",
         "ratio-width": 0.24,
         "ratio-height": 0.10,

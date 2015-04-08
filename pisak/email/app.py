@@ -17,7 +17,7 @@ def prepare_main_view(stage, script, data):
     handlers.button_to_view(
         stage, script, "button_address_book", "email/address_book")
     handlers.button_to_view(
-        stage, script, "button_new_message", "email/speller_message_to")
+        stage, script, "button_new_message", "email/speller_message_subject")
 
 
 def prepare_drafts_view(stage, script, data):
@@ -34,14 +34,18 @@ def prepare_sent_view(stage, script, data):
 
 def prepare_speller_message_body_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
-
+    handlers.button_to_view(stage, script, "button_proceed",
+                            "email/speller_message_to")
 
 def prepare_speller_message_subject_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(stage, script, "button_proceed",
+                            "email/speller_message_body")
 
 
 def prepare_speller_message_to_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(stage, script, "button_proceed", "email/sent")
 
 
 def prepare_address_book_view(stage, script, data):

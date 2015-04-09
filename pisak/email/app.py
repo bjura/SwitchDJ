@@ -84,7 +84,7 @@ def prepare_address_book_view(stage, script, data):
         :param tile: tile representing single contact
         :param contact: contact dictionary
         """
-        pass
+        tile.toggled = not tile.toggled
     data_source.item_handler =  lambda tile, contact: \
         on_contact_select(tile, contact)
 

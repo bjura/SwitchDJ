@@ -18,7 +18,10 @@ class AddressTileSource(pager.DataSource):
         tile = widgets.PhotoTile()
         self._prepare_item(tile)
         frame = widgets.Frame()
-        tile.add_child(frame)
+        frame.set_x_expand(False)
+        frame.set_y_expand(False)
+        frame.set_size(*tile.get_size())
+        tile.add_frame(frame)
         tile.style_class = "PisakEmailAddressTile"
         tile.hilite_tool = widgets.Aperture()
         tile.connect("clicked", self.item_handler, contact)

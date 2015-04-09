@@ -885,6 +885,9 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
 
     def __init__(self):
         super().__init__()
+        self._make_pointer_reactive()
+        self._init_box()
+        self._init_elements()
         self.frame = None
         self.hilite_tool = None
         self.preview_loading_width = 300
@@ -892,9 +895,6 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
         self.toggle_coeff = 0.6
         self._toggled = False
         self.scale_mode = Mx.ImageScaleMode.CROP
-        self._make_pointer_reactive()
-        self._init_box()
-        self._init_elements()
         self.prepare_style()
 
     @property
@@ -1039,7 +1039,7 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
             pisak.app.play_sound_effect('selection')
 
     def _toggle(self):
-        for element in self.get_children():
+        for element in [self]:
             element.set_size(*[dim * self.toggle_coeff for dim in element.get_size()])
 
     def _untoggle(self):

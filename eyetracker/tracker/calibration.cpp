@@ -2,12 +2,20 @@
 #include "calibration.h"
 #include <QDebug>
 
-// http://gazeparser.sourceforge.net/adv/principle.html
 cv::Point2d EyeTrackerCalibration::getGazePosition(const cv::Point2d & pupilPos)
 {
-    // return m_transform * pupilPos + m_translation;
-    return cv::Point2d(m_paramX[0] * pupilPos.x + m_paramX[1] * pupilPos.y + m_paramX[2],
-                       m_paramY[0] * pupilPos.x + m_paramY[1] * pupilPos.y + m_paramY[2]);
+    if(m_useHomography)
+    {
+        cv::Mat pos = (cv::Mat_<double>(3,1) << pupilPos.x, pupilPos.y, 1);
+        cv::Mat res = m_transform * pos;
+        //std::cout << "r: " << res << std::endl;
+        return cv::Point2d(res.at<double>(0), res.at<double>(1));
+    }
+    else
+    {
+        return cv::Point2d(m_paramX[0] * pupilPos.x + m_paramX[1] * pupilPos.y + m_paramX[2],
+                           m_paramY[0] * pupilPos.x + m_paramY[1] * pupilPos.y + m_paramY[2]);
+    }
 }
 
 bool EyeTrackerCalibration::calibrate(const CalibrationData & calibrationData)
@@ -26,7 +34,7 @@ bool EyeTrackerCalibration::calibrate(const CalibrationData & calibrationData)
     std::vector<cv::Point2d> eyePositions;
     std::vector<cv::Point2d> screenPositions;
 
-    if(0)
+    if(m_dataPreparationMethod == 0)
     {
         eyePositions.resize(totalCalibrationPointsNum);
         screenPositions.resize(totalCalibrationPointsNum);
@@ -51,7 +59,6 @@ bool EyeTrackerCalibration::calibrate(const CalibrationData & calibrationData)
         size_t i = 0;
         for(const auto & p: calibrationData)
         {
-            const auto screenPos = p.screenPoint;
             double mean_x = 0.0;
             double mean_y = 0.0;
             for(const auto & eyePos: p.eyePositions)
@@ -63,7 +70,7 @@ bool EyeTrackerCalibration::calibrate(const CalibrationData & calibrationData)
             mean_y /= p.eyePositions.size();
 
             eyePositions[i] = cv::Point2d(mean_x, mean_y);
-            screenPositions[i] = screenPos;
+            screenPositions[i] = p.screenPoint;
             i++;
         }
     }
@@ -93,53 +100,60 @@ bool EyeTrackerCalibration::estimateParameters(
         return false;
     }
 
-    cv::Mat IJ(dataCounter, 3, CV_64FC1); // positions of eye in video frame
-    cv::Mat X(dataCounter, 1, CV_64FC1); // positions of point on screen
-    cv::Mat Y(dataCounter, 1, CV_64FC1);
-
-    for(int i = 0; i < IJ.rows; i++)
+    // first calibration method
     {
-        double * Mi = IJ.ptr<double>(i);
-        Mi[0] = eyeData[i].x;
-        Mi[1] = eyeData[i].y;
-        Mi[2] = 1.0;
+        cv::Mat IJ(dataCounter, 3, CV_64FC1); // positions of eye in video frame
+        cv::Mat X(dataCounter, 1, CV_64FC1); // positions of point on screen
+        cv::Mat Y(dataCounter, 1, CV_64FC1);
+
+        for(int i = 0; i < IJ.rows; i++)
+        {
+            double * Mi = IJ.ptr<double>(i);
+            Mi[0] = eyeData[i].x;
+            Mi[1] = eyeData[i].y;
+            Mi[2] = 1.0;
+        }
+
+        cv::MatIterator_<double> it;
+
+        int i;
+        for(i = 0, it = X.begin<double>(); it != X.end<double>(); it++)
+        {
+            *it = calPointData[i].x;
+            i++;
+        }
+
+        for(i = 0, it = Y.begin<double>(); it != Y.end<double>(); it++)
+        {
+            *it = calPointData[i].y;
+            i++;
+        }
+
+        const cv::Mat PX = (IJ.t() * IJ).inv() * IJ.t() * X;
+        const cv::Mat PY = (IJ.t() * IJ).inv() * IJ.t() * Y;
+
+        //g_GX = IJ*PX;  //If calibration results are necessary ...
+        //g_GY = IJ*PY;
+
+        for(int i = 0; i < 3; i++)
+        {
+            const double * MiX = PX.ptr<double>(i);
+            const double * MiY = PY.ptr<double>(i);
+            m_paramX[i] = *MiX;
+            m_paramY[i] = *MiY;
+        }
+
+        qDebug() << "Calibration coeffs:";
+        qDebug() << m_paramX[0] << " " <<  m_paramX[1] << " " << m_paramX[2];
+        qDebug() << m_paramY[0] << " " <<  m_paramY[2] << " " << m_paramY[2];
     }
 
-    cv::MatIterator_<double> it;
-
-    int i;
-    for(i = 0, it = X.begin<double>(); it != X.end<double>(); it++)
+    // second calibration method
     {
-        *it = calPointData[i].x;
-        i++;
+        cv::Mat src(eyeData);
+        cv::Mat dst(calPointData);
+        m_transform = cv::findHomography(src, dst, cv::RANSAC);
     }
-
-    for(i = 0, it = Y.begin<double>(); it != Y.end<double>(); it++)
-    {
-        *it = calPointData[i].y;
-        i++;
-    }
-
-    const cv::Mat PX = (IJ.t() * IJ).inv() * IJ.t() * X;
-    const cv::Mat PY = (IJ.t() * IJ).inv() * IJ.t() * Y;
-
-    //g_GX = IJ*PX;  //If calibration results are necessary ...
-    //g_GY = IJ*PY;
-
-    //m_transform = cv::Matx22d();
-    //m_translation = cv::Vec2d(*PX.ptr<double>(2), *PY.ptr<double>(2));
-
-    for(int i = 0; i < 3; i++)
-    {
-        const double* MiX = PX.ptr<double>(i);
-        const double* MiY = PY.ptr<double>(i);
-        m_paramX[i] = *MiX;
-        m_paramY[i] = *MiY;
-    }
-
-    qDebug() << "Calibration coeffs:";
-    qDebug() << m_paramX[0] << " " <<  m_paramX[1] << " " << m_paramX[2];
-    qDebug() << m_paramY[0] << " " <<  m_paramY[2] << " " << m_paramY[2];
 
     return true;
 }
@@ -172,4 +186,6 @@ void EyeTrackerCalibration::setToZero()
     m_paramY[0] = 0.0;
     m_paramY[1] = 0.0;
     m_paramY[2] = 0.0;
+
+    m_transform = cv::Mat::zeros(3, 3, CV_64F);
 }

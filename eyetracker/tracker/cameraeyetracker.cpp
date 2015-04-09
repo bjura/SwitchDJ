@@ -31,9 +31,6 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
         SLOT(pupilData(bool, double, double, double))
     );
 
-    connect(&m_cameraSetupWindow, SIGNAL(finished(int)), this, SLOT(cameraSetupDialogFinished(int)));
-    connect(&m_cameraSetupWindow, SIGNAL(cameraIndexChanged(int)), this, SLOT(setCameraIndex(int)));
-
     m_pointCalibrationTimer.setSingleShot(true);
     connect(&m_pointCalibrationTimer, SIGNAL(timeout()), this, SLOT(pointCalibrationTimeout()));
 }
@@ -62,8 +59,15 @@ QString CameraEyetracker::getBackend() const
 
 void CameraEyetracker::runCameraSetup()
 {
-    m_cameraSetupWindow.setVideoSource(&m_pupilDetector, m_cameraIndex);
-    m_cameraSetupWindow.show();
+    if(m_cameraSetupWindow.isNull())
+    {
+        m_cameraSetupWindow = new PupilDetectorSetupWindow;
+        connect(m_cameraSetupWindow, SIGNAL(finished(int)), this, SLOT(cameraSetupDialogFinished(int)));
+        connect(m_cameraSetupWindow, SIGNAL(cameraIndexChanged(int)), this, SLOT(setCameraIndex(int)));
+    }
+
+    m_cameraSetupWindow->setVideoSource(&m_pupilDetector, m_cameraIndex);
+    m_cameraSetupWindow->show();
 }
 
 void CameraEyetracker::cameraSetupDialogFinished(int result)
@@ -205,6 +209,7 @@ bool CameraEyetracker::addDataPoint(std::vector<cv::Point2d> & v, const cv::Poin
         distances[i] = std::sqrt(dx * dx + dy * dy);
     }
 
+    // mean distance
     double meanDist = 0.0;
     std::for_each(std::begin(distances), std::end(distances), [&](const double val) {
         meanDist += val;
@@ -218,14 +223,15 @@ bool CameraEyetracker::addDataPoint(std::vector<cv::Point2d> & v, const cv::Poin
     });
     stdDevDist = std::sqrt(stdDevDist / (v.size() - 1));
 
+    // outliers cutoff
     const double maxDist = meanDist + stdDevDist * m_distStdDevCoeff;
 
-    qDebug() << "meanDist:" << meanDist << "+/-" << stdDevDist;
-    qDebug() << "maxDist:" << maxDist;
+    //qDebug() << "meanDist:" << meanDist << "+/-" << stdDevDist;
+    //qDebug() << "maxDist:" << maxDist;
 
-    qDebug() << "dist:";
-    for(auto d : distances)
-        qDebug() << d;
+    //qDebug() << "dist:";
+    //for(auto d : distances)
+    //    qDebug() << d;
 
     std::vector<size_t> removeIndexes;
     removeIndexes.reserve(distances.size());
@@ -233,9 +239,9 @@ bool CameraEyetracker::addDataPoint(std::vector<cv::Point2d> & v, const cv::Poin
         if(distances[i] >= maxDist)
             removeIndexes.push_back(i);
 
-    qDebug() << "removing:";
-    for(auto i : removeIndexes)
-        qDebug() << distances[i];
+    //qDebug() << "removing:";
+    //for(auto i : removeIndexes)
+    //    qDebug() << distances[i];
 
     for(int i = removeIndexes.size() - 1; i >= 0; i--)
         v.erase(v.begin() + removeIndexes[i]);
@@ -258,17 +264,17 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
 
     if(m_tracking)
     {
-        cv::Point2d pos = m_calibration.getGazePosition(pos);
-        if(boost::math::isnan(pos.x) || boost::math::isnan(pos.y))
-            pos = cv::Point2d(-1, -1);
-        const QPointF qpos(pos.x, pos.y);
+        cv::Point2d gazePos = m_calibration.getGazePosition(pos);
+        if(boost::math::isnan(gazePos.x) || boost::math::isnan(gazePos.y))
+            gazePos = cv::Point2d(-1, -1);
+        const QPointF qpos(gazePos.x, gazePos.y);
         qDebug() << "pos:" << qpos;
         emit gazeData(qpos, qpos);
     }
 
     if(m_calibrating && m_calibrating_point)
     {
-        qDebug() << "cm: " << pos.x << pos.y;
+        //qDebug() << "cm: " << pos.x << pos.y;
 
         std::vector<cv::Point2d> & v = m_calibrationData[m_calibrationData.size() - 1].eyePositions;
 

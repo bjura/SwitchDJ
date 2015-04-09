@@ -52,7 +52,7 @@ private:
     QPointer<QThread> m_captureThread;
     QPointer<QThread> m_detectorThread;
 
-    PupilDetectorSetupWindow m_cameraSetupWindow;
+    QPointer<PupilDetectorSetupWindow> m_cameraSetupWindow;
 
     bool m_tracking;
     bool m_calibrating;

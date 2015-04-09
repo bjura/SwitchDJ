@@ -27,11 +27,15 @@ private:
     bool estimateParameters(const std::vector<cv::Point2d> & eyeData,
                             const std::vector<cv::Point2d> & calPointData);
 
-    // cv::Matx22d m_transform;
-    // cv::Vec2d m_translation;
+    // method 1
+    cv::Mat m_transform;
 
+    // method 2
     double m_paramX[3] = { 0, 0, 0 };
     double m_paramY[3] = { 0, 0, 0 };
+
+    bool m_useHomography = true;
+    const int m_dataPreparationMethod = 1;
 };
 
 #endif // CALIBRATION_H

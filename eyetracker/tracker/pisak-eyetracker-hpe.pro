@@ -14,6 +14,7 @@ SOURCES += main.cpp \
     opencvcapture.cpp \
     pupildetector.cpp \
     ../common/eyetracker.cpp \
+    ../common/smoother.cpp \
     cameraeyetracker.cpp \
     calibration.cpp
 
@@ -22,6 +23,7 @@ HEADERS  += \
     pupildetector.h \
     ../common/etr_main.h \
     ../common/eyetracker.h \
+    ../common/smoother.h \
     cameraeyetracker.h \
     calibration.h
 

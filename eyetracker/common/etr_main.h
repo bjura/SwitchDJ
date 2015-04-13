@@ -11,7 +11,7 @@ template<typename EyeTrackerType>
 int etr_main(int argc, char * argv[])
 {
     bool trackingOnly = false;
-    const char* smoothingMethod = "ma";
+    const char* smoothingMethod = "custom";
     if(argc > 1)
     {
         for(int i = 1; i < argc; i++)

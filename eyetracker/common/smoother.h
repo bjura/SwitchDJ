@@ -10,7 +10,7 @@
 // https://msdn.microsoft.com/en-us/library/jj131429.aspx
 
 enum NoiseReductionMethod { SIMPLE_MOVING_AVERAGE, DOUBLE_MOVING_AVERAGE, MEDIAN, \
-                            SAVITZKY_GOLAY, KALMAN, DOUBLE_EXP };
+                            SAVITZKY_GOLAY, KALMAN, DOUBLE_EXP, CUSTOM };
 
 
 class EyeTrackerDataSmoother
@@ -23,7 +23,7 @@ public:
     void newPoint(cv::Point2d &point, int timestamp);
 
 protected:
-    int m_bufferSize = 10;
+    int m_bufferSize = 8;
 
     boost::circular_buffer<double> m_inputDataXBuffer;
     boost::circular_buffer<double> m_inputDataYBuffer;
@@ -78,13 +78,35 @@ public:
     ~DoubleExpSmoother();
 
 private:
-    double gamma = 0.7;
+    double gamma = 0.6;
     double alpha = 0.5;
 
-    std::vector<double> m_outputsXBuffer;
-    std::vector<double> m_outputsYBuffer;
-    std::vector<double> m_trendsXBuffer;
-    std::vector<double> m_trendsYBuffer;
+    double m_previousOutputX = 0.0;
+    double m_previousOutputY = 0.0;
+    double m_previousTrendX = 0.0;
+    double m_previousTrendY = 0.0;
+
+    void filter(cv::Point2d &point);
+};
+
+
+class CustomSmoother : public EyeTrackerDataSmoother
+{
+
+public:
+    CustomSmoother();
+    ~CustomSmoother();
+
+private:
+    double gamma = 0.4;
+    double alpha = 0.6;
+
+    double m_previousOutputX = 0.0;
+    double m_previousOutputY = 0.0;
+    double m_previousTrendX = 0.0;
+    double m_previousTrendY = 0.0;
+
+    double m_jitterThreshold = 0.7;
 
     void filter(cv::Point2d &point);
 };
@@ -128,6 +150,7 @@ public:
             {"double-ma", DOUBLE_MOVING_AVERAGE},
             {"median", MEDIAN},
             {"double-exp", DOUBLE_EXP},
+            {"custom", CUSTOM},
             {"savitzky-golay", SAVITZKY_GOLAY},
             {"kalman", KALMAN}
         };
@@ -144,6 +167,8 @@ public:
                 return new MedianSmoother();
             case DOUBLE_EXP:
                 return new DoubleExpSmoother();
+            case CUSTOM:
+                return new CustomSmoother();
             case SAVITZKY_GOLAY:
                 return new SavitzkyGolaySmoother();
             case KALMAN:

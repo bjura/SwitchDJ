@@ -5,7 +5,7 @@ CONFIG += c++11
 TARGET = tracker
 TEMPLATE = app
 
-LIBS += -lpthread -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_calib3d
+LIBS += -lpthread -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_calib3d -lopencv_video
 
 INCLUDEPATH += \
     ../common

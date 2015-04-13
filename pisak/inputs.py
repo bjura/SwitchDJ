@@ -1,6 +1,7 @@
 import subprocess
 import time
 
+import os
 import pisak
 from pisak import cursor, scanning, logger, handlers
 
@@ -43,14 +44,14 @@ INPUTS = {
     },
     "tobii": {
         "process": {
-            "command": "pisak-eyetracker-tobii"
+            "command": os.path.expanduser("~/pisak/eyetracker/build-pisak-eyetracker-tobii-Desktop-Debug/pisak-eyetracker-tobii --tracking")
         },
         "middleware": {
             "name": "sprite",
             "activator": "InputGroup.launch_sprite",
             "deactivator": "InputGroup.stop_sprite"
         }
-    }
+    },
 }
 
 
@@ -274,8 +275,10 @@ def run_input_process():
     _LOG.debug("Running external process {}...".format(command))
     process = subprocess.Popen(command.split(), shell=False,
              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    startup = eval(process_spec.get("startup"))
+    startup = process_spec.get("startup")
     if startup:
-        startup(process)
+        startup_func = eval(startup)
+        startup_func(process)
     _LOG.debug("Process {} was started up and is all ready now.".format(command))
+    pisak.input_process = process
     return process

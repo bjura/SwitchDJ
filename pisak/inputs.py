@@ -44,7 +44,7 @@ INPUTS = {
     },
     "tobii": {
         "process": {
-            "command": os.path.expanduser("~/pisak_history/eyetracker/build-pisak-eyetracker-tobii-Desktop-Debug/pisak-eyetracker-tobii --tracking")
+            "command": os.path.expanduser("~/pisak/eyetracker/build-pisak-eyetracker-tobii-Desktop-Debug/pisak-eyetracker-tobii --tracking")
         },
         "middleware": {
             "name": "sprite",

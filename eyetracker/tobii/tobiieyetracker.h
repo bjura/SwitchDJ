@@ -65,6 +65,8 @@ private slots:
 private:
     void cleanup();
 
+    QPointF calculateSinglePoint(QPointF right, QPointF left);
+
     QString m_tobiiUrl;
     tobiigaze_eye_tracker * m_eye_tracker = nullptr;
     EyetrackerEventLoopWorker * m_worker = nullptr;

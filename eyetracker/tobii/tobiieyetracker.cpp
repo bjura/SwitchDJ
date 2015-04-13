@@ -310,6 +310,28 @@ bool TobiiEyetracker::stopTracking()
     return false;
 }
 
+QPointF TobiiEyetracker::calculateSinglePoint(QPointF right, QPointF left)
+{
+    QPointF pt(-1, -1);
+    if(right.x() != -1 &&
+       right.y() != -1 &&
+       left.x() != -1 &&
+       left.y() != -1)
+    {
+        pt.setX(0.5 * (right.x() + left.x()));
+        pt.setY(0.5 * (right.y() + left.y()));
+    }
+    else if(right.x() != -1 && right.y() != -1)
+    {
+        pt = right;
+    }
+    else if(left.x() != -1 && left.y() != -1)
+    {
+        pt = left;
+    }
+    return pt;
+}
+
 // private implementation details
 
 void TobiiEyetracker::cleanup()
@@ -351,5 +373,7 @@ void TobiiEyetracker::privComputeAndSetCalibrationFinished(int error_code)
 
 void TobiiEyetracker::privGazeData(QPointF right, QPointF left)
 {
-    emit gazeData(right, left);
+    QPointF point = calculateSinglePoint(right, left);
+    m_smoother->newPoint(point);
+    emit gazeData(point);
 }

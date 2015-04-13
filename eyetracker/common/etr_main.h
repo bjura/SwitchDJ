@@ -1,17 +1,13 @@
-#include <smoother.h>
-
 #include <cstring>
 #include <iostream>
 
 #include <QApplication>
 #include <QtQml>
-#include <QDateTime>
 
 template<typename EyeTrackerType>
 int etr_main(int argc, char * argv[])
 {
     bool trackingOnly = false;
-    const char* smoothingMethod = "custom";
     if(argc > 1)
     {
         for(int i = 1; i < argc; i++)
@@ -19,10 +15,7 @@ int etr_main(int argc, char * argv[])
             if(std::strcmp(argv[i], "--tracking") == 0)
             {
                 trackingOnly = true;
-            }
-            if(std::strcmp(argv[i], "--smoothing-method") == 0 && i+1 <= argc)
-            {
-                smoothingMethod = argv[i+1];
+                break;
             }
         }
     }
@@ -31,9 +24,6 @@ int etr_main(int argc, char * argv[])
     {
         QCoreApplication app(argc, argv);
         EyeTrackerType tracker;
-
-        SmootherFactory factory;
-        EyeTrackerDataSmoother* smoother = factory.pickSmoother(smoothingMethod);
 
         QObject::connect(&tracker, &EyeTrackerType::initialized,
             [&tracker](bool success, QString errorMessage)
@@ -66,31 +56,9 @@ int etr_main(int argc, char * argv[])
         );
 
         QObject::connect(&tracker, &EyeTrackerType::gazeData,
-            [&smoother](QPointF right, QPointF left)
+            [](QPointF pt)
             {
-                cv::Point2d pt(-1, -1);
-                if(right.x() != -1 &&
-                   right.y() != -1 &&
-                   left.x() != -1 &&
-                   left.y() != -1)
-                {
-                    pt.x = 0.5 * (right.x() + left.x());
-                    pt.y = 0.5 * (right.y() + left.y());
-                }
-                else if(right.x() != -1 && right.y() != -1)
-                {
-                    pt.x = right.x();
-                    pt.y = right.y();
-                }
-                else if(left.x() != -1 && left.y() != -1)
-                {
-                    pt.x = left.x();
-                    pt.y = left.y();
-                }
-
-                smoother->newPoint(pt, QDateTime::currentMSecsSinceEpoch());
-
-                std::cout << "gaze_pos: " << pt.x << " " << pt.y << std::endl;
+                std::cout << "gaze_pos: " << pt.x() << " " << pt.y() << std::endl;
             }
         );
 

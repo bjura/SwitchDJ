@@ -1,4 +1,5 @@
 #include "cameraeyetracker.h"
+#include "smoother.h"
 
 #include <QFile>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -267,9 +268,10 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
         cv::Point2d gazePos = m_calibration.getGazePosition(pos);
         if(boost::math::isnan(gazePos.x) || boost::math::isnan(gazePos.y))
             gazePos = cv::Point2d(-1, -1);
-        const QPointF qpos(gazePos.x, gazePos.y);
+        QPointF qpos(gazePos.x, gazePos.y);
+        m_smoother->newPoint(qpos);
         qDebug() << "pos:" << qpos;
-        emit gazeData(qpos, qpos);
+        emit gazeData(qpos);
     }
 
     if(m_calibrating && m_calibrating_point)

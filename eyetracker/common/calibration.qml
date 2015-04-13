@@ -149,16 +149,8 @@ ApplicationWindow {
         }
 
         onGazeData: {
-            // console.log(right, left)
-            if(right.x !== -1 && right.y !== -1 &&
-               left.x !== -1 && left.y !== -1) {
-                var x = (right.x + left.x) / 2
-                var y = (right.y + left.y) / 2
-                trackingDot.moveTo(x, y)
-            } else if(right.x !== -1 && right.y !== -1) {
-                trackingDot.moveTo(right.x, right.y)
-            } else if(left.x !== -1 && left.y !== -1) {
-                trackingDot.moveTo(left.x, left.y)
+            if(point.x !== -1 && point.y !== -1) {
+                trackingDot.moveTo(point.x, point.y)
             }
         }
     }

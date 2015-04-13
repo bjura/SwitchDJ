@@ -5,6 +5,8 @@
 #include <QPointF>
 #include <QVariant>
 
+#include <smoother.h>
+
 class Eyetracker : public QObject
 {
     Q_OBJECT
@@ -37,7 +39,7 @@ signals:
     void shutdownCompleted(bool success, QString errorMessage);
     void cameraSetupFinished(bool success, QString errorMessage);
 
-    void gazeData(QPointF right, QPointF left);
+    void gazeData(QPointF point);
 
     void calibrationStarted(bool success, QString errorMessage);
     void calibrationStopped(bool success, QString errorMessage);
@@ -47,6 +49,13 @@ signals:
 protected:
     virtual const char * getBackendCodename() const = 0; // only lowercase ASCII, no spaces
     QString getBaseConfigPath() const;
+
+    EyeTrackerDataSmoother * m_smoother;
+
+private:
+    NoiseReductionMethod m_smoothingMethod;
+
+    void pickSmoother();
 };
 
 #endif // EYETRACKER_H

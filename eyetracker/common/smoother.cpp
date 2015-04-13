@@ -14,7 +14,6 @@ EyeTrackerDataSmoother::~EyeTrackerDataSmoother()
 
 void EyeTrackerDataSmoother::newPoint(QPointF &point)
 {
-    return;
     int timestamp = QDateTime::currentMSecsSinceEpoch();
 
     m_inputDataXBuffer.push_back(point.x());

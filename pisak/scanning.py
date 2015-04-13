@@ -66,7 +66,7 @@ class Scannable(object):
         raise NotImplementedError()
 
 
-class StylableScannable(object):
+class StylableScannable(Scannable):
     """
     Partial implementation of Scannable interface for stylable widgets.
     Hilighted and scanned widgets are marked with CSS pseudoclasses.

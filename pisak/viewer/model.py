@@ -1,3 +1,4 @@
+import os.path
 from pisak import dirs, res, media_library
 
 
@@ -8,7 +9,7 @@ ACCEPTED_TYPES = [
 LIBRARY_DIR = dirs.get_user_dir("pictures")
 
 
-FAVOURITE_PHOTOS_STORE = res.get("favourite_photos.ini")
+FAVOURITE_PHOTOS_STORE = os.path.join(dirs.HOME_PISAK_DIR, "favourite_photos.ini")
 
 
 FAVOURITE_PHOTOS_ALIAS = "ULUBIONE"

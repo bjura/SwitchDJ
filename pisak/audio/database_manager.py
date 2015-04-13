@@ -9,13 +9,13 @@ from sqlalchemy import Column, String, Table, ForeignKey, Integer, DateTime, \
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declarative_base
 
-from pisak import res
+from pisak import res, dirs
 
 
 
 _FAVOURITES_FOLDER_ALIAS = "ULUBIONE"
 
-_MUSIC_DB_PATH = res.get("music.db")
+_MUSIC_DB_PATH = os.path.join(dirs.HOME_PISAK_DIR, "music.db")
 
 _ENGINE_URL = "sqlite:///" + _MUSIC_DB_PATH
 

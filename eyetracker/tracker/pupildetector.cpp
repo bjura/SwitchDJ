@@ -275,21 +275,22 @@ FramePupilDetector::PupilDetectionResult FramePupilDetector::detect(const cv::Ma
             );
     }
 
-    std::array<double, MAX_FIRST_CANDIDATES> candidateSizes{{}};
-
+    // find candidate with largest size
+    int maxSizeIndex = 0;
+    double maxSize = -1.0;
     for(size_t i = 0; i < numCandidates; i++)
     {
-        const auto & size = firstCandidateRects[i].size;
-        // size if proportional to area
-        candidateSizes[i] = double(size.width) * double(size.height);
+        const auto & ellipseSize = firstCandidateRects[i].size;
+        // assume size is proportional to area
+        const double size = double(ellipseSize.width) * double(ellipseSize.height);
+        if(size > maxSize)
+        {
+            maxSizeIndex = i;
+            maxSize = size;
+        }
     }
 
-    // find candidate with largest size
-    const cv::RotatedRect pupilRect =
-            firstCandidateRects[
-                std::distance(candidateSizes.begin(),
-                              std::max_element(candidateSizes.begin(), candidateSizes.end()))
-            ];
+    const cv::RotatedRect pupilRect = firstCandidateRects[maxSizeIndex];
 
     if(!drawFrame.empty())
         drawPupil(drawFrame, pupilRect, CV_RGB(0, 255, 192), 2);

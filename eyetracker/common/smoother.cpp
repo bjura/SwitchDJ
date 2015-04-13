@@ -3,7 +3,9 @@
 #include <smoother.h>
 
 EyeTrackerDataSmoother::EyeTrackerDataSmoother()
-    : m_inputDataXBuffer(m_bufferSize)
+    : m_bufferSize(8)
+    , m_previousPointTime(0)
+    , m_inputDataXBuffer(m_bufferSize)
     , m_inputDataYBuffer(m_bufferSize)
 {
 }
@@ -88,6 +90,12 @@ void MedianSmoother::filter(QPointF &point)
 }
 
 DoubleExpSmoother::DoubleExpSmoother()
+    : gamma(0.6)
+    , alpha(0.5)
+    , m_previousOutputX(0.0)
+    , m_previousOutputY(0.0)
+    , m_previousTrendX(0.0)
+    , m_previousTrendY(0.0)
 {
 }
 
@@ -109,6 +117,13 @@ void DoubleExpSmoother::filter(QPointF &point)
 }
 
 CustomSmoother::CustomSmoother()
+    : gamma(0.6)
+    , alpha(0.5)
+    , m_previousOutputX(0.0)
+    , m_previousOutputY(0.0)
+    , m_previousTrendX(0.0)
+    , m_previousTrendY(0.0)
+    , m_jitterThreshold(0.7)
 {
 }
 

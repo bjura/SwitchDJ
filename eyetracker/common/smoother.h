@@ -26,8 +26,8 @@ public:
     void newPoint(QPointF &point);
 
 protected:
-    int m_previousPointTime = 0;
-    int m_bufferSize = 8;
+    int m_previousPointTime;
+    int m_bufferSize;
 
     boost::circular_buffer<double> m_inputDataXBuffer;
     boost::circular_buffer<double> m_inputDataYBuffer;
@@ -82,13 +82,13 @@ public:
     ~DoubleExpSmoother();
 
 private:
-    double gamma = 0.6;
-    double alpha = 0.5;
+    double gamma;
+    double alpha;
 
-    double m_previousOutputX = 0.0;
-    double m_previousOutputY = 0.0;
-    double m_previousTrendX = 0.0;
-    double m_previousTrendY = 0.0;
+    double m_previousOutputX;
+    double m_previousOutputY;
+    double m_previousTrendX;
+    double m_previousTrendY;
 
     void filter(QPointF &point);
 };
@@ -102,15 +102,15 @@ public:
     ~CustomSmoother();
 
 private:
-    double gamma = 0.4;
-    double alpha = 0.6;
+    double gamma;
+    double alpha;
 
-    double m_previousOutputX = 0.0;
-    double m_previousOutputY = 0.0;
-    double m_previousTrendX = 0.0;
-    double m_previousTrendY = 0.0;
+    double m_previousOutputX;
+    double m_previousOutputY;
+    double m_previousTrendX;
+    double m_previousTrendY;
 
-    double m_jitterThreshold = 0.7;
+    double m_jitterThreshold;
 
     void filter(QPointF &point);
 };

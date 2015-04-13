@@ -15,7 +15,7 @@ _LIBRARY_DIR = dirs.get_user_dir("music")
 _COVER_EXTENSIONS = [
     "jpg", "jpeg", "png", "bmp"]
 
-_LOAD_TRACKER = res.get("music_load_tracker.ini")
+_LOAD_TRACKER = os.path.join(dirs.HOME_PISAK_DIR, "music_load_tracker.ini")
 
 _FAKE_COVER_NAME = "fake_cover.png"
 

@@ -27,15 +27,22 @@ private:
     bool estimateParameters(const std::vector<cv::Point2d> & eyeData,
                             const std::vector<cv::Point2d> & calPointData);
 
+    bool m_useHomography = true;
+    enum DataPreprocessingType { NoPreprocessing, MeanPoint };
+    const DataPreprocessingType m_dataPreprocessingType = MeanPoint;
+
     // method 1
     cv::Mat m_transform;
+    void estimateParametersMethod1(
+        const std::vector<cv::Point2d> & eyeData,
+        const std::vector<cv::Point2d> & calPointData);
 
     // method 2
     double m_paramX[3] = { 0, 0, 0 };
     double m_paramY[3] = { 0, 0, 0 };
-
-    bool m_useHomography = true;
-    const int m_dataPreparationMethod = 1;
+    void estimateParametersMethod2(
+        const std::vector<cv::Point2d> & eyeData,
+        const std::vector<cv::Point2d> & calPointData);
 };
 
 #endif // CALIBRATION_H

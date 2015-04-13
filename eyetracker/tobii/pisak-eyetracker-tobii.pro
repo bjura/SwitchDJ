@@ -5,6 +5,7 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     ../common/eyetracker.cpp \
+    ../common/smoother.cpp \
     tobiieyetracker.cpp
 
 RESOURCES += qml.qrc
@@ -26,5 +27,6 @@ include(deployment.pri)
 HEADERS += \
     ../common/eyetracker.h \
     tobiieyetracker.h \
-    ../common/etr_main.h
+    ../common/etr_main.h \
+    ../common/smoother.h
 

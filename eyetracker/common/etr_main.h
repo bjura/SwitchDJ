@@ -11,7 +11,7 @@ template<typename EyeTrackerType>
 int etr_main(int argc, char * argv[])
 {
     bool trackingOnly = false;
-    const char* smoothingMethod = "simple-ma";
+    const char* smoothingMethod = "ma";
     if(argc > 1)
     {
         for(int i = 1; i < argc; i++)
@@ -31,9 +31,9 @@ int etr_main(int argc, char * argv[])
     {
         QCoreApplication app(argc, argv);
         EyeTrackerType tracker;
-        EyeTrackerDataSmoother smoother;
 
-        smoother.pickMethod(smoothingMethod);
+        SmootherFactory factory;
+        EyeTrackerDataSmoother* smoother = factory.pickSmoother(smoothingMethod);
 
         QObject::connect(&tracker, &EyeTrackerType::initialized,
             [&tracker](bool success, QString errorMessage)
@@ -88,7 +88,7 @@ int etr_main(int argc, char * argv[])
                     pt.y = left.y();
                 }
 
-                smoother.newPoint(pt, QDateTime::currentMSecsSinceEpoch());
+                smoother->newPoint(pt, QDateTime::currentMSecsSinceEpoch());
 
                 std::cout << "gaze_pos: " << pt.x << " " << pt.y << std::endl;
             }

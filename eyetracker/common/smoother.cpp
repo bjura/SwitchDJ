@@ -1,11 +1,8 @@
 #include <smoother.h>
 
-
 EyeTrackerDataSmoother::EyeTrackerDataSmoother()
     : m_inputDataXBuffer(m_bufferSize)
     , m_inputDataYBuffer(m_bufferSize)
-    , m_meansXBuffer(m_bufferSize)
-    , m_meansYBuffer(m_bufferSize)
 {
 }
 
@@ -17,39 +14,60 @@ void EyeTrackerDataSmoother::newPoint(cv::Point2d &point, int timestamp)
 {
     m_inputDataXBuffer.push_back(point.x);
     m_inputDataYBuffer.push_back(point.y);
-    switch (m_smoothingMethod)
-    {
-        case SIMPLE_MOVING_AVERAGE: filterSimpleMovingAverage(point);
-        case DOUBLE_MOVING_AVERAGE: filterDoubleMovingAverage(point);
-        case MEDIAN: filterMedian(point);
-        case SAVITZKY_GOLAY: filterSavitzkyGolay(point);
-    }
+    filter(point);
 }
 
-void EyeTrackerDataSmoother::pickMethod(const char* methodName)
+void EyeTrackerDataSmoother::filter(cv::Point2d &point)
 {
-    m_smoothingMethod = m_methodsMap[methodName];
 }
 
-void EyeTrackerDataSmoother::filterSimpleMovingAverage(cv::Point2d &point)
+MovingAverageSmoother::MovingAverageSmoother()
 {
-    point.x = std::accumulate(m_inputDataXBuffer.begin(), m_inputDataXBuffer.end(), 0) / m_bufferSize;
-    point.y = std::accumulate(m_inputDataYBuffer.begin(), m_inputDataYBuffer.end(), 0) / m_bufferSize;
 }
 
-void EyeTrackerDataSmoother::filterDoubleMovingAverage(cv::Point2d &point)
+MovingAverageSmoother::~MovingAverageSmoother()
 {
-    m_meansXBuffer.push_back(std::accumulate(m_inputDataXBuffer.begin(), m_inputDataXBuffer.end(), 0) / m_bufferSize);
-    m_meansYBuffer.push_back(std::accumulate(m_inputDataYBuffer.begin(), m_inputDataYBuffer.end(), 0) / m_bufferSize);
+}
 
-    double secondOrderMeanX = std::accumulate(m_meansXBuffer.begin(), m_meansXBuffer.end(), 0) / m_bufferSize;
-    double secondOrderMeanY = std::accumulate(m_meansYBuffer.begin(), m_meansYBuffer.end(), 0) / m_bufferSize;
+void MovingAverageSmoother::filter(cv::Point2d &point)
+{
+    point.x = std::accumulate(m_inputDataXBuffer.begin(), m_inputDataXBuffer.end(), 0.0) / m_bufferSize;
+
+    std::cout<< m_inputDataXBuffer[0]<< std::endl;
+    point.y = std::accumulate(m_inputDataYBuffer.begin(), m_inputDataYBuffer.end(), 0.0) / m_bufferSize;
+}
+
+DoubleMovingAverageSmoother::DoubleMovingAverageSmoother()
+    : m_meansXBuffer(m_bufferSize)
+    , m_meansYBuffer(m_bufferSize)
+{
+}
+
+DoubleMovingAverageSmoother::~DoubleMovingAverageSmoother()
+{
+}
+
+void DoubleMovingAverageSmoother::filter(cv::Point2d &point)
+{
+    m_meansXBuffer.push_back(std::accumulate(m_inputDataXBuffer.begin(), m_inputDataXBuffer.end(), 0.0) / m_bufferSize);
+    m_meansYBuffer.push_back(std::accumulate(m_inputDataYBuffer.begin(), m_inputDataYBuffer.end(), 0.0) / m_bufferSize);
+
+    double secondOrderMeanX = std::accumulate(m_meansXBuffer.begin(), m_meansXBuffer.end(), 0.0) / m_bufferSize;
+    double secondOrderMeanY = std::accumulate(m_meansYBuffer.begin(), m_meansYBuffer.end(), 0.0) / m_bufferSize;
 
     point.x = 2 * m_meansXBuffer.back() - secondOrderMeanX;
     point.y = 2 * m_meansYBuffer.back() - secondOrderMeanY;
 }
 
-void EyeTrackerDataSmoother::filterMedian(cv::Point2d &point)
+MedianSmoother::MedianSmoother()
+{
+}
+
+MedianSmoother::~MedianSmoother()
+{
+}
+
+void MedianSmoother::filter(cv::Point2d &point)
 {
     std::nth_element(m_inputDataXBuffer.begin(), m_inputDataXBuffer.begin() + m_bufferSize/2, m_inputDataXBuffer.end());
     std::nth_element(m_inputDataYBuffer.begin(), m_inputDataYBuffer.begin() + m_bufferSize/2, m_inputDataYBuffer.end());
@@ -58,6 +76,81 @@ void EyeTrackerDataSmoother::filterMedian(cv::Point2d &point)
     point.y = m_inputDataYBuffer[m_bufferSize/2];
 }
 
-void EyeTrackerDataSmoother::filterSavitzkyGolay(cv::Point2d &point)
+DoubleExpSmoother::DoubleExpSmoother()
+    : m_outputsXBuffer()
+    , m_outputsYBuffer()
+    , m_trendsXBuffer()
+    , m_trendsYBuffer()
+{
+}
+
+DoubleExpSmoother::~DoubleExpSmoother()
+{
+}
+
+void DoubleExpSmoother::filter(cv::Point2d &point)
+{
+    double newTrendX = 0;
+    double newTrendY = 0;
+    if (m_trendsXBuffer.size() >= 1 && m_outputsXBuffer.size() >= 1)
+    {
+        point.x = alpha*point.x + (1 - alpha)*(m_outputsXBuffer.back() + m_trendsXBuffer.back());
+        point.y = alpha*point.y + (1 - alpha)*(m_outputsYBuffer.back() + m_trendsYBuffer.back());
+        newTrendX = gamma*(point.x - m_outputsXBuffer.back()) + (1 - gamma)*m_trendsXBuffer.back();
+        newTrendY = gamma*(point.y - m_outputsYBuffer.back()) + (1 - gamma)*m_trendsYBuffer.back();
+
+    }
+    m_trendsXBuffer.push_back(newTrendX);
+    m_trendsYBuffer.push_back(newTrendY);
+    m_outputsXBuffer.push_back(point.x);
+    m_outputsYBuffer.push_back(point.y);
+}
+
+ KalmanSmoother::KalmanSmoother()
+    : m_filter(4, 2, 0)
+    , m_input(2, 0)
+{
+    setUp();
+}
+
+void KalmanSmoother::setUp()
+{
+    m_filter.transitionMatrix = *(cv::Mat_<float>(4, 4) << 1,0,1,0,  0,1,0,1,  0,0,1,0,  0,0,0,1);
+    m_input.setTo(cv::Scalar(0));
+    m_filter.statePre.at<float>(0) = m_inputDataXBuffer.back();
+    m_filter.statePre.at<float>(1) = m_inputDataYBuffer.back();
+    m_filter.statePre.at<float>(2) = 0;
+    m_filter.statePre.at<float>(3) = 0;
+    cv::setIdentity(m_filter.measurementMatrix);
+    cv::setIdentity(m_filter.processNoiseCov, cv::Scalar::all(1e-4));
+    cv::setIdentity(m_filter.measurementNoiseCov, cv::Scalar::all(1e-1));
+    cv::setIdentity(m_filter.errorCovPost, cv::Scalar::all(.1));
+}
+
+KalmanSmoother::~KalmanSmoother()
+{
+}
+
+void KalmanSmoother::filter(cv::Point2d &point)
+{
+    cv::Mat prediction = m_filter.predict();
+
+    m_input(0) = point.x;
+    m_input(1) = point.y;
+
+    cv::Mat estimation = m_filter.correct(m_input);
+    point.x = estimation.at<float>(0);
+    point.y = estimation.at<float>(1);
+}
+
+SavitzkyGolaySmoother::SavitzkyGolaySmoother()
+{
+}
+
+SavitzkyGolaySmoother::~SavitzkyGolaySmoother()
+{
+}
+
+void SavitzkyGolaySmoother::filter(cv::Point2d &point)
 {
 }

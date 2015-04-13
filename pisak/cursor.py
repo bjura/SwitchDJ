@@ -7,16 +7,15 @@ import time
 from gi.repository import GObject, Clutter
 import sys
 
-from pisak import scanning, configurator, layout
+import pisak
+from pisak import scanning, configurator, layout, unit, logger
+
+_LOG = logger.getLogger(__name__)
 
 
 class Sprite(layout.Bin, configurator.Configurable):
     __gtype_name__ = "PisakSprite"
 
-    __gsignals__ = {
-        "new-coords": (GObject.SIGNAL_RUN_FIRST, None, (int, int,))
-    }
-    
     __gproperties__ = {
         "timeout": (
             GObject.TYPE_UINT,
@@ -39,9 +38,11 @@ class Sprite(layout.Bin, configurator.Configurable):
         self.clickables = None
         self.hover_start = None
         self.hover_actor = None
+        self.coords = (0, 0)
         self.apply_props()
+        self.set_x_expand(True)
+        self.set_y_expand(True)
         self.container.connect("allocation-changed", self._rescan)
-        self.connect("new-coords", self.on_new_coords)
         self.worker = threading.Thread(target=self.work, daemon=True)
         self.worker.start()
 
@@ -49,7 +50,7 @@ class Sprite(layout.Bin, configurator.Configurable):
         self.sprite = Clutter.Actor()
         self.sprite.set_size(20, 20)
         self.sprite.set_background_color(Clutter.Color.new(255, 255, 0, 255))
-        self.sprite.set_depth(10.0)
+        self.sprite.set_depth(100)
         self.add_actor(self.sprite)
 
     @property
@@ -69,11 +70,15 @@ class Sprite(layout.Bin, configurator.Configurable):
         self._locked = value
     
     def read_coords(self):
-        line = sys.stdin.readline()
+        line = pisak.input_process.stdout.readline()
+        line = line.decode('utf-8')
         try:
             fields = line.split(" ")
-            coords = int(fields[0]), int(fields[1])
-            return coords
+            if fields[0] == "gaze_pos:" and '-' not in fields[1] and '-' not in fields[2]:
+                coords = float(fields[1].strip()) * unit.size_pix.width, float(fields[2].strip()) * unit.size_pix.height
+                coords = int(coords[0]), int(coords[1])
+                self.coords = coords
+            return self.coords
         except:
             raise Exception("Protocol error")
     
@@ -93,6 +98,7 @@ class Sprite(layout.Bin, configurator.Configurable):
                 clickables.append(current)
             to_scan = to_scan + current.get_children()
         self.clickables = clickables
+        _LOG.debug("clickables: {}".format(clickables))
     
     def find_actor(self, coords):
         if self.clickables is None:
@@ -104,7 +110,7 @@ class Sprite(layout.Bin, configurator.Configurable):
                 return clickable
         return None
 
-    def on_new_coords(self, event, x, y):
+    def on_new_coords(self, x, y):
         coords = (x, y)
         self.update_sprite(coords)
         actor = self.find_actor(coords)
@@ -126,7 +132,7 @@ class Sprite(layout.Bin, configurator.Configurable):
                 self.hover_actor = None
 
     def work(self):
-        time.sleep(1)
         while True:
             x, y = self.read_coords()
-            self.emit("new-coords", x, y)
+            Clutter.threads_add_idle(900, self.on_new_coords, x, y)
+            time.sleep(0.01)

@@ -276,21 +276,16 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
     {
         //qDebug() << "cm: " << pos.x << pos.y;
 
-        std::vector<cv::Point2d> & v = m_calibrationData[m_calibrationData.size() - 1].eyePositions;
+        // append new eye positions to the last calibration point
+        std::vector<cv::Point2d> & eyePositions =
+            m_calibrationData[m_calibrationData.size() - 1].eyePositions;
 
-        bool gotEnoughPoints;
-        if(1)
-            gotEnoughPoints = addDataPoint(v, pos);
-        else
-        {
-            v.push_back(pos);
-            gotEnoughPoints = v.size() > 15;
-        }
+        const bool gotEnoughPoints = addDataPoint(eyePositions, pos);
 
         if(gotEnoughPoints)
         {
-            //for(size_t i = 0; i < v.size(); i++)
-            //    qDebug() << v[i].x << v[i].y;
+            //for(size_t i = 0; i < eyePositions.size(); i++)
+            //    qDebug() << eyePositions[i].x << eyePositions[i].y;
             m_calibrating_point = false;
             m_pointCalibrationTimer.stop();
             emit pointCalibrated(true, QString());

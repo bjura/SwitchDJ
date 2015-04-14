@@ -373,7 +373,7 @@ void TobiiEyetracker::privComputeAndSetCalibrationFinished(int error_code)
 
 void TobiiEyetracker::privGazeData(QPointF right, QPointF left)
 {
-    QPointF point = calculateSinglePoint(right, left);
-    m_smoother->newPoint(point);
-    emit gazeData(point);
+    QPointF gazePos = calculateSinglePoint(right, left);
+    cv::Point2d smoothedPoint = m_smoother->filter(cv::Point2d(gazePos.x(), gazePos.y()));
+    emit gazeData(QPointF(smoothedPoint.x, smoothedPoint.y));
 }

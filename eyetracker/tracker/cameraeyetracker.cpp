@@ -268,8 +268,10 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
         cv::Point2d gazePos = m_calibration.getGazePosition(pos);
         if(boost::math::isnan(gazePos.x) || boost::math::isnan(gazePos.y))
             gazePos = cv::Point2d(-1, -1);
-        QPointF qpos(gazePos.x, gazePos.y);
-        m_smoother->newPoint(qpos);
+
+        cv::Point2d smoothedPos = m_smoother->filter(gazePos);
+
+        QPointF qpos(smoothedPos.x, smoothedPos.y);
         qDebug() << "pos:" << qpos;
         emit gazeData(qpos);
     }

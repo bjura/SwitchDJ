@@ -50,7 +50,7 @@ protected:
     virtual const char * getBackendCodename() const = 0; // only lowercase ASCII, no spaces
     QString getBaseConfigPath() const;
 
-    EyeTrackerDataSmoother * m_smoother;
+    MovementSmoother * m_smoother;
 
 private:
     NoiseReductionMethod m_smoothingMethod;

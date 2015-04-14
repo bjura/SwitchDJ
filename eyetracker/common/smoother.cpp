@@ -28,7 +28,6 @@ cv::Point2d MovementSmootherWithBuffer::filter(const cv::Point2d &point)
 }
 
 MovingAverageSmoother::MovingAverageSmoother()
-    : MovementSmootherWithBuffer()
 {
 }
 
@@ -49,8 +48,7 @@ cv::Point2d MovingAverageSmoother::filter(const cv::Point2d &point)
 
 
 DoubleMovingAverageSmoother::DoubleMovingAverageSmoother()
-    : MovementSmootherWithBuffer()
-    , m_bufAveragesX(m_bufSize)
+    : m_bufAveragesX(m_bufSize)
     , m_bufAveragesY(m_bufSize)
 {
 }
@@ -78,7 +76,6 @@ cv::Point2d DoubleMovingAverageSmoother::filter(const cv::Point2d &point)
 
 
 MedianSmoother::MedianSmoother()
-    : MovementSmootherWithBuffer()
 {
 }
 
@@ -134,8 +131,7 @@ cv::Point2d DoubleExpSmoother::filter(const cv::Point2d &point)
 
 
 CustomSmoother::CustomSmoother()
-    : MovementSmootherWithBuffer()
-    , m_gamma(0.6)
+    : m_gamma(0.6)
     , m_alpha(0.5)
     , m_previousOutputX(0.0)
     , m_previousOutputY(0.0)
@@ -223,7 +219,6 @@ cv::Point2d KalmanSmoother::filter(const cv::Point2d &point)
 
 
 SavitzkyGolaySmoother::SavitzkyGolaySmoother()
-    : MovementSmootherWithBuffer()
 {
 }
 

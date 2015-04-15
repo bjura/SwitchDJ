@@ -876,6 +876,11 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
             GObject.TYPE_STRING,
             "", "", "",
             GObject.PARAM_READWRITE),
+        "toggled": (
+            GObject.TYPE_BOOLEAN,
+            "", "", False,
+            GObject.PARAM_READWRITE
+        )
     }
 
     def __init__(self):
@@ -883,9 +888,12 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
         self._make_pointer_reactive()
         self._init_box()
         self._init_elements()
+        self.frame = None
+        self.hilite_tool = None
         self.preview_loading_width = 300
         self.preview_loading_height = 300
-        self.hilite_tool = None
+        self.toggle_coeff = 0.6
+        self._toggled = False
         self.scale_mode = Mx.ImageScaleMode.CROP
         self.prepare_style()
 
@@ -896,6 +904,20 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
     @style_class.setter
     def style_class(self, value):
         self._style_class = value
+
+    @property
+    def toggled(self):
+        return self._toggled
+
+    @toggled.setter
+    def toggled(self, value):
+        previous = self._toggled
+        self._toggled = value
+        if value != previous:
+            if value:
+                self._toggle()
+            else:
+                self._untoggle()
 
     @property
     def label_text(self):
@@ -1015,6 +1037,23 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
     def _play_selection_sound(self, source):
         if pisak.app.window.input_group.middleware != "scanning":
             pisak.app.play_sound_effect('selection')
+
+    def _toggle(self):
+        for element in [self]:
+            element.set_size(*[dim * self.toggle_coeff for dim in element.get_size()])
+
+    def _untoggle(self):
+        for element in self.get_children():
+            element.set_size(*[dim / self.toggle_coeff for dim in element.get_size()])
+
+    def add_frame(self, frame):
+        """
+        Add tile frame for extra visual effects.
+
+        :param frame: tile frame widget
+        """
+        self.frame = frame
+        self.add_child(frame)
 
     def activate(self):
         self.emit("clicked")

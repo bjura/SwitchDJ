@@ -9,8 +9,6 @@
     {
         "id": "background_box",
         "type": "PisakBackgroundPattern",
-        "background-color": "rgba(0, 0, 0, 1)",
-        "rgba": "1, 1, 1, 0.3",
         "x-expand": true,
         "y-expand": true
     },
@@ -21,16 +19,44 @@
         "y-align": "end",
         "x-expand": true,
         "y-expand": true,
-        "ratio-margin-top": 0.05,
+        "ratio-margin-top": 0.01,
         "ratio-margin-bottom": 0.02,
-        "ratio-spacing": 0.025,
+        "ratio-spacing": 0.02,
         "orientation": "vertical",
-        "children": ["progress_bar", "middle_box_group"]
+        "children": ["progress_bar", "middle_box_group", "header_box"]
+    },
+    {
+	"id": "header_box",
+	"type": "PisakBoxLayout",
+	"x-expand": true,
+	"children": ["header", "date_container"]
     },
     {
         "id": "header",
         "type": "MxLabel",
-        "style-class": "PisakEmailHeader"
+        "style-class": "PisakEmailHeader",
+		"text": "KSIĄŻKA ADRESOWA",
+		"x-expand": true,
+        "margin-right": 100,
+        "x-align": "end"
+    },
+    {
+        "id": "date_container",
+        "type": "PisakBinLayout",
+        "ratio-width": 0.24,
+        "ratio-height": 0.10,
+        "children": ["date_frame"]
+    },
+    {
+        "id": "date_frame",
+        "type": "PisakFrame",
+        "style-class": "PisakEmailDate",
+        "children": ["date"]
+    },
+    {
+        "id": "date",
+        "type": "MxLabel",
+        "style-class": "PisakEmailDate"
     },
     {
         "id": "middle_box_group",
@@ -52,6 +78,7 @@
         "id": "button_menu",
         "type": "PisakScanningGroup",
         "children": ["button_menu_box"],
+        "scanning-hilite": true,
         "strategy": {
             "id": "menu_group_strategy",
             "type": "PisakRowStrategy"
@@ -64,9 +91,29 @@
         "ratio-spacing": 0.015,
         "y-expand": true,
         "y-align": "end",
-        "children": ["button_exit", "button_scan_page",
+        "children": ["button_exit", "button_back", "button_scan_page",
                      "button_previous_page", "button_next_page",
-                     "button_automatic"]
+                     "button_automatic", "button_new_contact"]
+    },
+    {
+        "id": "button_new_contact",
+        "label": "NOWY KONTAKT",
+        "type": "PisakButton",
+        "style-class": "PisakEmailButton",
+        "ratio-width": 0.24,
+        "ratio-height": 0.10,
+        "icon-size": 50,
+        "icon-name": "dodaj_do_playlisty"
+    },
+    {
+        "id": "button_back",
+        "label": "EKRAN GŁÓWNY",
+        "type": "PisakButton",
+        "style-class": "PisakEmailButton",
+        "ratio-width": 0.24,
+        "ratio-height": 0.10,
+        "icon-size": 50,
+        "icon-name": "back"
     },
     {
         "id": "button_exit",

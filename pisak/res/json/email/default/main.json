@@ -32,7 +32,7 @@
         "x-expand": true,
 	    "orientation": "horizontal",
         "ratio-spacing": 0.001,
-        "children": ["photo_widget", "left_box"]
+        "children": ["photo", "left_box"]
     },
     {
         "id": "left_box",
@@ -46,12 +46,14 @@
         "type": "MxLabel",
 		"style-class": "PisakEmailTitle",
 	    "x-align": "end",
-	    "x-expand": true
+	    "x-expand": true,
+        "text": "POCZTA EMAIL"
     },
     {
         "id": "menu_group",
         "type": "PisakScanningGroup",
         "children": ["menu_box"],
+        "scanning-hilite": true,
         "strategy": {
             "id": "menu_group_strategy",
             "type": "PisakRowStrategy"
@@ -65,35 +67,35 @@
 	    "x-align": "start",
         "x-expand": true,
         "y-align": "center",
-        "children": ["button_exit", "button_drafts", "button_sent",
-		     "button_inbox", "button_address_book", "button_new_message"]
+        "children": ["button_exit", "button_address_book", "button_drafts",
+          "button_sent", "button_inbox", "button_new_message"]
     },
 	{
 		"id": "button_new_message",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "NOWA WIADOMOŚĆ",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "edytuj_opis"
 	},
 	{
 		"id": "button_address_book",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "KSIĄŻKA ADRESOWA",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "edytuj_zdjecie"
 	},
     {
         "id": "button_exit",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "PANEL STARTOWY",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
@@ -104,45 +106,42 @@
     {
         "id": "button_drafts",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "SZKICE",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "edytuj2"
     },
     {
         "id": "button_sent",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "WYSŁANE",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
+        "icon-name": "komentuj"
     },
     {
         "id": "button_inbox",
         "type": "PisakButton",
-        "style-class": "PisakEmailFlatButton",
+        "style-class": "PisakEmailButton",
         "label": "ODEBRANE",
         "ratio-width": 0.5,
         "ratio-height": 0.10,
         "icon-size": 50,
 	    "custom-padding": "left",
-        "icon-name": ""
-    },
-    {
-	    "id": "photo_widget",
-	    "type": "PisakBinLayout",
-	    "ratio-width": 0.3,
-        "ratio-height": 0.445,
-	    "children": ["photo"]
+        "icon-name": "nawigator_ebook"
     },
     {
 	    "id": "photo",
-	    "type": "ClutterActor"
+	    "type": "PisakMenuHeader",
+        "ratio-width": 0.3,
+        "ratio-height": 0.445,
+        "color": "rgb(90, 110, 105)",
+        "name": "wyslij"
     }
 ]

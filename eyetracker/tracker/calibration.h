@@ -14,6 +14,8 @@ typedef std::vector<CalibrationPoint> CalibrationData;
 struct EyeTrackerCalibration
 {
 public:
+    EyeTrackerCalibration();
+
     cv::Point2d getGazePosition(const cv::Point2d & pupilPos);
 
     bool calibrate(const CalibrationData & calibrationData);

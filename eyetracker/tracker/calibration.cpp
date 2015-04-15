@@ -2,6 +2,11 @@
 #include "calibration.h"
 #include <QDebug>
 
+EyeTrackerCalibration::EyeTrackerCalibration()
+{
+    setToZero();
+}
+
 cv::Point2d EyeTrackerCalibration::getGazePosition(const cv::Point2d & pupilPos)
 {
     if(m_useHomography)

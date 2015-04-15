@@ -55,10 +55,10 @@ cv::Point2d MedianSmoother::filter(const cv::Point2d & point)
     m_bufX.push_back(point.x);
     m_bufY.push_back(point.y);
 
-    std::nth_element(m_bufX.begin(), m_bufX.begin() + m_bufSize/2, m_bufX.end());
-    std::nth_element(m_bufY.begin(), m_bufY.begin() + m_bufSize/2, m_bufY.end());
+    std::nth_element(m_bufX.begin(), m_bufX.begin() + m_bufX.size()/2, m_bufX.end());
+    std::nth_element(m_bufY.begin(), m_bufY.begin() + m_bufY.size()/2, m_bufY.end());
 
-    return cv::Point2d(m_bufX[m_bufSize/2], m_bufY[m_bufSize/2]);
+    return cv::Point2d(m_bufX[m_bufX.size()/2], m_bufY[m_bufY.size()/2]);
 }
 
 DoubleExpSmoother::DoubleExpSmoother()
@@ -104,11 +104,11 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
     m_bufX.push_back(point.x);
     m_bufY.push_back(point.y);
 
-    std::nth_element(m_bufX.begin(), m_bufX.begin() + m_bufSize/2, m_bufX.end());
-    std::nth_element(m_bufY.begin(), m_bufY.begin() + m_bufSize/2, m_bufY.end());
+    std::nth_element(m_bufX.begin(), m_bufX.begin() + m_bufX.size()/2, m_bufX.end());
+    std::nth_element(m_bufY.begin(), m_bufY.begin() + m_bufY.size()/2, m_bufY.end());
 
-    double medianX = m_bufX[m_bufSize/2];
-    double medianY = m_bufY[m_bufSize/2];
+    double medianX = m_bufX[m_bufX.size()/2];
+    double medianY = m_bufY[m_bufY.size()/2];
 
     cv::Point2d smoothedPoint;
 

@@ -5,9 +5,9 @@
 
 Eyetracker::Eyetracker(QObject * parent)
     : QObject(parent)
-    , m_smoothingMethod(Custom)
+    , m_smoothingMethod(SmoothingMethod::Custom)
 {
-    pickSmoother();
+    createSmoother();
 }
 
 Eyetracker::~Eyetracker()
@@ -22,23 +22,35 @@ QString Eyetracker::getBaseConfigPath() const
     return dir.filePath(getBackendCodename());
 }
 
-void Eyetracker::pickSmoother()
+void Eyetracker::createSmoother()
 {
     switch (m_smoothingMethod)
     {
-        case MovingAverage:
-            m_smoother = new MovingAverageSmoother();
-        case DoubleMovingAverage:
-            m_smoother = new DoubleMovingAverageSmoother();
-        case Median:
-            m_smoother = new MedianSmoother();
-        case DoubleExp:
-            m_smoother = new DoubleExpSmoother();
-        case Custom:
-            m_smoother = new CustomSmoother();
-        case SavitzkyGolay:
-            m_smoother = new SavitzkyGolaySmoother();
-        case Kalman:
-            m_smoother = new KalmanSmoother();
+        case SmoothingMethod::None:
+            m_smoother.reset(new NullSmoother);
+            break;
+        case SmoothingMethod::MovingAverage:
+            m_smoother.reset(new MovingAverageSmoother);
+            break;
+        case SmoothingMethod::DoubleMovingAverage:
+            m_smoother.reset(new DoubleMovingAverageSmoother);
+            break;
+        case SmoothingMethod::Median:
+            m_smoother.reset(new MedianSmoother);
+            break;
+        case SmoothingMethod::DoubleExp:
+            m_smoother.reset(new DoubleExpSmoother);
+            break;
+        case SmoothingMethod::Custom:
+            m_smoother.reset(new CustomSmoother);
+            break;
+        case SmoothingMethod::SavitzkyGolay:
+            m_smoother.reset(new SavitzkyGolaySmoother);
+            break;
+        case SmoothingMethod::Kalman:
+            m_smoother.reset(new KalmanSmoother);
+            break;
+        default:
+            m_smoother.reset(new NullSmoother);
     }
 }

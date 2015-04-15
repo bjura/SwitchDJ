@@ -10,13 +10,20 @@
 // https://msdn.microsoft.com/en-us/library/jj131429.aspx
 
 
-enum NoiseReductionMethod { MovingAverage, DoubleMovingAverage, Median, \
-                            SavitzkyGolay, Kalman, DoubleExp, Custom };
+enum class SmoothingMethod {
+    None,
+    MovingAverage,
+    DoubleMovingAverage,
+    Median,
+    SavitzkyGolay,
+    Kalman,
+    DoubleExp,
+    Custom
+};
 
 
 class MovementSmoother
 {
-
 public:
     virtual ~MovementSmoother();
 
@@ -24,13 +31,17 @@ public:
 };
 
 
+class NullSmoother final : public MovementSmoother
+{
+public:
+    cv::Point2d filter(const cv::Point2d & point) override;
+};
+
+
 class MovementSmootherWithBuffer : public MovementSmoother
 {
-
 public:
     MovementSmootherWithBuffer();
-
-    virtual cv::Point2d filter(const cv::Point2d & point) = 0;
 
 protected:
    int m_bufSize;
@@ -43,7 +54,6 @@ protected:
 
 class MovingAverageSmoother final : public MovementSmootherWithBuffer
 {
-
 public:
     cv::Point2d filter(const cv::Point2d & point) override;
 };
@@ -51,7 +61,6 @@ public:
 
 class DoubleMovingAverageSmoother final : public MovementSmootherWithBuffer
 {
-
 public:
     DoubleMovingAverageSmoother();
 
@@ -65,7 +74,6 @@ private:
 
 class MedianSmoother final : public MovementSmootherWithBuffer
 {
-
 public:
     cv::Point2d filter(const cv::Point2d & point) override;
 };
@@ -73,7 +81,6 @@ public:
 
 class DoubleExpSmoother final : public MovementSmoother
 {
-
 public:
     DoubleExpSmoother();
 
@@ -92,7 +99,6 @@ private:
 
 class CustomSmoother final : public MovementSmootherWithBuffer
 {
-
 public:
     CustomSmoother();
 
@@ -113,7 +119,6 @@ private:
 
 class KalmanSmoother final : public MovementSmoother
 {
-
 public:
     KalmanSmoother();
 
@@ -127,7 +132,6 @@ private:
 
 class SavitzkyGolaySmoother final : public MovementSmootherWithBuffer
 {
-
 public:
     cv::Point2d filter(const cv::Point2d & point) override;
 };

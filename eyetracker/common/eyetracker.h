@@ -5,7 +5,7 @@
 #include <QPointF>
 #include <QVariant>
 
-#include <smoother.h>
+#include "smoother.h"
 
 class Eyetracker : public QObject
 {
@@ -50,12 +50,11 @@ protected:
     virtual const char * getBackendCodename() const = 0; // only lowercase ASCII, no spaces
     QString getBaseConfigPath() const;
 
-    MovementSmoother * m_smoother;
+    std::unique_ptr<MovementSmoother> m_smoother;
 
 private:
-    NoiseReductionMethod m_smoothingMethod;
-
-    void pickSmoother();
+    SmoothingMethod m_smoothingMethod;
+    void createSmoother();
 };
 
 #endif // EYETRACKER_H

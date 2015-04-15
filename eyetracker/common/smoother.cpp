@@ -2,9 +2,6 @@
 
 #include <smoother.h>
 
-MovementSmoother::MovementSmoother()
-{
-}
 
 MovementSmoother::~MovementSmoother()
 {
@@ -19,21 +16,6 @@ MovementSmootherWithBuffer::MovementSmootherWithBuffer()
 {
 }
 
-MovementSmootherWithBuffer::~MovementSmootherWithBuffer()
-{
-}
-
-cv::Point2d MovementSmootherWithBuffer::filter(const cv::Point2d &point)
-{
-}
-
-MovingAverageSmoother::MovingAverageSmoother()
-{
-}
-
-MovingAverageSmoother::~MovingAverageSmoother()
-{
-}
 
 cv::Point2d MovingAverageSmoother::filter(const cv::Point2d &point)
 {
@@ -50,10 +32,6 @@ cv::Point2d MovingAverageSmoother::filter(const cv::Point2d &point)
 DoubleMovingAverageSmoother::DoubleMovingAverageSmoother()
     : m_bufAveragesX(m_bufSize)
     , m_bufAveragesY(m_bufSize)
-{
-}
-
-DoubleMovingAverageSmoother::~DoubleMovingAverageSmoother()
 {
 }
 
@@ -75,14 +53,6 @@ cv::Point2d DoubleMovingAverageSmoother::filter(const cv::Point2d &point)
 }
 
 
-MedianSmoother::MedianSmoother()
-{
-}
-
-MedianSmoother::~MedianSmoother()
-{
-}
-
 cv::Point2d MedianSmoother::filter(const cv::Point2d &point)
 {
     int timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -96,6 +66,7 @@ cv::Point2d MedianSmoother::filter(const cv::Point2d &point)
     return cv::Point2d(m_bufX[m_bufSize/2], m_bufY[m_bufSize/2]);
 }
 
+
 DoubleExpSmoother::DoubleExpSmoother()
     : m_gamma(0.6)
     , m_alpha(0.5)
@@ -103,10 +74,6 @@ DoubleExpSmoother::DoubleExpSmoother()
     , m_previousOutputY(0.0)
     , m_previousTrendX(0.0)
     , m_previousTrendY(0.0)
-{
-}
-
-DoubleExpSmoother::~DoubleExpSmoother()
 {
 }
 
@@ -138,10 +105,6 @@ CustomSmoother::CustomSmoother()
     , m_previousTrendX(0.0)
     , m_previousTrendY(0.0)
     , m_jitterThreshold(0.7)
-{
-}
-
-CustomSmoother::~CustomSmoother()
 {
 }
 
@@ -180,11 +143,6 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d &point)
     : m_filter(4, 2, 0)
     , m_input(2, 0)
 {
-    setUp();
-}
-
-void KalmanSmoother::setUp()
-{
     double statePreX = 0;
     double statePreY = 0;
 
@@ -196,13 +154,18 @@ void KalmanSmoother::setUp()
     m_filter.statePre.at<float>(2) = 0;
     m_filter.statePre.at<float>(3) = 0;
     cv::setIdentity(m_filter.measurementMatrix);
-    cv::setIdentity(m_filter.processNoiseCov, cv::Scalar::all(1e-4));
-    cv::setIdentity(m_filter.measurementNoiseCov, cv::Scalar::all(1e-1));
-    cv::setIdentity(m_filter.errorCovPost, cv::Scalar::all(.1));
-}
 
-KalmanSmoother::~KalmanSmoother()
-{
+    // supposed and demanded level of eye movement natural noise,
+    // movements in both dimensions are supposed to be independent
+    cv::setIdentity(m_filter.processNoiseCov, cv::Scalar::all(1e-4));
+
+    // supposed level of tracker measurement noise,
+    // measurements of both dimensions are supposed to be independent
+    cv::setIdentity(m_filter.measurementNoiseCov, cv::Scalar::all(1e-1));
+
+    // post prediction state allowed error level,
+    // dimensions should be independent
+    cv::setIdentity(m_filter.errorCovPost, cv::Scalar::all(.1));
 }
 
 cv::Point2d KalmanSmoother::filter(const cv::Point2d &point)
@@ -217,14 +180,6 @@ cv::Point2d KalmanSmoother::filter(const cv::Point2d &point)
     return cv::Point2d(estimation.at<float>(0), estimation.at<float>(1));
 }
 
-
-SavitzkyGolaySmoother::SavitzkyGolaySmoother()
-{
-}
-
-SavitzkyGolaySmoother::~SavitzkyGolaySmoother()
-{
-}
 
 cv::Point2d SavitzkyGolaySmoother::filter(const cv::Point2d &point)
 {

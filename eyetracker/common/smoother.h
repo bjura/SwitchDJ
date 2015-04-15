@@ -18,7 +18,6 @@ class MovementSmoother
 {
 
 public:
-    MovementSmoother();
     virtual ~MovementSmoother();
 
     virtual cv::Point2d filter(const cv::Point2d & point) = 0;
@@ -30,9 +29,8 @@ class MovementSmootherWithBuffer : public MovementSmoother
 
 public:
     MovementSmootherWithBuffer();
-    virtual ~MovementSmootherWithBuffer();
 
-    cv::Point2d filter(const cv::Point2d & point) override;
+    virtual cv::Point2d filter(const cv::Point2d & point) = 0;
 
 protected:
    int m_bufSize;
@@ -43,25 +41,21 @@ protected:
 };
 
 
-class MovingAverageSmoother : public MovementSmootherWithBuffer
+class MovingAverageSmoother final : public MovementSmootherWithBuffer
 {
 
 public:
-    MovingAverageSmoother();
-    ~MovingAverageSmoother();
-
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 };
 
 
-class DoubleMovingAverageSmoother : public MovementSmootherWithBuffer
+class DoubleMovingAverageSmoother final : public MovementSmootherWithBuffer
 {
 
 public:
     DoubleMovingAverageSmoother();
-    ~DoubleMovingAverageSmoother();
 
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 
 private:
     boost::circular_buffer<double> m_bufAveragesX;
@@ -69,25 +63,21 @@ private:
 };
 
 
-class MedianSmoother : public MovementSmootherWithBuffer
+class MedianSmoother final : public MovementSmootherWithBuffer
 {
 
 public:
-    MedianSmoother();
-    ~MedianSmoother();
-
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 };
 
 
-class DoubleExpSmoother : public MovementSmoother
+class DoubleExpSmoother final : public MovementSmoother
 {
 
 public:
     DoubleExpSmoother();
-    ~DoubleExpSmoother();
 
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 
 private:
     double m_gamma;
@@ -100,14 +90,13 @@ private:
 };
 
 
-class CustomSmoother : public MovementSmootherWithBuffer
+class CustomSmoother final : public MovementSmootherWithBuffer
 {
 
 public:
     CustomSmoother();
-    ~CustomSmoother();
 
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 
 private:
     double m_gamma;
@@ -122,31 +111,25 @@ private:
 };
 
 
-class KalmanSmoother : public MovementSmoother
+class KalmanSmoother final : public MovementSmoother
 {
 
 public:
     KalmanSmoother();
-    ~KalmanSmoother();
 
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 
 private:
-    void setUp();
-
     cv::KalmanFilter m_filter;
     cv::Mat_<float> m_input;
 };
 
 
-class SavitzkyGolaySmoother : public MovementSmootherWithBuffer
+class SavitzkyGolaySmoother final : public MovementSmootherWithBuffer
 {
 
 public:
-    SavitzkyGolaySmoother();
-    ~SavitzkyGolaySmoother();
-
-    cv::Point2d filter(const cv::Point2d & point);
+    cv::Point2d filter(const cv::Point2d & point) override;
 };
 
 #endif

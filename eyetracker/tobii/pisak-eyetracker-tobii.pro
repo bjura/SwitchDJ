@@ -16,7 +16,7 @@ INCLUDEPATH += \
 
 LIBPATH += ../tobii/sdk/lib
 
-LIBS += -ltobiigazecore
+LIBS += -ltobiigazecore -lopencv_core -lopencv_video
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

@@ -128,7 +128,7 @@ class Strategy(GObject.GObject):
                 else:
                     self._do_select(element)
         elif hasattr(element, "enable_hilite"):
-            self.group.stage.pending_group = self.unwind_to
+            (self.group.stage or self.group.get_stage()).pending_group = self.unwind_to
             if hasattr(element, "scanning_pauser") and element.scanning_pauser:
                 if self.group.paused:
                     select_lag_disabled = True
@@ -274,6 +274,7 @@ class Group(Clutter.Actor, properties.PropertyAdapter,
         self._strategy = None
         self.paused = False
         self.killed = False
+        self.stage = None
         self.parent_group = None
         self.signal_source = None
         self._scanning_hilite = False

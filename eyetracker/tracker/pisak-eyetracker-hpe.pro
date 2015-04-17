@@ -31,5 +31,4 @@ FORMS += \
     camera_setup.ui
 
 RESOURCES += \
-    qml.qrc \
     ../common/qml.qrc

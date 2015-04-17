@@ -259,7 +259,7 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
     Q_UNUSED(size);
 
     if(!ok)
-        emit gazeDetectionFailed(tr"Tracker failed in detecting any pupil.");
+        emit gazeDetectionFailed(tr("Tracker failed in detecting any pupil."));
         return;
 
     const cv::Point2d pos(posX, posY);

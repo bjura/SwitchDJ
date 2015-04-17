@@ -8,7 +8,8 @@ SOURCES += main.cpp \
     ../common/smoother.cpp \
     tobiieyetracker.cpp
 
-RESOURCES += qml.qrc
+RESOURCES += qml.qrc \
+    ../common/qml.qrc
 
 INCLUDEPATH += \
     ../tobii/sdk/include \

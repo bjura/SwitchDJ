@@ -156,6 +156,8 @@ ApplicationWindow {
             if(point.x !== -1 && point.y !== -1) {
                 gazeDot.detected = true
                 trackingDot.moveTo(point.x, point.y)
+            } else {
+                gazeDot.detected = false
             }
         }
     }
@@ -176,6 +178,7 @@ ApplicationWindow {
 
         Keys.onPressed: {
             focus = false
+            gazeDot.visible = false
             if(calibration.loadConfig()) {
                 console.log("tracker config loaded")
             } else {
@@ -187,7 +190,7 @@ ApplicationWindow {
 
     Image {
         id: gazeDot
-        width: 0.05 * parent.height
+        width: 0.08 * parent.height
         height: width
         x: 0.5 * (parent.width - width)
         y: 0.9 * (parent.height - height)

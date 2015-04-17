@@ -146,6 +146,8 @@ class _OwnBlog(Blog):
         :param post: instance of the post to be published
         """
         post.post_status = "publish"
+		if hasattr(post, "post_type") and post.post_type != "page":
+			post.comment_status = "open"
         if hasattr(post, "id"):
             method = wordpress_xmlrpc.methods.posts.EditPost(post.id, post)
         else:

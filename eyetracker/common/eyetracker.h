@@ -46,6 +46,8 @@ signals:
     void pointCalibrated(bool success, QString errorMessage);
     void computeAndSetCalibrationFinished(bool success, QString errorMessage);
 
+    void gazeDetectionFailed(QString errorMessage);
+
 protected:
     virtual const char * getBackendCodename() const = 0; // only lowercase ASCII, no spaces
     QString getBaseConfigPath() const;

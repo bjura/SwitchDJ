@@ -148,8 +148,13 @@ ApplicationWindow {
             calibration.calibrationStop()
         }
 
+        onGazeDetectionFailed: {
+            gazeDot.detected = false
+        }
+
         onGazeData: {
             if(point.x !== -1 && point.y !== -1) {
+                gazeDot.detected = true
                 trackingDot.moveTo(point.x, point.y)
             }
         }
@@ -177,6 +182,26 @@ ApplicationWindow {
                 console.log("error loading tracker config")
             }
             calibration.initialize()
+        }
+    }
+
+    Image {
+        id: gazeDot
+        width: 0.05 * parent.height
+        height: width
+        x: 0.5 * (parent.width - width)
+        y: 0.9 * (parent.height - height)
+        visible: true
+        source: "no_eye.svg"
+
+        property bool detected: false
+
+        onDetectedChanged: {
+            if (detected) {
+                source = "eye.svg"
+            } else {
+                source = "no_eye.svg"
+            }
         }
     }
 

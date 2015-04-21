@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
+import QtQuick.Window 2.1
 
 import pisak.eyetracker 1.0
 
@@ -8,8 +9,8 @@ ApplicationWindow {
     id: applicationWnd
     visible: true
     visibility: "FullScreen"
-    width: 800
-    height: 600
+    width: Screen.width
+    height: Screen.height
     title: qsTr("Eyetracker calibration")
     color: "#555" // background color
 
@@ -125,6 +126,7 @@ ApplicationWindow {
             } else {
                 console.log("error saving config")
             }
+            fixationDots.visible = true
             calibration.startTracking()
         }
 
@@ -158,6 +160,34 @@ ApplicationWindow {
                 trackingDot.moveTo(point.x, point.y)
             } else {
                 gazeDot.detected = false
+            }
+        }
+    }
+
+    Rectangle {
+        id: fixationDots
+        width: parent.width
+        height: parent.height
+        visible: false
+        focus: false
+        color: "transparent"
+        layer.enabled: true
+
+        Grid {
+            anchors.centerIn: parent
+            columns: 3
+            rows: 3
+            spacing: parent.height * 0.4
+
+            Repeater {
+                model: 9
+
+                Rectangle {
+                    color: "red"
+                    height: parent.height * 0.02
+                    width: height
+                    radius: width * 0.5
+                }
             }
         }
     }

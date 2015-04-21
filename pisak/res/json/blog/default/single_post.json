@@ -32,7 +32,7 @@
         "x-expand": true,
         "margin-right": 100,
         "x-align": "end",
-	    "text": "TYTUŁ BLOGA"
+        "text": "TYTUŁ BLOGA"
     },
     {
         "id": "middle_box_group",
@@ -101,15 +101,15 @@
         "icon-name": "exit"
     },
     {
-	    "id": "photo_widget",
-	    "type": "PisakBinLayout",
-	    "ratio-width": 0.24,
+	"id": "photo_widget",
+	"type": "PisakBinLayout",
+	"ratio-width": 0.24,
         "ratio-height": 0.18,
-	    "children": ["photo"]
+	"children": ["photo"]
     },
     {
-	    "id": "photo",
-	    "type": "PisakBlogUserPhoto"
+	"id": "photo",
+	"type": "PisakBlogUserPhoto"
     },
     {
         "id": "post_menu",
@@ -165,7 +165,7 @@
         "ratio-height": 0.09,
         "icon-size": 50,
         "icon-name": "nav_up",
-	    "signals": [
+	"signals": [
                        {
                            "name": "clicked",
                            "handler": "blog/scroll_post_up",
@@ -211,9 +211,9 @@
         "icon-name": "nav_right"
     },
     {
-        "id": "post_text",
-	    "type": "PisakBlogPost",
-	    "ratio-height": 0.8,
-	    "ratio-width": 0.642
+	"id": "post_text",
+	"type": "PisakBlogPost",
+	"ratio-height": 0.8,
+	"ratio-width": 0.642
     }
 ]

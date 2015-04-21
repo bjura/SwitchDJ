@@ -111,6 +111,16 @@ def prepare_contact_view(stage, script, data):
                             "email/speller_contact_address")
     handlers.button_to_view(stage, script, "button_edit_photo",
                             "email/viewer_contact_library")
+    handlers.button_to_view(stage, script, "button_create_message",
+                             "email/speller_message_subject")
+    contact = data["contact"]
+    photo = script.get_object("photo")
+    name = script.get_object("contact_name_text")
+    address = script.get_object("contact_address_text")
+    photo.set_from_file(contact["photo"])
+    name.set_text(contact["name"])
+    address.set_text(contact["address"])
+
 
 def prepare_speller_contact_name_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")

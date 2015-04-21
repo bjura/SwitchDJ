@@ -55,8 +55,19 @@
         "orientation": "vertical",
         "ratio-spacing": 0.015,
         "y-align": "center",
-        "children": ["button_exit", "button_back", "button_edit_address"
-		     "photo_widget", "button_edit_name", "button_edit_photo"]
+        "children": ["button_exit", "button_back", "button_edit_address",
+		     "photo_widget", "button_edit_name", "button_edit_photo",
+            "button_create_message"]
+    },
+	{
+        "id": "button_create_message",
+        "type": "PisakButton",
+        "style-class": "PisakEmailButton",
+        "label": "WYŚLIJ WIADOMOŚĆ",
+        "ratio-width": 0.24,
+        "ratio-height": 0.09,
+        "icon-size": 50,
+        "icon-name": "wyslij"
     },
     {
         "id": "button_exit",
@@ -97,7 +108,7 @@
         "ratio-width": 0.24,
         "ratio-height": 0.10,
         "icon-size": 50,
-        "icon-name": "edytuj_opis"
+        "icon-name": "house"
     },
     {
         "id": "button_edit_name",

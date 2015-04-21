@@ -51,3 +51,20 @@ void Eyetracker::createSmoother()
             m_smoother.reset(new NullSmoother);
     }
 }
+
+void Eyetracker::emitNewPoint(cv::Point2d point)
+{
+    if(std::isnan(point.x) || std::isnan(point.y) ||
+       point.x < 0 || point.y < 0)
+    {
+        point.x = m_previousPoint.x();
+        point.y = m_previousPoint.y();
+    }
+
+    const cv::Point2d smoothed = m_smoother->filter(point);
+    QPointF ret(smoothed.x, smoothed.y);
+    m_previousPoint = ret;
+
+    qDebug() << "pos:" << ret;
+    emit gazeData(ret);
+}

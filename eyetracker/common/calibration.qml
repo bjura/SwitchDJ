@@ -14,6 +14,10 @@ ApplicationWindow {
     title: qsTr("Eyetracker calibration")
     color: "#555" // background color
 
+    Component.onCompleted: {
+        calibration.initialize()
+    }
+
     onClosing: {
         close.accepted = false
         calibration.shutdown()
@@ -60,6 +64,12 @@ ApplicationWindow {
             exitText.focus = true
         }
 
+        function runSetup() {
+            calibration.stopTracking()
+            // fullscreen camera setup
+            calibration.runCameraSetup()
+        }
+
         property int pointIdx: 0
         property var points: getCalibrationPoints()
 
@@ -69,8 +79,7 @@ ApplicationWindow {
                 calibrationError(errorMessage)
                 return
             } else {
-                // fullscreen camera setup
-                calibration.runCameraSetup()
+                calibration.startTracking()
             }
         }
 
@@ -94,7 +103,6 @@ ApplicationWindow {
             } else {
                 console.log("error saving tracker config")
             }
-
             infoText.visible = false
             calibrationStartDelayTimer.running = true
         }
@@ -151,15 +159,17 @@ ApplicationWindow {
         }
 
         onGazeDetectionFailed: {
-            gazeDot.detected = false
+            eyeStatus.change(false)
         }
 
         onGazeData: {
             if(point.x !== -1 && point.y !== -1) {
-                gazeDot.detected = true
-                trackingDot.moveTo(point.x, point.y)
+                eyeStatus.change(true)
+                if (trackingDot.visible) {
+                    trackingDot.moveTo(point.x, point.y)
+                }
             } else {
-                gazeDot.detected = false
+                eyeStatus.change(false)
             }
         }
     }
@@ -208,18 +218,18 @@ ApplicationWindow {
 
         Keys.onPressed: {
             focus = false
-            gazeDot.visible = false
+            eyeStatus.visible = false
             if(calibration.loadConfig()) {
                 console.log("tracker config loaded")
             } else {
                 console.log("error loading tracker config")
             }
-            calibration.initialize()
+            calibration.runSetup()
         }
     }
 
     Image {
-        id: gazeDot
+        id: eyeStatus
         width: 0.08 * parent.height
         height: width
         x: 0.5 * (parent.width - width)
@@ -227,10 +237,8 @@ ApplicationWindow {
         visible: true
         source: "no_eye.svg"
 
-        property bool detected: false
-
-        onDetectedChanged: {
-            if (detected) {
+        function change(status) {
+            if (status) {
                 source = "eye.svg"
             } else {
                 source = "no_eye.svg"

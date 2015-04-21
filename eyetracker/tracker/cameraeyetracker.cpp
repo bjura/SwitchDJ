@@ -107,7 +107,7 @@ bool CameraEyetracker::loadConfig()
     QSettings settings(getBaseConfigPath() + ".ini", QSettings::IniFormat);
     m_pupilDetector.loadSettings(settings);
     m_calibration.load(settings);
-    m_cameraIndex = settings.value("camera_index", 0).toInt();
+    m_cameraIndex = settings.value("camera_index", m_cameraIndex).toInt();
     return settings.status() == QSettings::NoError;
 }
 

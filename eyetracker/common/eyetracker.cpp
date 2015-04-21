@@ -5,7 +5,7 @@
 
 Eyetracker::Eyetracker(QObject * parent)
     : QObject(parent)
-    , m_smoothingMethod(SmoothingMethod::Custom)
+    , m_smoothingMethod(SmoothingMethod::Kalman)
 {
     createSmoother();
 }
@@ -43,9 +43,6 @@ void Eyetracker::createSmoother()
             break;
         case SmoothingMethod::Custom:
             m_smoother.reset(new CustomSmoother);
-            break;
-        case SmoothingMethod::SavitzkyGolay:
-            m_smoother.reset(new SavitzkyGolaySmoother);
             break;
         case SmoothingMethod::Kalman:
             m_smoother.reset(new KalmanSmoother);

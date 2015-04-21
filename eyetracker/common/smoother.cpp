@@ -11,32 +11,39 @@ cv::Point2d NullSmoother::filter(const cv::Point2d & point)
 }
 
 MovementSmootherWithBuffer::MovementSmootherWithBuffer()
-    : m_bufSize(8)
+    : m_bufSize(15)
     , m_previousPointTimestamp(0)
-    , m_bufX(m_bufSize)
-    , m_bufY(m_bufSize)
+    , m_bufX(m_bufSize, 0.0)
+    , m_bufY(m_bufSize, 0.0)
 {
 }
 
 cv::Point2d MovingAverageSmoother::filter(const cv::Point2d & point)
 {
-    m_bufX.push_back(point.x);
-    m_bufY.push_back(point.y);
+    double x = point.x >= 0 ? point.x : m_bufX.back();
+    double y = point.y >= 0 ? point.y : m_bufY.back();
+
+    m_bufX.push_back(x);
+    m_bufY.push_back(y);
+
     return cv::Point2d(std::accumulate(m_bufX.begin(), m_bufX.end(), 0.0) / m_bufX.size(),
                        std::accumulate(m_bufY.begin(), m_bufY.end(), 0.0) / m_bufY.size());
 }
 
 
 DoubleMovingAverageSmoother::DoubleMovingAverageSmoother()
-    : m_bufAveragesX(m_bufSize)
-    , m_bufAveragesY(m_bufSize)
+    : m_bufAveragesX(m_bufSize, 0.0)
+    , m_bufAveragesY(m_bufSize, 0.0)
 {
 }
 
 cv::Point2d DoubleMovingAverageSmoother::filter(const cv::Point2d & point)
 {
-    m_bufX.push_back(point.x);
-    m_bufY.push_back(point.y);
+    double x = point.x >= 0 ? point.x : m_bufX.back();
+    double y = point.y >= 0 ? point.y : m_bufY.back();
+
+    m_bufX.push_back(x);
+    m_bufY.push_back(y);
 
     m_bufAveragesX.push_back(std::accumulate(m_bufX.begin(), m_bufX.end(), 0.0) / m_bufX.size());
     m_bufAveragesY.push_back(std::accumulate(m_bufY.begin(), m_bufY.end(), 0.0) / m_bufY.size());
@@ -52,8 +59,11 @@ cv::Point2d DoubleMovingAverageSmoother::filter(const cv::Point2d & point)
 
 cv::Point2d MedianSmoother::filter(const cv::Point2d & point)
 {
-    m_bufX.push_back(point.x);
-    m_bufY.push_back(point.y);
+    double x = point.x >= 0 ? point.x : m_bufX.back();
+    double y = point.y >= 0 ? point.y : m_bufY.back();
+
+    m_bufX.push_back(x);
+    m_bufY.push_back(y);
 
     std::nth_element(m_bufX.begin(), m_bufX.begin() + m_bufX.size()/2, m_bufX.end());
     std::nth_element(m_bufY.begin(), m_bufY.begin() + m_bufY.size()/2, m_bufY.end());
@@ -73,9 +83,12 @@ DoubleExpSmoother::DoubleExpSmoother()
 
 cv::Point2d DoubleExpSmoother::filter(const cv::Point2d & point)
 {
+    double x = point.x >= 0 ? point.x : m_previousOutputX;
+    double y = point.y >= 0 ? point.y : m_previousOutputY;
+
     const cv::Point2d smoothedPoint(
-        m_alpha*point.x + (1 - m_alpha)*(m_previousOutputX + m_previousTrendX),
-        m_alpha*point.y + (1 - m_alpha)*(m_previousOutputY + m_previousTrendY)
+        m_alpha*x + (1 - m_alpha)*(m_previousOutputX + m_previousTrendX),
+        m_alpha*y + (1 - m_alpha)*(m_previousOutputY + m_previousTrendY)
     );
 
     m_previousTrendX =
@@ -90,19 +103,22 @@ cv::Point2d DoubleExpSmoother::filter(const cv::Point2d & point)
 
 CustomSmoother::CustomSmoother()
     : m_gamma(0.6)
-    , m_alpha(0.5)
+    , m_alpha(0.4)
     , m_previousOutputX(0.0)
     , m_previousOutputY(0.0)
     , m_previousTrendX(0.0)
     , m_previousTrendY(0.0)
-    , m_jitterThreshold(0.7)
+    , m_jitterThreshold(0.5)
 {
 }
 
 cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
 {
-    m_bufX.push_back(point.x);
-    m_bufY.push_back(point.y);
+    double x = point.x >= 0 ? point.x : m_bufX.back();
+    double y = point.y >= 0 ? point.y : m_bufY.back();
+
+    m_bufX.push_back(x);
+    m_bufY.push_back(y);
 
     std::nth_element(m_bufX.begin(), m_bufX.begin() + m_bufX.size()/2, m_bufX.end());
     std::nth_element(m_bufY.begin(), m_bufY.begin() + m_bufY.size()/2, m_bufY.end());
@@ -112,10 +128,10 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
 
     cv::Point2d smoothedPoint;
 
-    smoothedPoint.x = (std::abs(point.x - medianX) > m_jitterThreshold) ? medianX :
-            m_alpha*point.x + (1 - m_alpha)*(m_previousOutputX + m_previousTrendX);
-    smoothedPoint.y = (std::abs(point.y - medianY) > m_jitterThreshold) ? medianY :
-            m_alpha*point.y + (1 - m_alpha)*(m_previousOutputY + m_previousTrendY);
+    smoothedPoint.x = (std::abs(x - medianX) > m_jitterThreshold) ? medianX :
+            m_alpha*x + (1 - m_alpha)*(m_previousOutputX + m_previousTrendX);
+    smoothedPoint.y = (std::abs(y - medianY) > m_jitterThreshold) ? medianY :
+            m_alpha*y + (1 - m_alpha)*(m_previousOutputY + m_previousTrendY);
 
     m_previousTrendX =
         m_gamma * (smoothedPoint.x - m_previousOutputX) + (1.0 - m_gamma) * m_previousTrendX;
@@ -128,10 +144,12 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
 
  KalmanSmoother::KalmanSmoother()
     : m_filter(4, 2, 0)
-    , m_input(2, 0)
+    , m_input(2, 1)
+    , m_previousOutputX(0.0)
+    , m_previousOutputY(0.0)
 {
-    double statePreX = 0;
-    double statePreY = 0;
+    double statePreX = 0.0;
+    double statePreY = 0.0;
 
     m_filter.transitionMatrix = *(cv::Mat_<float>(4, 4) <<
                                   1,0,1,0,  0,1,0,1,  0,0,1,0,  0,0,0,1);
@@ -144,7 +162,7 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
 
     // supposed and demanded level of eye movement natural noise,
     // movements in both dimensions are supposed to be independent
-    cv::setIdentity(m_filter.processNoiseCov, cv::Scalar::all(1e-4));
+    cv::setIdentity(m_filter.processNoiseCov, cv::Scalar::all(5e-5));
 
     // supposed level of tracker measurement noise,
     // measurements of both dimensions are supposed to be independent
@@ -157,17 +175,18 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
 
 cv::Point2d KalmanSmoother::filter(const cv::Point2d & point)
 {
+    double x = point.x >= 0 ? point.x : m_previousOutputX;
+    double y = point.y >= 0 ? point.y : m_previousOutputY;
+
     cv::Mat prediction = m_filter.predict();
 
-    m_input(0) = point.x;
-    m_input(1) = point.y;
+    m_input(0) = x;
+    m_input(1) = y;
 
     cv::Mat estimation = m_filter.correct(m_input);
 
-    return cv::Point2d(estimation.at<float>(0), estimation.at<float>(1));
-}
+    m_previousOutputX = estimation.at<float>(0);
+    m_previousOutputY = estimation.at<float>(1);
 
-cv::Point2d SavitzkyGolaySmoother::filter(const cv::Point2d & point)
-{
-    return cv::Point2d();
+    return cv::Point2d(m_previousOutputX, m_previousOutputY);
 }

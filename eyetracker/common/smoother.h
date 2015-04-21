@@ -15,7 +15,6 @@ enum class SmoothingMethod {
     MovingAverage,
     DoubleMovingAverage,
     Median,
-    SavitzkyGolay,
     Kalman,
     DoubleExp,
     Custom
@@ -127,13 +126,9 @@ public:
 private:
     cv::KalmanFilter m_filter;
     cv::Mat_<float> m_input;
-};
 
-
-class SavitzkyGolaySmoother final : public MovementSmootherWithBuffer
-{
-public:
-    cv::Point2d filter(const cv::Point2d & point) override;
+    double m_previousOutputX;
+    double m_previousOutputY;
 };
 
 #endif

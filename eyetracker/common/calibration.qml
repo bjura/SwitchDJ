@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
+import QtQuick.Window 2.1
 
 import pisak.eyetracker 1.0
 
@@ -8,10 +9,14 @@ ApplicationWindow {
     id: applicationWnd
     visible: true
     visibility: "FullScreen"
-    width: 800
-    height: 600
+    width: Screen.width
+    height: Screen.height
     title: qsTr("Eyetracker calibration")
     color: "#555" // background color
+
+    Component.onCompleted: {
+        calibration.initialize()
+    }
 
     onClosing: {
         close.accepted = false
@@ -59,6 +64,12 @@ ApplicationWindow {
             exitText.focus = true
         }
 
+        function runSetup() {
+            calibration.stopTracking()
+            // fullscreen camera setup
+            calibration.runCameraSetup()
+        }
+
         property int pointIdx: 0
         property var points: getCalibrationPoints()
 
@@ -68,8 +79,7 @@ ApplicationWindow {
                 calibrationError(errorMessage)
                 return
             } else {
-                // fullscreen camera setup
-                calibration.runCameraSetup()
+                calibration.startTracking()
             }
         }
 
@@ -93,7 +103,6 @@ ApplicationWindow {
             } else {
                 console.log("error saving tracker config")
             }
-
             infoText.visible = false
             calibrationStartDelayTimer.running = true
         }
@@ -125,6 +134,7 @@ ApplicationWindow {
             } else {
                 console.log("error saving config")
             }
+            fixationDots.visible = true
             calibration.startTracking()
         }
 
@@ -148,9 +158,46 @@ ApplicationWindow {
             calibration.calibrationStop()
         }
 
+        onGazeDetectionFailed: {
+            eyeStatus.change(false)
+        }
+
         onGazeData: {
             if(point.x !== -1 && point.y !== -1) {
-                trackingDot.moveTo(point.x, point.y)
+                eyeStatus.change(true)
+                if (trackingDot.visible) {
+                    trackingDot.moveTo(point.x, point.y)
+                }
+            } else {
+                eyeStatus.change(false)
+            }
+        }
+    }
+
+    Rectangle {
+        id: fixationDots
+        width: parent.width
+        height: parent.height
+        visible: false
+        focus: false
+        color: "transparent"
+        layer.enabled: true
+
+        Grid {
+            anchors.centerIn: parent
+            columns: 3
+            rows: 3
+            spacing: parent.height * 0.4
+
+            Repeater {
+                model: 9
+
+                Rectangle {
+                    color: "red"
+                    height: parent.height * 0.02
+                    width: height
+                    radius: width * 0.5
+                }
             }
         }
     }
@@ -171,12 +218,31 @@ ApplicationWindow {
 
         Keys.onPressed: {
             focus = false
+            eyeStatus.visible = false
             if(calibration.loadConfig()) {
                 console.log("tracker config loaded")
             } else {
                 console.log("error loading tracker config")
             }
-            calibration.initialize()
+            calibration.runSetup()
+        }
+    }
+
+    Image {
+        id: eyeStatus
+        width: 0.08 * parent.height
+        height: width
+        x: 0.5 * (parent.width - width)
+        y: 0.9 * (parent.height - height)
+        visible: true
+        source: "no_eye.svg"
+
+        function change(status) {
+            if (status) {
+                source = "eye.svg"
+            } else {
+                source = "no_eye.svg"
+            }
         }
     }
 

@@ -15,7 +15,6 @@ enum class SmoothingMethod {
     MovingAverage,
     DoubleMovingAverage,
     Median,
-    SavitzkyGolay,
     Kalman,
     DoubleExp,
     Custom
@@ -45,7 +44,6 @@ public:
 
 protected:
    int m_bufSize;
-   int m_previousPointTimestamp;
 
    boost::circular_buffer<double> m_bufX;
    boost::circular_buffer<double> m_bufY;
@@ -90,10 +88,8 @@ private:
     double m_gamma;
     double m_alpha;
 
-    double m_previousOutputX;
-    double m_previousOutputY;
-    double m_previousTrendX;
-    double m_previousTrendY;
+    cv::Point2d m_previousOutput;
+    cv::Point2d m_previousTrend;
 };
 
 
@@ -108,12 +104,10 @@ private:
     double m_gamma;
     double m_alpha;
 
-    double m_previousOutputX;
-    double m_previousOutputY;
-    double m_previousTrendX;
-    double m_previousTrendY;
-
     double m_jitterThreshold;
+
+    cv::Point2d m_previousOutput;
+    cv::Point2d m_previousTrend;
 };
 
 
@@ -127,13 +121,6 @@ public:
 private:
     cv::KalmanFilter m_filter;
     cv::Mat_<float> m_input;
-};
-
-
-class SavitzkyGolaySmoother final : public MovementSmootherWithBuffer
-{
-public:
-    cv::Point2d filter(const cv::Point2d & point) override;
 };
 
 #endif

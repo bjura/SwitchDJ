@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QPointF>
 #include <QVariant>
+#include <QDebug>
 
 #include "smoother.h"
 
@@ -46,9 +47,14 @@ signals:
     void pointCalibrated(bool success, QString errorMessage);
     void computeAndSetCalibrationFinished(bool success, QString errorMessage);
 
+    void gazeDetectionFailed(QString errorMessage);
+
 protected:
     virtual const char * getBackendCodename() const = 0; // only lowercase ASCII, no spaces
     QString getBaseConfigPath() const;
+
+    virtual void emitNewPoint(cv::Point2d point);
+    QPointF m_previousPoint;
 
     std::unique_ptr<MovementSmoother> m_smoother;
 

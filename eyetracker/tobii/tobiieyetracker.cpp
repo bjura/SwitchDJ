@@ -310,24 +310,27 @@ bool TobiiEyetracker::stopTracking()
     return false;
 }
 
-QPointF TobiiEyetracker::calculateSinglePoint(QPointF right, QPointF left)
+cv::Point2d TobiiEyetracker::calculateSinglePoint(QPointF right, QPointF left)
 {
-    QPointF pt(-1, -1);
-    if(right.x() != -1 &&
-       right.y() != -1 &&
-       left.x() != -1 &&
-       left.y() != -1)
+    cv::Point2d pt(std::numeric_limits<double>::quiet_NaN(),
+                   std::numeric_limits<double>::quiet_NaN());
+    if(!std::isnan(right.x()) &&
+       !std::isnan(right.y()) &&
+       !std::isnan(left.x()) &&
+       !std::isnan(left.y()))
     {
-        pt.setX(0.5 * (right.x() + left.x()));
-        pt.setY(0.5 * (right.y() + left.y()));
+        pt.x = 0.5 * (right.x() + left.x());
+        pt.y = 0.5 * (right.y() + left.y());
     }
-    else if(right.x() != -1 && right.y() != -1)
+    else if(!std::isnan(right.x()) && !std::isnan(right.y()))
     {
-        pt = right;
+        pt.x = right.x();
+        pt.y = right.y();
     }
-    else if(left.x() != -1 && left.y() != -1)
+    else if(!std::isnan(left.x()) && !std::isnan(left.y()))
     {
-        pt = left;
+        pt.x = left.x();
+        pt.y = left.y();
     }
     return pt;
 }
@@ -373,7 +376,5 @@ void TobiiEyetracker::privComputeAndSetCalibrationFinished(int error_code)
 
 void TobiiEyetracker::privGazeData(QPointF right, QPointF left)
 {
-    QPointF gazePos = calculateSinglePoint(right, left);
-    cv::Point2d smoothedPoint = m_smoother->filter(cv::Point2d(gazePos.x(), gazePos.y()));
-    emit gazeData(QPointF(smoothedPoint.x, smoothedPoint.y));
+    emitNewPoint(calculateSinglePoint(right, left));
 }

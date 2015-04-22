@@ -107,7 +107,7 @@ bool CameraEyetracker::loadConfig()
     QSettings settings(getBaseConfigPath() + ".ini", QSettings::IniFormat);
     m_pupilDetector.loadSettings(settings);
     m_calibration.load(settings);
-    m_cameraIndex = settings.value("camera_index", 0).toInt();
+    m_cameraIndex = settings.value("camera_index", m_cameraIndex).toInt();
     return settings.status() == QSettings::NoError;
 }
 
@@ -259,21 +259,15 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
     Q_UNUSED(size);
 
     if(!ok)
+        emit gazeDetectionFailed(tr("Tracker failed in detecting any pupil."));
         return;
 
-    const cv::Point2d pos(posX, posY);
+    cv::Point2d pos(posX, posY);
 
     if(m_tracking)
     {
-        cv::Point2d gazePos = m_calibration.getGazePosition(pos);
-        if(boost::math::isnan(gazePos.x) || boost::math::isnan(gazePos.y))
-            gazePos = cv::Point2d(-1, -1);
+        emitNewPoint(m_calibration.getGazePosition(pos));
 
-        cv::Point2d smoothedPos = m_smoother->filter(gazePos);
-
-        QPointF qpos(smoothedPos.x, smoothedPos.y);
-        qDebug() << "pos:" << qpos;
-        emit gazeData(qpos);
     }
 
     if(m_calibrating && m_calibrating_point)

@@ -66,8 +66,8 @@ cv::Point2d MedianSmoother::filter(const cv::Point2d & point)
 DoubleExpSmoother::DoubleExpSmoother()
     : m_gamma(0.6)
     , m_alpha(0.5)
-    , m_previousTrend(0, 0)
     , m_previousOutput(0, 0)
+    , m_previousTrend(0, 0)
 {
 }
 
@@ -90,9 +90,9 @@ cv::Point2d DoubleExpSmoother::filter(const cv::Point2d & point)
 CustomSmoother::CustomSmoother()
     : m_gamma(0.6)
     , m_alpha(0.4)
-    , m_previousTrend(0.0)
-    , m_previousOutput(0, 0)
     , m_jitterThreshold(0.5)
+    , m_previousOutput(0, 0)
+    , m_previousTrend(0.0)
 {
 }
 

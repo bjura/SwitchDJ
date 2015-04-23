@@ -101,6 +101,18 @@ HOME_SYMBOLS_SPREADSHEET = os.path.join(HOME_SYMBOLS_DIR, "symbols_topology.ods"
 
 
 """
+Path to the symbols model for "symboler" application.
+"""
+HOME_SYMBOLS_MODEL = os.path.join(HOME_SYMBOLS_DIR, "symbols_model.ods")
+
+
+"""
+Path to the symbols model for "symboler" application.
+"""
+HOME_SYMBOLS_ENTRY = os.path.join(HOME_SYMBOLS_DIR, "symbols_entry.ods")
+
+
+"""
 Path to a file containing all informations and list of URLs to blogs that are being
 followed by the user.
 """

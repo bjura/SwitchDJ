@@ -11,10 +11,6 @@ _LOG = logger.getLogger(__name__)
 
 SYMBOLS_DIR = res.get("symbols")
 
-MODEL_PATH = res.get("symbols.ini")
-
-ENTRIES_PATH = res.get("symbols_entries.ini")
-
 
 def create_model():
     """
@@ -25,7 +21,7 @@ def create_model():
     Any changes applied previously to the records in the spec
     file will not be overwritten.
     """
-    model = configobj.ConfigObj(MODEL_PATH, encoding='UTF8')
+    model = configobj.ConfigObj(dirs.HOME_SYMBOLS_MODEL, encoding='UTF8')
     items = model.keys()
     if "ALL" not in items:
         model["ALL"] = {}
@@ -56,7 +52,7 @@ def assign_text_to_symbol(symbol, text):
     :param symbol: symbol identificator
     :param text: text to be assigned to the symbol
     """
-    model = configobj.ConfigObj(MODEL_PATH, encoding='UTF8')
+    model = configobj.ConfigObj(dirs.HOME_SYMBOLS_MODEL, encoding='UTF8')
     for section in model.keys():
         if symbol in model[section].keys():
             model[section][symbol] = text
@@ -70,7 +66,7 @@ def add_symbol_to_category(symbol, category):
     :param symbol: symbol indentificator
     :param category: name of the category
     """
-    model = configobj.ConfigObj(MODEL_PATH, encoding='UTF8')
+    model = configobj.ConfigObj(dirs.HOME_SYMBOLS_MODEL, encoding='UTF8')
     model[category][symbol] = model["ALL"][symbol]
     model.write()
 
@@ -81,7 +77,7 @@ def get_symbol(symbol):
 
     :param symbol: symbol identificator
     """
-    model = configobj.ConfigObj(MODEL_PATH, encoding='UTF8')
+    model = configobj.ConfigObj(dirs.HOME_SYMBOLS_MODEL, encoding='UTF8')
     if symbol in model["ALL"].keys():
         return model["ALL"][symbol]
 
@@ -93,7 +89,7 @@ def get_symbols(symbols_list):
     :param symbols_list: list with symbols identificators
     """
     symbols = []
-    model = configobj.ConfigObj(MODEL_PATH, encoding='UTF8')
+    model = configobj.ConfigObj(dirs.HOME_SYMBOLS_MODEL, encoding='UTF8')
     all_symbols = model["ALL"].keys()
     for item in symbols_list:
         if item in all_symbols:
@@ -145,14 +141,14 @@ def get_symbols_from_category(category):
 
 def _get_symbols_from_section(section):
     return list(configobj.ConfigObj(
-        MODEL_PATH, encoding='UTF8')[section].items())
+        dirs.HOME_SYMBOLS_MODEL, encoding='UTF8')[section].items())
 
 
 def get_saved_entries():
     """
     Get all previously saved symbols entries.
     """
-    return configobj.ConfigObj(ENTRIES_PATH, encoding='UTF8')
+    return configobj.ConfigObj(dirs.HOME_SYMBOLS_ENTRY, encoding='UTF8')
 
 
 def save_entry(name, entry):
@@ -162,6 +158,6 @@ def save_entry(name, entry):
     :param entry: chain of symbols to be saved
     :param title: title of the new entry
     """
-    entries = configobj.ConfigObj(ENTRIES_PATH, encoding='UTF8')
+    entries = configobj.ConfigObj(dirs.HOME_SYMBOLS_ENTRY, encoding='UTF8')
     entries[name] = entry
     entries.write()

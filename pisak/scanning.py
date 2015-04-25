@@ -90,7 +90,7 @@ class StylableScannable(object):
         self.style_pseudo_class_remove("lag_hilite")
 
 
-class Strategy(GObject.GObject):
+class Strategy(Clutter.Actor):
     """
     Abstract base class for scanning strategies.
     """

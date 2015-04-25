@@ -5,7 +5,7 @@ from gi.repository import GObject, Clutter
 from pisak import properties, configurator
 
 
-class Predictor(GObject.GObject, properties.PropertyAdapter,
+class Predictor(Clutter.Actor, properties.PropertyAdapter,
                  configurator.Configurable):
     """
     Base class for objects that follow changes in the given target

@@ -43,7 +43,7 @@ class LoadingStage(Clutter.Stage):
         self.add_child(text)
 
 
-class AppManager(GObject.GObject,
+class AppManager(Clutter.Actor,
                  configurator.Configurable,
                  properties.PropertyAdapter,
                  widgets.ButtonSource):

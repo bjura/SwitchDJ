@@ -9,7 +9,7 @@ from gi.repository import Cogl, Clutter, GObject
 from pisak import properties, res, configurator
 
 
-class ImageBuffer(GObject.GObject, properties.PropertyAdapter,
+class ImageBuffer(Clutter.Actor, properties.PropertyAdapter,
                   configurator.Configurable):
     """
     Buffer containing a currently edited photo.

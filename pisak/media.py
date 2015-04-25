@@ -90,7 +90,7 @@ class MediaPlaybackIface(object):
         raise NotImplementedError
 
 
-class MediaPlayback(GObject.GObject, MediaPlaybackIface,
+class MediaPlayback(Clutter.Actor, MediaPlaybackIface,
                     properties.PropertyAdapter, configurator.Configurable):
     """
     Tool for controlling playback of different kinds of media data,

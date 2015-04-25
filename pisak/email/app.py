@@ -3,7 +3,7 @@ Email application main module.
 """
 import time
 
-from pisak import launcher, handlers
+from pisak import launcher, handlers, res
 from pisak.viewer import model
 from pisak.email import address_book, message, config
 
@@ -20,15 +20,26 @@ ELEMENTS = {
 }
 
 
-def prepare_main_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
-    handlers.button_to_view(stage, script, "button_inbox", "email/inbox")
-    handlers.button_to_view(stage, script, "button_sent", "email/sent")
-    handlers.button_to_view(stage, script, "button_drafts", "email/drafts")
+BUILTIN_CONTACTS = [
+	{
+		"name": "PISAK",
+		"address": "kontakt@pisak.org",
+		"photo": res.get("logo_pisak.jpg")
+	}
+ ]
+
+
+def prepare_main_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_inbox", "email/inbox")
+    handlers.button_to_view(app, script, "button_sent", "email/sent")
+    handlers.button_to_view(app, script, "button_drafts", "email/drafts")
     handlers.button_to_view(
-        stage, script, "button_address_book", "email/address_book")
+        app, script, "button_address_book", "email/address_book")
     handlers.button_to_view(
-        stage, script, "button_new_message", "email/speller_message_subject")
+        app, script, "button_new_message", "email/speller_message_subject")
+    for contact in BUILTIN_CONTACTS:
+		app.box.address_book.add_contact(contact)
 
 
 def prepare_drafts_view(stage, script, data):

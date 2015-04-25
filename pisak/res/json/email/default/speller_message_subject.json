@@ -182,7 +182,14 @@
         "ratio-height": 0.085,
         "icon-size": 50,
         "label": "AKCEPTUJ",
-        "icon-name": "ocena"
+        "icon-name": "ocena",
+        "signals": [
+            {
+                "name": "clicked",
+                "handler": "email/new_message_add_subject",
+                "object": "text_box"
+            }
+        ]
     },
     {
         "id": "button_4",

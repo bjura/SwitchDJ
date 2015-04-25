@@ -79,7 +79,7 @@ def prepare_sent_view(stage, script, data):
 def prepare_speller_message_body_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
     handlers.button_to_view(stage, script, "button_proceed",
-                            "email/address_book")
+                    "email/address_book", {"pick_recipents_mode": True})
 
 
 def prepare_speller_message_subject_view(stage, script, data):
@@ -94,13 +94,7 @@ def prepare_speller_message_to_view(stage, script, data):
 
 
 def prepare_address_book_view(app, script, data):
-    handlers.button_to_view(app, script, "button_exit")
-    handlers.button_to_view(
-        app, script, "button_new_contact", "email/contact")
-    handlers.button_to_view(app, script, "button_back", "email/main")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    app.ui.date.set_text(today)
-    data_source = script.get_object("data_source")
+
     def on_contact_select(tile, contact):
         """
         On contact tile select.
@@ -114,8 +108,24 @@ def prepare_address_book_view(app, script, data):
         else:
             app.box.new_message.recipents.remove(contact["address"])
 
-    data_source.item_handler =  lambda tile, contact: \
-        on_contact_select(tile, contact)
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_back", "email/main")
+    today = "DATA:   " + time.strftime("%d-%m-%Y")
+    app.ui.date.set_text(today)
+    data_source = script.get_object("data_source")
+
+    if data and data.get("pick_recipents_mode"):
+        specific_button= app.ui.button_send_message
+        tile_handler = lambda tile, contact: on_contact_select(tile, contact)
+    else:
+        specific_button = app.ui.button_new_contact
+        tile_handler = lambda tile, contact: app.load_view(
+            "email/contact", {"contact": contact})
+        handlers.button_to_view(
+            app, script, "button_new_contact", "email/contact")
+
+    app.ui.button_menu_box.replace_child(app.ui.button_specific, specific_button)
+    data_source.item_handler = tile_handler
 
 
 def prepare_contact_view(app, script, data):

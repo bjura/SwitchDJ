@@ -91,8 +91,15 @@
         "y-expand": true,
         "y-align": "end",
         "children": ["button_exit", "button_back", "button_scan_page",
-                      "button_next_page", "button_automatic",
-                      "button_new_contact", "button_send_message"]
+                      "button_previous_page", "button_next_page",
+                      "button_automatic", "button_specific"]
+    },
+    {
+        "id": "button_specific",
+        "type": "PisakButton",
+        "style-class": "PisakEmailButton",
+        "ratio-width": 0.24,
+        "ratio-height": 0.10
     },
     {
         "id": "button_send_message",
@@ -109,7 +116,6 @@
                 "handler": "email/new_message_send"
             }
         ]
-
     },
     {
         "id": "button_new_contact",

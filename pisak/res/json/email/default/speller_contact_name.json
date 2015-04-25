@@ -171,7 +171,6 @@
             }
         ]
     },
-
     {
         "id": "button_proceed",
         "type": "PisakButton",

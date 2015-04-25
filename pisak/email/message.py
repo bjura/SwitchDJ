@@ -52,9 +52,6 @@ class SimpleMessage(object):
         # only plain text, not any markups:
         return MIMEText(self.body, "plain", self.charset)
 
-    def _add_sender(self, sender):
-        pass
-
     def _compose_message(self):
         """
         Compose a message object from all the stored data.

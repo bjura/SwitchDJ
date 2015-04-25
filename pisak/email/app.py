@@ -117,6 +117,8 @@ def prepare_address_book_view(app, script, data):
     if data and data.get("pick_recipents_mode"):
         specific_button= app.ui.button_send_message
         tile_handler = lambda tile, contact: on_contact_select(tile, contact)
+        handlers.button_to_view(app, script,
+                                "button_send_message", "email/sent")
     else:
         specific_button = app.ui.button_new_contact
         tile_handler = lambda tile, contact: app.load_view(

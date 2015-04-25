@@ -1039,7 +1039,7 @@ class PhotoTile(layout.Bin, properties.PropertyAdapter, scanning.Scannable,
             pisak.app.play_sound_effect('selection')
 
     def _toggle(self):
-        for element in [self]:
+        for element in self.get_children():
             element.set_size(*[dim * self.toggle_coeff for dim in element.get_size()])
 
     def _untoggle(self):

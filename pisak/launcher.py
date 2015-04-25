@@ -24,10 +24,38 @@ class LauncherError(Exception):
     pass
 
 
+class _UI(object):
+    """
+    User interface definition plain container.
+
+    :param script: UI script
+    """
+    def __init__(self, script):
+        for obj in script.list_objects():
+            if hasattr(obj, "get_id"):
+                setattr(self, obj.get_id(), obj)
+
+
+class _Box(object):
+    """
+    Box for all the application specific gears.
+    """
+    def register_elements(self, elements):
+        """
+        Register all specific elements that will be used by the application.
+
+        :param elements: dictionary of elements
+        """
+        self.__dict__.update(elements)
+
+
 class LauncherWindow(configurator.Configurable):
-    def __init__(self, descriptor, stage):
+    def __init__(self, descriptor, stage, application):
         super().__init__()
+        self.base_application = application
         self.stage = stage
+        self.box = _Box()
+        self.ui = None
         self.input_group = inputs.InputGroup(self.stage)
         self._init_layout()
         self.type = descriptor["type"]
@@ -57,6 +85,9 @@ class LauncherWindow(configurator.Configurable):
         """
         view_list = descriptor.get("views")
         app_name = descriptor.get("app")
+        app_elements = descriptor.get("elements")
+        if app_elements:
+            self.box.register_elements(app_elements)
         self._read_config(app_name)
         self._read_views(app_name, view_list)
         self.initial_view = os.path.join(app_name, "main")
@@ -97,7 +128,8 @@ class LauncherWindow(configurator.Configurable):
         view_path, prepare = self.views.get(name)
         self.script = Clutter.Script()
         self.script.load_from_file(view_path)
-        self.script.connect_signals_full(signals.connect_registered)
+        self.script.connect_signals_full(signals.connect_registered, self)
+        self.ui = _UI(self.script)
         if prepare:
             prepare(self, self.script, data)
         children = self.stage.get_children()
@@ -118,7 +150,7 @@ def run(descriptor):
         '''
 
         def create_window(self, argv):
-            clutter_window = LauncherWindow(descriptor, Clutter.Stage())
+            clutter_window = LauncherWindow(descriptor, Clutter.Stage(), self)
             clutter_window.stage.set_title('Pisak Main')
             if arg_parser.get_args().debug:
                 clutter_window.stage.set_size(800, 600)
@@ -138,7 +170,7 @@ def run(descriptor):
             embed = GtkClutter.Embed()
             gtk_window.add(embed)
             gtk_window.stage = embed.get_stage()
-            clutter_window = LauncherWindow(descriptor, gtk_window.stage)
+            clutter_window = LauncherWindow(descriptor, gtk_window.stage, self)
             clutter_window.wrapper = gtk_window
             gtk_window.stage.set_title('Pisak Main')
             if arg_parser.get_args().debug:

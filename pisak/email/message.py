@@ -9,7 +9,7 @@ from pisak import logger
 from pisak.email import config
 
 
-LOG = logger.getLogger(__name__)
+_LOG = logger.getLogger(__name__)
 
 
 class  EmailSendingError(Exception):
@@ -19,42 +19,59 @@ class  EmailSendingError(Exception):
 class SimpleMessage(object):
 
     def __init__(self):
-        self._msg = Message()
-        self.recipents = []
         self.charset = "utf-8"
+        self.recipents = []
+        self.body = ""
+        self.subject = ""
 
-    def add_recipent(self, recipent):
+    def _add_recipents(self, msg):
         """
-        Add recipent address to the list of all recipents.
+        Add recipents to the message.
 
-        :param recipent: new recipent address
+        :param msg: internal message object
         """
-        self._msg["To"] = Header(recipent if not self._msg["To"] else \
-            ",".join([self._msg["To"], recipent]), self.charset)
-        self.recipents.append(recipent)
+        if len(self.recipents) > 0:
+            msg["To"] = Header(",".join(self.recipents), self.charset)
+        else:
+            e = "No recipents of the new message specified."
+            _LOG.error(e)
+            raise EmailSendingError(e)
 
-    def add_subject(self, subject):
+    def _add_subject(self, msg):
         """
         Set subject of the message.
 
-        :param subject: text subject of the message
+        :param msg: internal message object
         """
-        self._msg["Subject"] = Header(subject, self.charset)
+        msg["Subject"] = Header(self.subject, self.charset)
 
-    def add_body(self, text):
+    def _create_body(self):
         """
-        Add body of the message.
+        Create new simple message and add its body.
+        """
+        # only plain text, not any markups:
+        return MIMEText(self.body, "plain", self.charset)
 
-        :param text: message body as plain text
+    def _add_sender(self, sender):
+        pass
+
+    def _compose_message(self):
         """
-        body = MIMEText(text, "plain", self.charset)  # only plain text, not any markup
-        self._msg.set_payload(body.as_string())
+        Compose a message object from all the stored data.
+
+        :returns: fully prepared message object for internal use
+        """
+        msg = self._create_body()
+        self._add_subject(msg)
+        self._add_recipents(msg)
+        return msg
 
     def send(self):
         """
         Send the message through the SMTP.
         """
-        setup = config,get_account_setup()
+        msg = self._compose_message()
+        setup = config.get_account_setup()
         server_out = "smtp.{}:{}".format(
                 setup["server_address"], setup["port_out"])
         try:
@@ -66,10 +83,32 @@ class SimpleMessage(object):
                 _LOG.warning("Server does not support STARTTLS.")
             server.ehlo_or_helo_if_needed()
             server.login(setup["user_address"], setup["password"])
-            server.sendmail(setup["user_address"], self.recipents, self._msg.as_string())
+            server.sendmail(setup["user_address"], self.recipents, msg.as_string())
             server.quit()
             _LOG.debug("Email was sent successfully.")
             return True
-        except (socket.error, smtplib.SMTPException, SSLError) as msg:
-            _LOG.error(msg)
-            raise EmailSendingError(msg)
+        except (socket.error, smtplib.SMTPException, SSLError) as e:
+            _LOG.error(e)
+            raise EmailSendingError(e)
+
+    def clear(self):
+        """
+        Clear the whole message, all headers etc
+        and start creating a new one from the very beginning.
+        """
+        self.recipents = []
+        self.body = ""
+        self.subject = ""
+
+    def get_pretty(self):
+        """
+        Compose a prettyfied version of the message that can be saved in a
+        human-readable shape, for example as a draft message.
+
+        :returns: dictionary containing all the separate message fields.
+        """
+        return {
+            "recipents": self.recipents,
+            "subject": self.subject,
+            "body": self.body
+        }

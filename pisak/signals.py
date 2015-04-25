@@ -35,18 +35,18 @@ def resolve_handler(handler_name):
         raise Exception("Specified handler is not a function")
 
 
-def connect_function(gobject, signal, target, flags, function):
+def connect_function(gobject, signal, target, flags, function, data):
     # TODO:
     # make 'git grep connect' and redirect all the resulted connections in here
     if target is not None:
         if GObject.ConnectFlags.AFTER == flags:
-            gobject.connect_object_after(signal, function, target)
+            gobject.connect_object_after(signal, function, target, data)
         else:
-            gobject.connect_object(signal, function, target)
+            gobject.connect_object(signal, function, target, data)
     elif GObject.ConnectFlags.AFTER == flags:
-        gobject.connect_after(signal, function)
+        gobject.connect_after(signal, function, data)
     else:
-        gobject.connect(signal, function)
+        gobject.connect(signal, function, data)
 
 
 def python_connect(script, gobject, signal, handler, target, flags):
@@ -91,10 +91,10 @@ def registered_handler(handler_name):
     return f_reg
 
 
-def connect_registered(script, gobject, signal, handler, target, flags):
+def connect_registered(script, gobject, signal, handler, target, flags, data):
     """
     Alternate implementation of signal connector. Uses only registered
     functions instead of introspection.
     """
     function = resolve_registered(handler)
-    connect_function(gobject, signal, target, flags, function)
+    connect_function(gobject, signal, target, flags, function, data)

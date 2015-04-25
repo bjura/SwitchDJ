@@ -92,8 +92,25 @@
         "y-expand": true,
         "y-align": "end",
         "children": ["button_exit", "button_back", "button_scan_page",
-                     "button_previous_page", "button_next_page",
-                     "button_automatic", "button_new_contact"]
+                      "button_next_page", "button_automatic",
+                      "button_new_contact", "button_send_message"]
+    },
+    {
+        "id": "button_send_message",
+        "label": "WYŚLIJ WIADOMOŚĆ",
+        "type": "PisakButton",
+        "style-class": "PisakEmailButton",
+        "ratio-width": 0.24,
+        "ratio-height": 0.10,
+        "icon-size": 50,
+        "icon-name": "wyslij",
+        "signals": [
+            {
+                "name": "clicked",
+                "handler": "email/new_message_send"
+            }
+        ]
+
     },
     {
         "id": "button_new_contact",

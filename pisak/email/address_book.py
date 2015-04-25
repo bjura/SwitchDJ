@@ -28,11 +28,15 @@ class AddressBook(text_tools.Predictor):
         :param contact: contact dictionary with optional 'name',
         'address' and 'photo' keys
         """
-        contact_id = str(len(self.book))
-        while contact_id in self.book:
-            contact_id = str(int(contact_id + 1))
-        self.book[contact_id] = contact
-        self.book.write()
+        if contact not in self.book.values():
+            contact_id = str(len(self.book))
+            while contact_id in self.book:
+                contact_id = str(int(contact_id) + 1)
+            self.book[contact_id] = contact
+            self.book.write()
+        else:
+            _LOG.warning(
+                "Contact {} already in the address book.".format(contact))
 
     def remove_contact(self, contact_id):
         """

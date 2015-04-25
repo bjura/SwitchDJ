@@ -3,7 +3,9 @@ Email application main module.
 """
 import time
 
-from pisak import launcher, handlers, res
+from gi.repository import GObject
+
+from pisak import launcher, handlers, res, logger
 from pisak.viewer import model
 from pisak.email import address_book, message, config
 
@@ -12,6 +14,9 @@ import pisak.email.handlers  #@UnusedImport
 import pisak.speller.handlers  #@UnusedImport
 import pisak.speller.widgets  #@UnusedImport
 import pisak.viewer.widgets  #@UnusedImport
+
+
+_LOG = logger.getLogger(__name__)
 
 
 ELEMENTS = {
@@ -39,7 +44,7 @@ def prepare_main_view(app, script, data):
     handlers.button_to_view(
         app, script, "button_new_message", "email/speller_message_subject")
     for contact in BUILTIN_CONTACTS:
-		app.box.address_book.add_contact(contact)
+	    app.box.address_book.add_contact(contact)
 
 
 def prepare_drafts_view(stage, script, data):
@@ -113,24 +118,28 @@ def prepare_address_book_view(app, script, data):
         on_contact_select(tile, contact)
 
 
-def prepare_contact_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
-    handlers.button_to_view(stage, script, "button_back", "email/main")
-    handlers.button_to_view(stage, script, "button_edit_name",
+def prepare_contact_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_back", "email/main")
+    handlers.button_to_view(app, script, "button_edit_name",
                             "email/speller_contact_name")
-    handlers.button_to_view(stage, script, "button_edit_address",
+    handlers.button_to_view(app, script, "button_edit_address",
                             "email/speller_contact_address")
-    handlers.button_to_view(stage, script, "button_edit_photo",
+    handlers.button_to_view(app, script, "button_edit_photo",
                             "email/viewer_contact_library")
-    handlers.button_to_view(stage, script, "button_create_message",
+    handlers.button_to_view(app, script, "button_create_message",
                              "email/speller_message_subject")
-    contact = data["contact"]
-    photo = script.get_object("photo")
-    name = script.get_object("contact_name_text")
-    address = script.get_object("contact_address_text")
-    photo.set_from_file(contact["photo"])
-    name.set_text(contact["name"])
-    address.set_text(contact["address"])
+    if data:
+        contact = data["contact"]
+        if "photo" in contact:
+            try:
+                app.ui.photo.set_from_file(contact["photo"])
+            except GObject.GError as e:
+                _LOG.error(e)
+        if "name" in contact:
+            app.ui.contact_name_text.set_text(contact["name"])
+        if "address" in contact:
+            app.ui.contact_address_text.set_text(contact["address"])
 
 
 def prepare_speller_contact_name_view(stage, script, data):

@@ -5,11 +5,19 @@ import time
 
 from pisak import launcher, handlers
 from pisak.viewer import model
+from pisak.email import address_book, message, config
 
-from pisak.email import address_book, widgets  #@UnusedImport
+from pisak.email import widgets  #@UnusedImport
+import pisak.email.handlers  #@UnusedImport
 import pisak.speller.handlers  #@UnusedImport
 import pisak.speller.widgets  #@UnusedImport
 import pisak.viewer.widgets  #@UnusedImport
+
+
+ELEMENTS = {
+    "new_message": message.SimpleMessage(),
+    "address_book": address_book.AddressBook()
+}
 
 
 def prepare_main_view(stage, script, data):
@@ -55,7 +63,8 @@ def prepare_sent_view(stage, script, data):
 def prepare_speller_message_body_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
     handlers.button_to_view(stage, script, "button_proceed",
-                            "email/speller_message_to")
+                            "email/address_book")
+
 
 def prepare_speller_message_subject_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
@@ -68,14 +77,13 @@ def prepare_speller_message_to_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_proceed", "email/sent")
 
 
-def prepare_address_book_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
+def prepare_address_book_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(
-        stage, script, "button_new_contact", "email/contact")
-    handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
+        app, script, "button_new_contact", "email/contact")
+    handlers.button_to_view(app, script, "button_back", "email/main")
     today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
+    app.ui.date.set_text(today)
     data_source = script.get_object("data_source")
     def on_contact_select(tile, contact):
         """
@@ -85,6 +93,11 @@ def prepare_address_book_view(stage, script, data):
         :param contact: contact dictionary
         """
         tile.toggled = not tile.toggled
+        if tile.toggled:
+            app.box.new_message.recipents.append(contact["address"])
+        else:
+            app.box.new_message.recipents.remove(contact["address"])
+
     data_source.item_handler =  lambda tile, contact: \
         on_contact_select(tile, contact)
 
@@ -138,6 +151,7 @@ if __name__ == "__main__":
     email_app = {
         "app": "email",
         "type": "clutter",
+        "elements": ELEMENTS,
         "views": [
             ("main", prepare_main_view),
             ("drafts", prepare_drafts_view),

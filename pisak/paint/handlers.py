@@ -7,7 +7,7 @@ from pisak import signals, utils
 
 
 @signals.registered_handler("paint/set_line_color")
-def set_line_color(button):
+def set_line_color(button, _app):
     """
     Set easel line color
     """
@@ -16,7 +16,7 @@ def set_line_color(button):
 
 
 @signals.registered_handler("paint/set_line_width")
-def set_line_width(button):
+def set_line_width(button, _app):
     """
     Set easel line width
     """
@@ -25,7 +25,7 @@ def set_line_width(button):
 
 
 @signals.registered_handler("paint/clear_canvas")
-def clear_canvas(easel):
+def clear_canvas(easel, _app):
     """
     Clear easel canvas
     """
@@ -33,7 +33,7 @@ def clear_canvas(easel):
 
 
 @signals.registered_handler("paint/save_to_file")
-def save_to_file(easel):
+def save_to_file(easel, _app):
     """
     Save easel canvas picture to png file
     """
@@ -41,7 +41,7 @@ def save_to_file(easel):
 
 
 @signals.registered_handler("paint/new_spot")
-def new_spot(easel):
+def new_spot(easel, _app):
     """
     Localize new drawing spot
     """
@@ -49,7 +49,7 @@ def new_spot(easel):
 
 
 @signals.registered_handler("paint/navigate")
-def navigate(easel):
+def navigate(easel, _app):
     """
     Back to drawing and navigate
     """
@@ -57,7 +57,7 @@ def navigate(easel):
 
 
 @signals.registered_handler("paint/erase")
-def erase(easel):
+def erase(easel, _app):
     """
     Erase one step backward
     """

@@ -6,7 +6,7 @@ from pisak.speller import widgets, documents_manager
 
 
 @signals.registered_handler("speller/undo")
-def undo(text_box, *args):
+def undo(text_box, _app):
     """
     Undo the last operation applied to a text box.
 
@@ -16,7 +16,7 @@ def undo(text_box, *args):
 
 
 @signals.registered_handler("speller/nav_right")
-def nav_right(text_box):
+def nav_right(text_box, _app):
     """
     Move text cursor forward for one position.
 
@@ -26,7 +26,7 @@ def nav_right(text_box):
 
 
 @signals.registered_handler("speller/nav_left")
-def nav_left(text_box):
+def nav_left(text_box, _app):
     """
     Move text cursor backward for one position.
 
@@ -36,7 +36,7 @@ def nav_left(text_box):
 
 
 @signals.registered_handler("speller/nav_down")
-def nav_down(text_box):
+def nav_down(text_box, _app):
     """
     Move text cursor one line down.
 
@@ -46,7 +46,7 @@ def nav_down(text_box):
 
 
 @signals.registered_handler("speller/nav_up")
-def nav_up(text_box):
+def nav_up(text_box, _app):
     """
     Move text cursor one line up.
 
@@ -56,7 +56,7 @@ def nav_up(text_box):
 
 
 @signals.registered_handler("speller/nav_word_backward")
-def nav_word_backward(text_box):
+def nav_word_backward(text_box, _app):
     """
     Move text cursor backward skipping one word.
 
@@ -66,7 +66,7 @@ def nav_word_backward(text_box):
 
 
 @signals.registered_handler("speller/nav_word_forward")
-def nav_word_forward(text_box):
+def nav_word_forward(text_box, _app):
     """
     Move text cursor forward skipping one word.
 
@@ -76,7 +76,7 @@ def nav_word_forward(text_box):
 
 
 @signals.registered_handler("speller/save")
-def save(pop_up):
+def save(pop_up, _app):
     """
     Save the current text buffer content to a text file.
     Open a dialog window.
@@ -108,7 +108,7 @@ def save(pop_up):
 
 
 @signals.registered_handler("speller/load")
-def load(pop_up):
+def load(pop_up, _app):
     """
     Load one of the previously saved text files. Put the text
     inside the text box.
@@ -127,7 +127,7 @@ def load(pop_up):
 
 
 @signals.registered_handler("speller/print")
-def print_doc(text_box):
+def print_doc(text_box, _app):
     """
     Print text from the text buffer.
 
@@ -137,7 +137,7 @@ def print_doc(text_box):
 
 
 @signals.registered_handler("speller/send")
-def send(text_box):
+def send(text_box, _app):
     """
     Send text from the text buffer by means of some other application.
 
@@ -147,7 +147,7 @@ def send(text_box):
 
 
 @signals.registered_handler("speller/new_document")
-def new_document(text_box):
+def new_document(text_box, _app):
     """
     Remove the whole text from the text buffer and clear the text box.
 
@@ -157,7 +157,7 @@ def new_document(text_box):
 
 
 @signals.registered_handler("speller/text_to_speech")
-def text_to_speech(text_box):
+def text_to_speech(text_box, _app):
     """
     Read the text loud.
 
@@ -169,7 +169,7 @@ def text_to_speech(text_box):
 
 
 @signals.registered_handler("speller/backspace")
-def backspace(text_box):
+def backspace(text_box, _app):
     """
     Delete the one last character from the text buffer.
 
@@ -179,7 +179,7 @@ def backspace(text_box):
 
 
 @signals.registered_handler("speller/space")
-def space(text_box):
+def space(text_box, _app):
     """
     Insert space in the end of the text buffer.
 
@@ -188,7 +188,7 @@ def space(text_box):
     text_box.type_text(" ")
 
 @signals.registered_handler("speller/enter")
-def enter(text_box):
+def enter(text_box, _app):
     """
     Insert enter in the end of the text buffer.
 
@@ -198,7 +198,7 @@ def enter(text_box):
 
 
 @signals.registered_handler("speller/new_line")
-def new_line(text_box):
+def new_line(text_box, _app):
     """
     Begin a new line of text.
 
@@ -208,7 +208,7 @@ def new_line(text_box):
 
 
 @signals.registered_handler("speller/previous_chars")
-def previous_chars(keyboard_item):
+def previous_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the previously displayed ones.
 
@@ -226,7 +226,7 @@ def previous_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/default_chars")
-def default_chars(keyboard_item):
+def default_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the default ones.
 
@@ -240,7 +240,7 @@ def default_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/special_chars")
-def special_chars(keyboard_item):
+def special_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the special ones.
 
@@ -257,7 +257,7 @@ def special_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/altgr_chars")
-def altgr_chars(keyboard_item):
+def altgr_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the ones specified by altgr property.
 
@@ -274,7 +274,7 @@ def altgr_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/caps_chars")
-def caps_chars(keyboard_item):
+def caps_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the upper cased ones.
 
@@ -291,7 +291,7 @@ def caps_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/lower_chars")
-def lower_chars(keyboard_item):
+def lower_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the lower cased ones.
 
@@ -308,7 +308,7 @@ def lower_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/swap_special_chars")
-def swap_special_chars(keyboard_item):
+def swap_special_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the special or default ones.
 
@@ -323,7 +323,7 @@ def swap_special_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/swap_altgr_chars")
-def swap_altgr_chars(keyboard_item):
+def swap_altgr_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the ones specified by
     altgr property or to the default ones.
@@ -339,7 +339,7 @@ def swap_altgr_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/swap_caps_chars")
-def swap_caps_chars(keyboard_item):
+def swap_caps_chars(keyboard_item, _app):
     """
     Change chars on the keyboard keys to the upper or lower cased ones.
 
@@ -354,7 +354,7 @@ def swap_caps_chars(keyboard_item):
 
 
 @signals.registered_handler("speller/lower_chars_on_select")
-def lower_chars_on_select(keyboard_panel):
+def lower_chars_on_select(keyboard_panel, _app):
     """
     Automatically change chars on the keyboard keys to the lower cased ones
     after typing one of the characters.
@@ -365,7 +365,7 @@ def lower_chars_on_select(keyboard_panel):
 
 
 @signals.registered_handler("speller/caps_chars_on_select")
-def caps_chars_on_select(keyboard_panel):
+def caps_chars_on_select(keyboard_panel, _app):
     """
     Automatically change chars on the keyboard keys to the upper cased ones
     after typing one of the characters.
@@ -376,7 +376,7 @@ def caps_chars_on_select(keyboard_panel):
 
 
 @signals.registered_handler("speller/swap_caps_chars_on_select")
-def swap_caps_chars_on_select(keyboard_panel):
+def swap_caps_chars_on_select(keyboard_panel, _app):
     """
     Automatically change chars on the keyboard keys to the lower or upper
     cased ones after typing one of the characters.
@@ -387,7 +387,7 @@ def swap_caps_chars_on_select(keyboard_panel):
 
 
 @signals.registered_handler("speller/swap_altgr_chars_on_select")
-def swap_altgr_chars_on_select(keyboard_panel):
+def swap_altgr_chars_on_select(keyboard_panel, _app):
     """
     Automatically change chars on the keyboard keys to the ones specified by
     altgr property or to the default ones after typing one of the characters.
@@ -398,7 +398,7 @@ def swap_altgr_chars_on_select(keyboard_panel):
 
 
 @signals.registered_handler("speller/swap_special_chars_on_select")
-def swap_special_chars_on_select(keyboard_panel):
+def swap_special_chars_on_select(keyboard_panel, _app):
     """
     Automatically change chars on the keyboard keys to the special or default
     ones after typing one of the characters.
@@ -409,7 +409,7 @@ def swap_special_chars_on_select(keyboard_panel):
 
 
 @signals.registered_handler("speller/unset_toggled_state_on_select")
-def unset_toggled_state_on_select(button):
+def unset_toggled_state_on_select(button, _app):
     """
     Automatically unset toggled state of the button after selecting one
     of the keyboard keys.
@@ -428,7 +428,7 @@ def unset_toggled_state_on_select(button):
 
 
 @signals.registered_handler("speller/unset_toggled_state")
-def unset_toggled_state(button):
+def unset_toggled_state(button, _app):
     """
     Unset toggled state of the button.
 
@@ -450,7 +450,7 @@ def unset_toggled_state(button):
 
 
 @signals.registered_handler("speller/set_toggled_state")
-def set_toggled_state(button):
+def set_toggled_state(button, _app):
     """
     Set toggled state of the button.
 
@@ -461,7 +461,7 @@ def set_toggled_state(button):
 
 
 @signals.registered_handler("speller/switch_toggled_state")
-def switch_toggled_state(button):
+def switch_toggled_state(button, _app):
     """
     Set or unset toggled state of the button.
 

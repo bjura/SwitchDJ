@@ -7,7 +7,7 @@ from gi.repository import Clutter, Gtk
 
 
 @signals.registered_handler("general/run_input_middleware")
-def run_input_middleware(source):
+def run_input_middleware(source, _app):
     """
     Run the current middleware.
     """
@@ -15,7 +15,7 @@ def run_input_middleware(source):
 
 
 @signals.registered_handler("general/stop_input_middleware")
-def stop_input_middleware(source):
+def stop_input_middleware(source, _app):
     """
     Stop the middleware. Useful if the middleware is planned to be restarted.
     """
@@ -63,7 +63,7 @@ def button_to_view(window, script, button_name, view_to_load=None, data=None):
 
 
 @signals.registered_handler("data_source/next_data_set")
-def next_data_set(data_source):
+def next_data_set(data_source, _app):
     """
     Make the given data source to move to the next data set.
 
@@ -73,7 +73,7 @@ def next_data_set(data_source):
 
 
 @signals.registered_handler("data_source/previous_data_set")
-def previous_data_set(data_source):
+def previous_data_set(data_source, _app):
     """
     Make the given data source to move to the previous data set.
 
@@ -83,7 +83,7 @@ def previous_data_set(data_source):
 
 
 @signals.registered_handler("playlist/next")
-def move_next(playlist):
+def move_next(playlist, _app):
     """
     Move to the next position on the given playlist.
 
@@ -93,7 +93,7 @@ def move_next(playlist):
 
 
 @signals.registered_handler("playlist/previous")
-def move_previous(playlist):
+def move_previous(playlist, _app):
     """
     Move to the previous position on the given playlist.
 
@@ -103,7 +103,7 @@ def move_previous(playlist):
 
 
 @signals.registered_handler("playlist/play")
-def play(playlist):
+def play(playlist, _app):
     """
     Start playing the current media item on the given playlist.
 
@@ -113,7 +113,7 @@ def play(playlist):
 
 
 @signals.registered_handler("playlist/stop")
-def stop(playlist):
+def stop(playlist, _app):
     """
     Stop playing of the given playlist.
 
@@ -123,7 +123,7 @@ def stop(playlist):
 
 
 @signals.registered_handler("playlist/pause")
-def pause(playlist):
+def pause(playlist, _app):
     """
     Pause playing the current media item on the given playlist.
 
@@ -133,7 +133,7 @@ def pause(playlist):
     
 
 @signals.registered_handler("playlist/toggle_looped")
-def toggle_looped(playlist):
+def toggle_looped(playlist, _app):
     """
     Turn on or turn off the looped mode of the given playlist. 
 
@@ -143,7 +143,7 @@ def toggle_looped(playlist):
     
 
 @signals.registered_handler("playlist/toggle_random_order")
-def toggle_random_order(playlist):
+def toggle_random_order(playlist, _app):
     """
     Turn on or turn off the random order of playing the items
     on the given playlist. 
@@ -154,7 +154,7 @@ def toggle_random_order(playlist):
 
 
 @signals.registered_handler("playlist/toggle_play")
-def toggle_play(playlist):
+def toggle_play(playlist, _app):
     """
     Start or pause playing the current media item on the given playlist,
     basing on the current item state.
@@ -168,7 +168,7 @@ def toggle_play(playlist):
 
 
 @signals.registered_handler("media/toggle_play")
-def toggle_play_media(player):
+def toggle_play_media(player, _app):
     """
     Start or pause playing the current media stream,
     basing on the current state.
@@ -182,7 +182,7 @@ def toggle_play_media(player):
     
 
 @signals.registered_handler("media/play")
-def play_media(player):
+def play_media(player, _app):
     """
     Start playing the media playback.
 
@@ -192,7 +192,7 @@ def play_media(player):
 
 
 @signals.registered_handler("media/stop")
-def stop_media(player):
+def stop_media(player, _app):
     """
     Stop playing the media playback.
 
@@ -202,7 +202,7 @@ def stop_media(player):
 
 
 @signals.registered_handler("media/pause")
-def pause_media(player):
+def pause_media(player, _app):
     """
     Pause playing the media playback.
 
@@ -212,7 +212,7 @@ def pause_media(player):
 
 
 @signals.registered_handler("media/increase_volume")
-def increase_volume(player):
+def increase_volume(player, _app):
     """
     Increase volume of the media playback.
 
@@ -222,7 +222,7 @@ def increase_volume(player):
 
 
 @signals.registered_handler("media/decrease_volume")
-def decrease_volume(player):
+def decrease_volume(player, _app):
     """
     Decrease volume of the media playback.
 
@@ -232,7 +232,7 @@ def decrease_volume(player):
 
 
 @signals.registered_handler("media/skip_forward")
-def skip_forward(player):
+def skip_forward(player, _app):
     """
     Skip the media playback forward.
 
@@ -242,7 +242,7 @@ def skip_forward(player):
 
 
 @signals.registered_handler("media/skip_backward")
-def skip_backward(player):
+def skip_backward(player, _app):
     """
     Skip the media playback backward.
     
@@ -252,7 +252,7 @@ def skip_backward(player):
 
 
 @signals.registered_handler("media/toggle_rewind_forward")
-def toggle_rewind_forward(player):
+def toggle_rewind_forward(player, _app):
     """
     Start or stop rewinding of the media playback forward.
 
@@ -262,7 +262,7 @@ def toggle_rewind_forward(player):
 
 
 @signals.registered_handler("media/toggle_rewind_backward")
-def toggle_rewind_backward(player):
+def toggle_rewind_backward(player, _app):
     """
     Start or stop rewinding of the media playback backward.
     
@@ -272,7 +272,7 @@ def toggle_rewind_backward(player):
 
 
 @signals.registered_handler("general/hello_world")
-def say_hello(*args):
+def say_hello(_app):
     """
     Print standard acknowledging message
     """
@@ -280,7 +280,7 @@ def say_hello(*args):
 
 
 @signals.registered_handler("general/exit")
-def exit_app(source, *args):
+def exit_app(source, _app):
     """
     Destroy stage of the given element
 
@@ -290,7 +290,7 @@ def exit_app(source, *args):
 
 
 @signals.registered_handler("general/start_group")
-def start_group(source, *args):
+def start_group(source, _app):
     """
     Start scanning group
     """
@@ -299,7 +299,7 @@ def start_group(source, *args):
 
 
 @signals.registered_handler("general/kill_group")
-def kill_group(source, *args):
+def kill_group(source, _app):
     """
     Stop scanning group
     """
@@ -307,7 +307,7 @@ def kill_group(source, *args):
 
 
 @signals.registered_handler("scanning/toggle_pause_group")
-def toggle_pause_group(source, *args):
+def toggle_pause_group(source, _app):
     """
     Pause or restart to scan group
     """
@@ -315,7 +315,7 @@ def toggle_pause_group(source, *args):
 
 
 @signals.registered_handler("scanning/unpause_group")
-def unpause_group(source, *args):
+def unpause_group(source, _app):
     """
     Unpause the scanning of a group.
     """
@@ -323,7 +323,7 @@ def unpause_group(source, *args):
 
 
 @signals.registered_handler("pager/scan_page")
-def scan_page(pager):
+def scan_page(pager, _app):
     """
     Start scanning the current page of the given pager
 
@@ -333,7 +333,7 @@ def scan_page(pager):
 
 
 @signals.registered_handler("pager/next_page")
-def next_page(pager):
+def next_page(pager, _app):
     """
     Move to the next page of the given pager.
 
@@ -343,7 +343,7 @@ def next_page(pager):
 
 
 @signals.registered_handler("pager/previous_page")
-def previous_page(pager):
+def previous_page(pager, _app):
     """
     Move to the previous page of the given pager.
 
@@ -353,7 +353,7 @@ def previous_page(pager):
 
 
 @signals.registered_handler("pager/toggle_automatic")
-def toggle_automatic(pager):
+def toggle_automatic(pager, _app):
     """
     Turn on or turn off the automatic mode of pages flipping
 
@@ -366,7 +366,7 @@ def toggle_automatic(pager):
 
 
 @signals.registered_handler("scanning/set_pending_group")
-def set_pending_group(source, *args):
+def set_pending_group(source, _app):
     """
     Set the given group strategy's unwind to as the group's parent group
     Set the given group as a pending group of its stage
@@ -378,7 +378,7 @@ def set_pending_group(source, *args):
 
 
 @signals.registered_handler("general/switch_label")
-def switch_label(button):
+def switch_label(button, _app):
     """
     Switch label on the given button
 
@@ -388,7 +388,7 @@ def switch_label(button):
 
 
 @signals.registered_handler("general/switch_icon")
-def switch_icon(button):
+def switch_icon(button, _app):
     """
     Switch icon on the given button
 
@@ -398,7 +398,7 @@ def switch_icon(button):
 
 
 @signals.registered_handler("general/toggle_toggle")
-def toggle_toggle(button):
+def toggle_toggle(button, _app):
     """
     Turn on or off the toggled state of the given button.
 
@@ -411,7 +411,7 @@ def toggle_toggle(button):
 
 
 @signals.registered_handler("general/untoggle")
-def untoggle(button):
+def untoggle(button, _app):
     """
     Turn off the toggled state of the given button.
 
@@ -421,7 +421,7 @@ def untoggle(button):
 
 
 @signals.registered_handler("general/toggle")
-def toggle(button):
+def toggle(button, _app):
     """
     Turn on the toggled state of the given button.
 
@@ -431,7 +431,7 @@ def toggle(button):
 
 
 @signals.registered_handler("general/set_working")
-def set_working(button):
+def set_working(button, _app):
     """
     Turn on the working state of the given button.
 
@@ -441,7 +441,7 @@ def set_working(button):
 
 
 @signals.registered_handler("general/set_unworking")
-def set_unworking(button):
+def set_unworking(button, _app):
     """
     Turn off the working state of the given button.
 
@@ -451,7 +451,7 @@ def set_unworking(button):
 
 
 @signals.registered_handler("general/toggle_working")
-def toggle_working(button):
+def toggle_working(button, _app):
     """
     Turn on or turn off the working state of the given button.
 

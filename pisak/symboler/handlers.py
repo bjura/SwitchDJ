@@ -5,7 +5,7 @@ from pisak.symboler import symbols_manager
 
 
 @signals.registered_handler("symboler/save")
-def save(pop_up):
+def save(pop_up, _app):
     """
     Save the current symbols buffer.
     Open a dialog window.
@@ -38,7 +38,7 @@ def save(pop_up):
 
 
 @signals.registered_handler("symboler/load")
-def load(pop_up):
+def load(pop_up, _app):
     """
     Load one of the previously saved symbols chains. Put the symbols
     inside the entry.
@@ -57,7 +57,7 @@ def load(pop_up):
 
 
 @signals.registered_handler("symboler/text_to_speech")
-def text_to_speech(entry):
+def text_to_speech(entry, _app):
     """
     Read the text loud.
     :param entry: symbols entry
@@ -68,7 +68,7 @@ def text_to_speech(entry):
 
 
 @signals.registered_handler("symboler/backspace")
-def backspace(entry):
+def backspace(entry, _app):
     """
     Delete the last symbol from the entry.
     :param entry: symbols entry
@@ -77,7 +77,7 @@ def backspace(entry):
 
 
 @signals.registered_handler("symboler/clear_all")
-def clear_all(entry):
+def clear_all(entry, _app):
     """
     Clear the whole entry.
     :param entry: symbols entry
@@ -86,7 +86,7 @@ def clear_all(entry):
 
 
 @signals.registered_handler("symboler/scroll_left")
-def scroll_left(entry):
+def scroll_left(entry, _app):
     """
     Scroll the entry content left.
     :param entry: symbols entry
@@ -96,7 +96,7 @@ def scroll_left(entry):
 
 
 @signals.registered_handler("symboler/scroll_right")
-def scroll_right(entry):
+def scroll_right(entry, _app):
     """
     Scroll the entry content right.
     :param entry: symbols entry

@@ -3,7 +3,7 @@ from pisak.audio import database_manager
 
 
 @signals.registered_handler("audio/add_or_remove_from_favs")
-def add_or_remove_from_favs(playback):
+def add_or_remove_from_favs(playback, _app):
     """
     Add or remove the current audio stream object from the favourites.
 

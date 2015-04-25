@@ -7,7 +7,7 @@ from pisak.blog import wordpress
 
 
 @signals.registered_handler("blog/attach_post_content")
-def attach_post_content(text_field):
+def attach_post_content(text_field, _app):
     """
     Attach content to the currenlty edited post.
 
@@ -20,7 +20,7 @@ def attach_post_content(text_field):
 
 
 @signals.registered_handler("blog/attach_post_title")
-def attach_post_title(text_field):
+def attach_post_title(text_field, _app):
     """
     Attach title to the currenlty edited post.
 
@@ -33,7 +33,7 @@ def attach_post_title(text_field):
 
 
 @signals.registered_handler("blog/publish_pending_post")
-def publish_pending_post(source):
+def publish_pending_post(source, _app):
     """
     Publish the currently edited post.
     """
@@ -43,7 +43,7 @@ def publish_pending_post(source):
 
 
 @signals.registered_handler("blog/delete_pending_post")
-def delete_pending_post(source):
+def delete_pending_post(source, _app):
     """
     Permanently delete the currently edited post from the blog.
     """
@@ -53,7 +53,7 @@ def delete_pending_post(source):
 
 
 @signals.registered_handler("blog/publish_about_me_bio")
-def publish_about_me_bio(text_field):
+def publish_about_me_bio(text_field, _app):
     """
     Publish about me informations.
 
@@ -62,7 +62,7 @@ def publish_about_me_bio(text_field):
     wordpress.blog.update_about_me_bio(text_field.get_text())
 
 
-def publish_about_me_photo(photo_path):
+def publish_about_me_photo(photo_path, _app):
     """
     Publish my photo on the about me page.
 
@@ -88,7 +88,7 @@ def previous_post():
 
 
 @signals.registered_handler("blog/scroll_post_up")
-def scroll_post_up(post):
+def scroll_post_up(post, _app):
     """
     Scroll post upward. 
     
@@ -97,7 +97,7 @@ def scroll_post_up(post):
     post.v_adj.set_value(post.v_adj.get_value() - post.v_adj.get_page_size()/2)
 
 @signals.registered_handler("blog/scroll_post_down")
-def scroll_post_down(post):
+def scroll_post_down(post, _app):
     """
     Scroll post downward. 
     
@@ -106,7 +106,7 @@ def scroll_post_down(post):
     post.v_adj.set_value(post.v_adj.get_value() + post.v_adj.get_page_size()/2)
 
 @signals.registered_handler("blog/go_back")
-def go_back(post):
+def go_back(post, _app):
     """
     Go backward in the site. 
     
@@ -115,7 +115,7 @@ def go_back(post):
     post.view.go_back()
 
 @signals.registered_handler("blog/go_forward")
-def go_forward(post):
+def go_forward(post, _app):
     """
     Go forward in the site. 
     

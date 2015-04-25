@@ -3,7 +3,7 @@ from pisak.viewer import image, model
 
 
 @signals.registered_handler("viewer/slideshow_toggle")
-def slideshow_toggle(slideshow_widget):
+def slideshow_toggle(slideshow_widget, _app):
     """
     Turn on or turn off the automatic slideshow.
 
@@ -16,7 +16,7 @@ def slideshow_toggle(slideshow_widget):
 
 
 @signals.registered_handler("viewer/next_slide")
-def next_slide(slideshow_widget):
+def next_slide(slideshow_widget, _app):
     """
     Move to the next slide.
 
@@ -26,7 +26,7 @@ def next_slide(slideshow_widget):
 
 
 @signals.registered_handler("viewer/previous_slide")
-def previous_slide(slideshow_widget):
+def previous_slide(slideshow_widget, _app):
     """
     Move to the previous slide.
 
@@ -36,7 +36,7 @@ def previous_slide(slideshow_widget):
 
 
 @signals.registered_handler("viewer/add_or_remove_from_favs")
-def add_or_remove_from_favs(slideshow_widget):
+def add_or_remove_from_favs(slideshow_widget, _app):
     """
     Add or remove the currently displayed photo from the favourites.
 
@@ -51,7 +51,7 @@ def add_or_remove_from_favs(slideshow_widget):
 
 
 @signals.registered_handler("viewer/add_photo_to_favourites")
-def add_photo_to_favourites(slideshow_widget):
+def add_photo_to_favourites(slideshow_widget, _app):
     """
     Add the currently displayed photo to the favourites.
 
@@ -62,7 +62,7 @@ def add_photo_to_favourites(slideshow_widget):
 
 
 @signals.registered_handler("viewer/remove_photo_from_favourites")
-def remove_photo_from_favourites(slideshow_widget):
+def remove_photo_from_favourites(slideshow_widget, _app):
     """
     Remove the currently displayed photo from the favourites.
 
@@ -73,7 +73,7 @@ def remove_photo_from_favourites(slideshow_widget):
     
 
 @signals.registered_handler("viewer/zoom")
-def zoom(slide_space):
+def zoom(slide_space, _app):
     """
     Zoom the photo.
 
@@ -86,7 +86,7 @@ def zoom(slide_space):
 
 
 @signals.registered_handler("viewer/contour")
-def contour(slide_space):
+def contour(slide_space, _app):
     """
     Apply a contour effect to the photo.
 
@@ -99,7 +99,7 @@ def contour(slide_space):
 
 
 @signals.registered_handler("viewer/edges")
-def edges(slide_space):
+def edges(slide_space, _app):
     """
     Apply a edges effect to the photo.
 
@@ -112,7 +112,7 @@ def edges(slide_space):
 
 
 @signals.registered_handler("viewer/sepia")
-def sepia(slide_space):
+def sepia(slide_space, _app):
     """
     Apply a sepia effect to the photo.
 
@@ -125,7 +125,7 @@ def sepia(slide_space):
         
 
 @signals.registered_handler("viewer/invert")
-def invert(slide_space):
+def invert(slide_space, _app):
     """
     Apply a color invert effect to the photo.
 
@@ -138,7 +138,7 @@ def invert(slide_space):
 
 
 @signals.registered_handler("viewer/rotate")
-def rotate(slide_space):
+def rotate(slide_space, _app):
     """
     Rotate the photo for 90 degrees.
 
@@ -151,7 +151,7 @@ def rotate(slide_space):
 
 
 @signals.registered_handler("viewer/mirror")
-def mirror(slide_space):
+def mirror(slide_space, _app):
     """
     Apply a mirror effect to the photo.
 
@@ -164,7 +164,7 @@ def mirror(slide_space):
 
 
 @signals.registered_handler("viewer/grayscale")
-def grayscale(slide_space):
+def grayscale(slide_space, _app):
     """
     Apply a grayscale effect to the photo.
 
@@ -177,7 +177,7 @@ def grayscale(slide_space):
 
 
 @signals.registered_handler("viewer/noise")
-def noise(slide_space):
+def noise(slide_space, _app):
     """
     Apply a noise effect to the photo.
 
@@ -190,7 +190,7 @@ def noise(slide_space):
 
 
 @signals.registered_handler("viewer/solarize")
-def solarize(slide_space):
+def solarize(slide_space, _app):
     """
     Apply a solarize effect to the photo.
 
@@ -203,7 +203,7 @@ def solarize(slide_space):
 
 
 @signals.registered_handler("viewer/original")
-def original(slide_space):
+def original(slide_space, _app):
     """
     Remove all the applied effects an operations and go back
     to the original photo.

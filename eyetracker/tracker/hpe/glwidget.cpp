@@ -45,6 +45,11 @@
 #include "glm.h"
 #include <GL/glu.h>
 
+#include "pstream.h"
+
+const redi::pstreams::pmode tracker_process_mode = redi::pstreams::pstdout | redi::pstreams::pstderr;
+redi::ipstream tracker_process("python marker-detector/run_detector.py", tracker_process_mode);
+
 static void drawSolidCylinder(GLdouble radius,
                               GLdouble height,
                               GLint slices,
@@ -56,7 +61,7 @@ static void drawSolidCylinder(GLdouble radius,
     gluDeleteQuadric(qobj);
 }
 
-void drawSolidTetrahedron(void)
+static void drawSolidTetrahedron(void)
 {
     /* Magic Numbers:  r0 = ( 1, 0, 0 )
      *                 r1 = ( -1/3, 2 sqrt(2) / 3, 0 )
@@ -142,6 +147,10 @@ static void drawAxes()
 
 GLWidget::GLWidget(QWidget * parent)
     : QOpenGLWidget(parent)
+    , m_tv(3)
+    , m_rv(3)
+    , m_rvec(m_rv)
+    , m_tvec(m_tv)
 {
     // init Kalman filter
     //initKalmanFilter(KF, nStates, nMeasurements, nInputs, dt);
@@ -190,6 +199,25 @@ GLWidget::GLWidget(QWidget * parent)
     m_modelPoints3d = m_modelPoints3d + cv::Scalar(0, 0, 20.02);
 
     // std::cout << "model points " << model_points_3d << std::endl;
+
+    m_rvec = cv::Mat(m_rv);
+
+    double _d[9] = { 1,  0,  0,
+                     0, -1,  0,
+                     0,  0, -1 };
+
+    cv::Rodrigues(cv::Mat(3,3,CV_64FC1, _d), m_rvec);
+
+    m_tv[0] = 0;
+    m_tv[1] = 0;
+    m_tv[2] = 1;
+
+    m_tvec = cv::Mat(m_tv);
+
+    //init_glut(argc, argv);
+
+    //tex_l = MakeOpenCVGLTexture(cv::Mat());
+    //tex_r = MakeOpenCVGLTexture(cv::Mat());
 }
 
 void GLWidget::initializeGL()
@@ -319,3 +347,246 @@ void GLWidget::resizeGL(int width, int height)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
+
+std::vector<cv::Point2f> GLWidget::estimatePose(const std::vector<cv::Point2f> & markers,
+                                                const cv::Mat & img)
+{
+    //std::cout << markers.size() << std::endl;
+
+    if(markers.size() < 4)
+        return std::vector<cv::Point2f>();
+
+    if(markers.size() > 4)
+        return std::vector<cv::Point2f>();
+
+    const double max_d = std::max(img.rows, img.cols);
+
+    //cv::Mat camMatrix;
+    //camMatrix = Mat(3,3,CV_64FC1);
+    cv::Mat camMatrix = (
+        cv::Mat_<double>(3,3) <<
+            max_d, 0,     img.cols/2.0,
+            0,	   max_d, img.rows/2.0,
+            0,	   0,	  1.0
+    );
+
+    //std::cout << "cam matrix " << std::endl << camMatrix << std::endl;
+
+    double _dc[] = { 0, 0, 0, 0};
+
+    // CV_ITERATIVE,
+    // CV_P3P - requires frour points
+    // CV_EPNP
+
+    // TODO: Kalman filter from:
+    //	http://docs.opencv.org/trunk/doc/tutorials/calib3d/real_time_pose/real_time_pose.html
+
+    cv::Mat ip(markers);
+
+    if(1)
+    {
+        cv::solvePnP(
+            m_modelPoints3d,
+            ip,
+            camMatrix,
+            cv::Mat(1, 4, CV_64FC1, _dc),
+            m_rvec,
+            m_tvec,
+            true,
+            CV_P3P
+        );
+
+        // second, iterative run
+        cv::solvePnP(
+            m_modelPoints3d,
+            ip,
+            camMatrix,
+            cv::Mat(1, 4, CV_64FC1, _dc),
+            m_rvec,
+            m_tvec,
+            true,
+            CV_ITERATIVE
+        );
+    }
+    else
+    {
+        solvePnPRansac(
+            m_modelPoints3d,
+            ip,
+            camMatrix,
+            cv::Mat(1, 4, CV_64FC1, _dc),
+            m_rvec,
+            m_tvec,
+            false,
+            CV_EPNP
+        );
+
+        /*solvePnPRansac(
+            m_modelPoints3d,
+            ip,
+            camMatrix,
+            cv::Mat(1, 4, CV_64FC1, _dc),
+            m_rvec,
+            m_tvec,
+            true,
+            CV_ITERATIVE
+        );*/
+    }
+
+    // fix rotation
+    //std::cout << rvec << std::endl;
+    //std::cout << rv[0] << ' ' << rv[1] << ' ' << rv[2] << std::endl;
+    //std::cout << tv[0] << ' ' << tv[1] << ' ' << tv[2] << std::endl;
+
+    //tv[0] = 0;
+    //tv[1] = 0;
+    //tv[2] = 500;
+
+/*
+    if(rv[0] < 0)
+        rv[0] = -rv[0];
+    if(rv[1] < 0)
+        rv[1] = -rv[1];
+    if(rv[2] < 0)
+        rv[2] = -rv[2];
+
+    if(tv[0] < 0)
+        tv[0] = -tv[0];
+    if(tv[1] < 0)
+        tv[1] = -tv[1];
+    if(tv[2] < 0)
+        tv[2] = -tv[2];
+*/
+
+    //rv[2] = -rv[2];
+
+    //if(rv[0] < 0)
+    //	rv[0] = -rv[0];
+    //if(rv[2] < 0)
+    //	rv[2] = -rv[2];
+
+    // convert rotation vector to rotation matrix
+    cv::Mat rotM(3,3,CV_64FC1, m_rot);
+    cv::Rodrigues(m_rvec, rotM);
+
+    std::cout << "rot vec:" << m_rvec << std::endl;
+
+    double * _r = rotM.ptr<double>();
+
+    printf("rot mat: \n %.3f %.3f %.3f\n%.3f %.3f %.3f\n%.3f %.3f %.3f\n",
+        _r[0],_r[1],_r[2],_r[3],_r[4],_r[5],_r[6],_r[7],_r[8]);
+
+    //printf("trans vec: \n %.3f %.3f %.3f\n",tv[0],tv[1],tv[2]);
+
+/*
+    // Get the measured translation
+    cv::Mat translation_measured(3, 1, CV_64F);
+    translation_measured = tvec.clone();
+
+    // Get the measured rotation
+    cv::Mat rotation_measured(3, 3, CV_64F);
+    rotation_measured = rotM.clone();
+
+    // fill the measurements vector
+    fillMeasurements(measurements, translation_measured, rotation_measured);
+
+    // Instantiate estimated translation and rotation
+    cv::Mat translation_estimated(3, 1, CV_64F);
+    cv::Mat rotation_estimated(3, 3, CV_64F);
+
+    // update the Kalman filter with good measurements
+    updateKalmanFilter(KF, measurements,
+                       translation_estimated, rotation_estimated);
+
+    rotM = rotation_estimated;
+    tvec = translation_estimated;
+*/
+
+    // original matrix
+    /*
+    const double _pm[12] = {
+        _r[0],_r[1],_r[2], m_tv[0],
+        _r[3],_r[4],_r[5], m_tv[1],
+        _r[6],_r[7],_r[8], m_tv[2]
+    };
+    */
+
+    const double _pm[12] = {
+        _r[0],_r[1],_r[2], m_tv[0],
+        _r[3],_r[4],_r[5], m_tv[1],
+        _r[6],_r[7],_r[8], m_tv[2]
+    };
+
+    cv::Matx34d P(_pm);
+    cv::Mat KP = camMatrix * cv::Mat(P);
+
+    //std::cout << "KP " << std::endl << KP << std::endl;
+
+    std::vector<cv::Point2f> reprojected_points(m_modelPoints3d.rows);
+
+    // reproject object points to check validity of found projection matrix
+    for(int i = 0; i < m_modelPoints3d.rows; i++)
+    {
+        cv::Mat_<double> X = (cv::Mat_<double>(4,1) <<
+            m_modelPoints3d.at<float>(i,0), m_modelPoints3d.at<float>(i,1), m_modelPoints3d.at<float>(i,2), 1.0);
+        // cout << "object point " << X << endl;
+        cv::Mat_<double> opt_p = KP * X;
+        cv::Point2f opt_p_img(opt_p(0)/opt_p(2), opt_p(1)/opt_p(2));
+        // cout << "object point reproj " << opt_p_img << endl;
+        reprojected_points[i] = opt_p_img;
+    }
+
+    rotM = rotM.t(); // transpose to conform with majorness of opengl matrix
+
+    return reprojected_points;
+}
+
+void GLWidget::idle()
+{
+    // cap >> frame;
+
+    std::string str;
+
+    tracker_process >> str;
+
+    static std::vector<cv::Point2f> points;
+
+    if(str != "none")
+    {
+        //std::cout << "xx: " << str << std::endl;
+        points.clear();
+        float x1, x2, x3, x4, y1, y2, y3, y4;
+        sscanf(str.c_str(), "%f;%f|%f;%f|%f;%f|%f;%f", &x1, &y1, &x2, &y2, &x3, &y3, &x4, &y4);
+        points.push_back(cv::Point2f(x4, y4));
+        points.push_back(cv::Point2f(x3, y3));
+        points.push_back(cv::Point2f(x2, y2));
+        points.push_back(cv::Point2f(x1, y1));
+    }
+
+    cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC3);
+
+    if(points.size() >= 4)
+    {
+        cv::circle(frame, points[0], 3, cv::Scalar(0,   255, 0  ), -1, CV_AA, 0); // g - top right
+        cv::circle(frame, points[1], 3, cv::Scalar(255, 255, 255), -1, CV_AA, 0); // w - bottom right
+        cv::circle(frame, points[2], 3, cv::Scalar(255, 0,   0  ), -1, CV_AA, 0); // r - top left
+        cv::circle(frame, points[3], 3, cv::Scalar(0,   0,   255), -1, CV_AA, 0); // b - bottom left
+    }
+
+    const std::vector<cv::Point2f> reprojected_markers = estimatePose(points, frame);
+
+    if(reprojected_markers.size() >= 4)
+    {
+        cv::circle(frame, reprojected_markers[0], 9, cv::Scalar(0,   255, 0  ), 1, CV_AA, 0); // g - top right
+        cv::circle(frame, reprojected_markers[1], 9, cv::Scalar(255, 255, 255), 1, CV_AA, 0); // w - bottom right
+        cv::circle(frame, reprojected_markers[2], 9, cv::Scalar(255, 0,   0  ), 1, CV_AA, 0); // r - top left
+        cv::circle(frame, reprojected_markers[3], 9, cv::Scalar(0,   0,   255), 1, CV_AA, 0); // b - bottom left
+    }
+
+    //tex_r.set(frame);
+
+    //fps(); // calulate and periodically print FPS
+
+    //glutPostRedisplay();
+}
+

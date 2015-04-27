@@ -17,11 +17,6 @@
 #define GLM_H
 
 #include <GL/gl.h>
-//#include <GL/glut.h>
-
-#ifndef M_PI
-#define M_PI 3.14159265f
-#endif
 
 #define GLM_NONE     (0)            /* render with only vertices */
 #define GLM_FLAT     (1 << 0)       /* render with facet normals */

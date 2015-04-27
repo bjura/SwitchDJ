@@ -21,11 +21,9 @@
 #include "glm.h"
 
 //#define DebugVisibleSurfaces
-
 #define total_textures 5
 
 #define T(x) (model->triangles[(x)])
-GLuint glmLoadTexture(char *filename, GLboolean alpha, GLboolean repeat, GLboolean filtering, GLboolean mipmaps, GLfloat *texcoordwidth, GLfloat *texcoordheight);
 
 /* _GLMnode: general purpose node */
 typedef struct _GLMnode {
@@ -1101,7 +1099,7 @@ glmVertexNormals(GLMmodel* model, GLfloat angle)
     assert(model->facetnorms);
 
     /* calculate the cosine of the angle (in degrees) */
-    cos_angle = cos(angle * M_PI / 180.0);
+    cos_angle = cos(angle * 3.14159265f / 180.0f);
 
     /* nuke any previous normals */
     if (model->normals)

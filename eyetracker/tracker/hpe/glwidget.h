@@ -47,8 +47,17 @@ private:
 
     // object orientation
     double m_rot[9] = { 0 }; // opengl rotation matrix
-    double m_tv[3] = { 0 };  // opengl translation vector
+    std::vector<double> m_tv; // opengl translation vector
+    std::vector<double> m_rv;
+
+    cv::Mat m_rvec;
+    cv::Mat m_tvec;
+
     GLMmodel * m_headObj = nullptr;
+
+    std::vector<cv::Point2f> estimatePose(const std::vector<cv::Point2f> & markers,
+                                          const cv::Mat & img);
+    void idle();
 };
 
 #endif // GLWIDGET_H

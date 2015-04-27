@@ -22,8 +22,13 @@
 #define GLWIDGET_H
 
 #include <QOpenGLWidget>
+#include <QTimer>
 #include <opencv/cv.h>
 #include "glm.h"
+
+#include <memory>
+
+#include "pstream.h"
 
 class GLWidget : public QOpenGLWidget
 {
@@ -54,6 +59,11 @@ private:
     cv::Mat m_tvec;
 
     GLMmodel * m_headObj = nullptr;
+
+    QTimer m_timer;
+
+    const redi::pstreams::pmode m_tracker_process_mode = redi::pstreams::pstdout | redi::pstreams::pstderr;
+    std::unique_ptr<redi::ipstream> m_tracker_process;
 
     std::vector<cv::Point2f> estimatePose(const std::vector<cv::Point2f> & markers,
                                           const cv::Mat & img);

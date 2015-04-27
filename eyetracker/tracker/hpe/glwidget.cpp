@@ -46,11 +46,6 @@
 #include "glm.h"
 #include <GL/glu.h>
 
-#include "pstream.h"
-
-const redi::pstreams::pmode tracker_process_mode = redi::pstreams::pstdout | redi::pstreams::pstderr;
-redi::ipstream tracker_process("python marker-detector/run_detector.py", tracker_process_mode);
-
 static void drawSolidCylinder(GLdouble radius,
                               GLdouble height,
                               GLint slices,
@@ -158,8 +153,12 @@ GLWidget::GLWidget(QWidget * parent)
     //measurements.setTo(cv::Scalar(0));
 
     QDir dir(QDir::homePath());
-    QString path = dir.filePath("pisak/eyetracker/tracker/hpe/head-obj.obj");
-    m_headObj = glmReadOBJ(path.toLocal8Bit().data());
+
+    QString path = dir.filePath("pisak/eyetracker/tracker/hpe/marker-detector/run_detector.py");
+    m_tracker_process.reset(new redi::ipstream(("python " + path).toLocal8Bit().data(), m_tracker_process_mode));
+
+    QString modelPath = dir.filePath("pisak/eyetracker/tracker/hpe/head-obj.obj");
+    m_headObj = glmReadOBJ(modelPath.toLocal8Bit().data());
 
     double avgX = 0;
     double avgY = 0;
@@ -174,7 +173,7 @@ GLWidget::GLWidget(QWidget * parent)
     avgY /= m_headObj->numvertices;
     avgZ /= m_headObj->numvertices;
 
-    std::cout << "model mean:" << avgX << " " << avgY << " " << avgZ << std::endl;
+    std::cout << "model mean: " << avgX << " " << avgY << " " << avgZ << std::endl;
 
     for(GLuint i = 1; i <= m_headObj->numvertices; i++)
     {
@@ -221,6 +220,15 @@ GLWidget::GLWidget(QWidget * parent)
 
     //tex_l = MakeOpenCVGLTexture(cv::Mat());
     //tex_r = MakeOpenCVGLTexture(cv::Mat());
+
+    m_timer.setInterval(10);
+    m_timer.setSingleShot(false);
+
+    QObject::connect(&m_timer, &QTimer::timeout, [=]() {
+        idle();
+    });
+
+    m_timer.start();
 }
 
 void GLWidget::initializeGL()
@@ -549,7 +557,7 @@ void GLWidget::idle()
 
     std::string str;
 
-    tracker_process >> str;
+    *m_tracker_process >> str;
 
     static std::vector<cv::Point2f> points;
 

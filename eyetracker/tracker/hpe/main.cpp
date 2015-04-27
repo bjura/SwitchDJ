@@ -19,13 +19,17 @@
  */
 
 #include "mainwindow.h"
+#include "glwidget.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
+    QApplication app(argc, argv);
+    //MainWindow w;
+    //w.show();
+
+    GLWidget w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }

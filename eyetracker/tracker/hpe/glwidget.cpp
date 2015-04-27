@@ -41,6 +41,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <QDir>
 #include "glwidget.h"
 #include "glm.h"
 #include <GL/glu.h>
@@ -156,7 +157,9 @@ GLWidget::GLWidget(QWidget * parent)
     //initKalmanFilter(KF, nStates, nMeasurements, nInputs, dt);
     //measurements.setTo(cv::Scalar(0));
 
-    m_headObj = glmReadOBJ("head-obj.obj");
+    QDir dir(QDir::homePath());
+    QString path = dir.filePath("pisak/eyetracker/tracker/hpe/head-obj.obj");
+    m_headObj = glmReadOBJ(path.toLocal8Bit().data());
 
     double avgX = 0;
     double avgY = 0;
@@ -335,12 +338,11 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-    const float ar = float(width) / float(height);
-
     glViewport(0, 0, width, height);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    //const float ar = float(width) / float(height);
     //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
     gluPerspective(47, 1.0, 0.01, 1000.0);
 

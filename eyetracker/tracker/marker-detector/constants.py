@@ -1,0 +1,5 @@
+WIDTH, HEIGHT = range(2)
+X, Y = range(2)
+POS_X, POS_Y, POS_WIDTH, POS_HEIGHT = range(4)
+FROM, TO = range(2)
+YEAR, MONTH, DAY = range(3)

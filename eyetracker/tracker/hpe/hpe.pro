@@ -5,8 +5,8 @@ CONFIG += c++11
 TARGET = hpe
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
+SOURCES += main.cpp \
+    mainwindow.cpp \
     glwidget.cpp \
     glm.cpp
 

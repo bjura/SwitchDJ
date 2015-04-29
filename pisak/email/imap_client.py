@@ -97,6 +97,24 @@ class IMAPClient(object):
         """
         return self._get_message("INBOX", uid)
 
+    def get_inbox_list(self):
+        """
+        Get list containing previews of all the messages.
+
+        :returns: list of dictionary with message previews.
+        Each contain: subject, sender and date.
+        """
+        return self._get_mailbox_list("INBOX")
+
+    @imap_errors_handler
+    def _get_mailbox_list(self, mailbox):
+        self._conn.select(mailbox)
+        _ret, uids_data = self._conn.search(None, "ALL")
+        uids = uids_data[0].decode(parsers.DEFAULT_CHARSET).split()
+        _ret, msg_data = self._conn.fetch(
+            ",".join(uids), "(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE)])")
+        return parsers.parse_mailbox_list(uids, msg_data)
+
     @imap_errors_handler
     def _find_mailboxes(self):
         _ret, mailboxes_data = self._conn.list()

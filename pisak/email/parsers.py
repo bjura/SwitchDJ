@@ -9,7 +9,7 @@ from datetime import datetime
 DEFAULT_CHARSET = "utf-8"
 
 
-def decode_message(message):
+def _decode_message(message):
     """
     Decode content of the message.
 
@@ -22,7 +22,7 @@ def decode_message(message):
     return content.decode(charset)
 
 
-def get_addresses(message, header):
+def _get_addresses(message, header):
     """
     Extract all addresses from a header with the given name.
 
@@ -34,7 +34,7 @@ def get_addresses(message, header):
     return email.utils.getaddresses(message.get_all(header, []))
 
 
-def parse_date(raw_date):
+def _parse_date(raw_date):
     """
     Parse date of the message.
 
@@ -65,21 +65,32 @@ def parse_message(raw_message):
             content_type = part.get_content_type()
             is_inline = part.get("Content-Disposition") in (None, "inline")
             if content_type == "text/plain" and is_inline:
-                parsed_msg["Body"] = decode_message(part)
+                parsed_msg["Body"] = _decode_message(part)
     elif content_type == "text/plain":
-        parsed_msg["Body"] = decode_message(part)
+        parsed_msg["Body"] = _decode_message(part)
 
     # put all the message fields into a dictionary
     parsed_msg.update(msg.items())
 
     # look for all the addresses
-    parsed_msg["To"] = get_addresses(msg, "To")
-    parsed_msg["From"] = get_addresses(msg, "From")
+    parsed_msg["To"] = _get_addresses(msg, "To")
+    parsed_msg["From"] = _get_addresses(msg, "From")
 
     # convert date into datetime object if possible
-    date = parse_date(parsed_msg.get("Date"))
+    date = _parse_date(parsed_msg.get("Date"))
     if date:
         parsed_msg["Date"] = date
 
     return parsed_msg
 
+
+def parse_mailbox_list(uids, msg_data):
+    """
+    Parse list of message previews.
+
+    :param uids: list of the given messages uids.
+    :param msg_data: raw messages data.
+
+    :returns: list of dictionaries containing parsed message previews.
+    """
+    return

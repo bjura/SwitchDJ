@@ -7,7 +7,7 @@ from gi.repository import GObject
 
 from pisak import launcher, handlers, res, logger
 from pisak.viewer import model
-from pisak.email import address_book, message, config
+from pisak.email import address_book, message, config, imap_client
 
 from pisak.email import widgets  #@UnusedImport
 import pisak.email.handlers  #@UnusedImport
@@ -21,7 +21,8 @@ _LOG = logger.getLogger(__name__)
 
 ELEMENTS = {
     "new_message": message.SimpleMessage(),
-    "address_book": address_book.AddressBook()
+    "address_book": address_book.AddressBook(),
+    "imap_client": imap_client.IMAPClient()
 }
 
 
@@ -45,6 +46,7 @@ def prepare_main_view(app, script, data):
         app, script, "button_new_message", "email/speller_message_subject")
     for contact in BUILTIN_CONTACTS:
 	    app.box.address_book.add_contact(contact)
+    app.box.imap_client.login()
 
 
 def prepare_drafts_view(stage, script, data):

@@ -3,9 +3,10 @@ Module providing access to the email account through the imap client.
 """
 import socket
 import imaplib
+import email
 
 from pisak import logger
-from pisak.email import config
+from pisak.email import config, parsers
 
 
 _LOG = logger.getLogger(__name__)
@@ -82,6 +83,22 @@ class IMAPClient(object):
         and number of unseen messages
         """
         return self._get_mailbox_status(self.sent_box_name)
+
+    def get_message_from_inbox(self, uid):
+        """
+        Get message with the given uid from the inbox.
+
+        :param uid: uid of the message.
+
+        :return: dictionary with the message.
+        """
+        return self._get_message("INBOX", uid)
+
+    @imap_errors_handler
+    def _get_message(self, mailbox, uid):
+        self._conn.select(mailbox)
+        _ret, msg_data = self._conn.fetch(uid, '(RFC822)')
+        return parsers.parse_message(str(msg_data[0][1], self.encoding))
 
     @imap_errors_handler
     def _get_mailbox_status(self, mailbox):

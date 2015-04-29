@@ -21,7 +21,6 @@ class IMAPClient(object):
     Class representing an email account connection. Used access protocol - IMAP.
     """
     def __init__(self):
-        self.encoding = "utf-8"
         self._conn = None
         self.sent_box_name = None
 
@@ -57,12 +56,16 @@ class IMAPClient(object):
         self._find_mailboxes()
 
     @imap_errors_handler
-    def _find_mailboxes(self):
-        _ret, mailboxes_data = self._conn.list()
-        for mailbox in mailboxes_data:
-            str_spec = str(mailbox, self.encoding)
-            if "sent" in str_spec.lower():
-                self.sent_box_name = str_spec.split()[-1].split('"')[1]
+    def logout(self):
+        """
+        Logout from the account.
+        """
+        if self._conn is not None:
+            self._conn.close()
+            self._conn.logout()
+        else:
+            _LOG.warning("There is no connection to the email account."
+                         "Nowhere to logout from.")
 
     def get_inbox_status(self):
         """
@@ -95,26 +98,23 @@ class IMAPClient(object):
         return self._get_message("INBOX", uid)
 
     @imap_errors_handler
+    def _find_mailboxes(self):
+        _ret, mailboxes_data = self._conn.list()
+        for mailbox in mailboxes_data:
+            str_spec = mailbox.decode(parsers.DEFAULT_CHARSET)
+            if "sent" in str_spec.lower():
+                self.sent_box_name = str_spec.split()[-1].split('"')[1]
+
+    @imap_errors_handler
     def _get_message(self, mailbox, uid):
         self._conn.select(mailbox)
         _ret, msg_data = self._conn.fetch(uid, '(RFC822)')
-        return parsers.parse_message(str(msg_data[0][1], self.encoding))
+        return parsers.parse_message(
+            msg_data[0][1].decode(parsers.DEFAULT_CHARSET))
 
     @imap_errors_handler
     def _get_mailbox_status(self, mailbox):
         _ret, status_data = self._conn.status(mailbox, "(MESSAGES UNSEEN)")
-        status = str(status_data[0], self.encoding)
+        status = status_data[0].decode(parsers.DEFAULT_CHARSET)
         return int(status[status.find("MESSAGES") : ].split()[1]), \
                int(status[status.find("UNSEEN") : ].split()[1].rstrip(")"))
-
-    @imap_errors_handler
-    def logout(self):
-        """
-        Logout from the account.
-        """
-        if self._conn is not None:
-            self._conn.close()
-            self._conn.logout()
-        else:
-            _LOG.warning("There is no connection to the email account."
-                         "Nowhere to logout from.")

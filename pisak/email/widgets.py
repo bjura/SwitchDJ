@@ -1,5 +1,4 @@
 from pisak import pager, widgets
-
 from pisak.email import address_book
 
 
@@ -46,9 +45,13 @@ class InboxTileSource(pager.DataSource):
     def _produce_item(self, message):
         tile = widgets.PhotoTile()
         self._prepare_item(tile)
+        frame = widgets.Frame()
+        tile.add_frame(frame)
         tile.style_class = "PisakEmailInboxTile"
         tile.hilite_tool = widgets.Aperture()
         tile.connect("clicked", self.item_handler, message)
+        tile.label_text = "\n\n".join(
+            [message["From"][1], message["Subject"], str(message["Date"])])
         return tile
 
 

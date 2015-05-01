@@ -59,14 +59,18 @@ def prepare_drafts_view(stage, script, data):
     date_widget.set_text(today)
 
 
-def prepare_inbox_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
+def prepare_inbox_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(
-        stage, script, "button_new_message", "email/speller_message_subject")
-    handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
+        app, script, "button_new_message", "email/speller_message_subject")
+    handlers.button_to_view(app, script, "button_back", "email/main")
     today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
+    app.ui.date.set_text(today)
+    data_source = script.get_object("data_source")
+    data_source.item_handler = lambda tile, message: \
+        app.load_view("email/single_message", message)
+    data_source.data = app.box.imap_client.get_inbox_list()[::-1]
+
 
 def prepare_sent_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
@@ -172,6 +176,7 @@ def prepare_viewer_contact_library_view(stage, script, data):
     tile_source = script.get_object("library_data")
     tile_source.item_handler = lambda tile, album: stage.load_view(
         "email/viewer_contact_album", {"album_id": album})
+
 
 def prepare_viewer_contact_album_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")

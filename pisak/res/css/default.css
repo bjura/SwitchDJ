@@ -1209,7 +1209,7 @@ MxProgressBarFill.PisakEmailProgressBar {
 MxLabel.PisakEmailProgressBar {
   font-family: Kelson Sans;
   font-size: 30pt;
-  color: black;
+  color: white;
 }
 
 MxLabel.PisakEmailHeader {
@@ -1257,6 +1257,10 @@ MxLabel.PisakEmailInboxTile {
   font-family: Kelson Sans;
   font-size: 20pt;
   color: black;
+}
+
+PisakFrame.PisakEmailInboxTile {
+  border-image: url("black_frame.png") 5;
 }
 
 MxLabel.PisakEmailSentTile {

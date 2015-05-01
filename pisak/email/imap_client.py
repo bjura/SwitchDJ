@@ -108,12 +108,14 @@ class IMAPClient(object):
 
     @imap_errors_handler
     def _get_mailbox_list(self, mailbox):
+        headers = ["Subject", "From", "Date"]
         self._conn.select(mailbox)
         _ret, uids_data = self._conn.search(None, "ALL")
         uids = uids_data[0].decode(parsers.DEFAULT_CHARSET).split()
         _ret, msg_data = self._conn.fetch(
-            ",".join(uids), "(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE)])")
-        return parsers.parse_mailbox_list(uids, msg_data)
+            ",".join(uids),
+            "(BODY.PEEK[HEADER.FIELDS ({})])".format(" ".join(headers).upper()))
+        return parsers.parse_mailbox_list(uids, msg_data, headers)
 
     @imap_errors_handler
     def _find_mailboxes(self):

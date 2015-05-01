@@ -22,16 +22,23 @@ def _decode_message(message):
     return content.decode(charset)
 
 
-def _get_addresses(message, header):
+def _get_addresses(value, header):
     """
     Extract all addresses from a header with the given name.
 
-    :params message: message object.
+    :params value: single string with raw header value or
+    `email.message.Message` object.
     :param header: header name.
 
     :returns: list of tuples containing name and address for each record.
     """
-    return email.utils.getaddresses(message.get_all(header, []))
+    if isinstance(value, str):
+        return email.utils.parseaddr(value)
+    elif isinstance(value, email.message.Message):
+        return email.utils.getaddresses(message.get_all(header, []))
+    else:
+        _LOG.error("Invalid argument 'value'. Only string or "
+                   "email.message.Message object accepted.")
 
 
 def _parse_date(raw_date):
@@ -63,7 +70,13 @@ def _decode_header(header):
             DEFAULT_CHARSET)
     else:
         for idx, (value, charset) in enumerate(headers):
-            headers[idx] = value.decode(charset or DEFAULT_CHARSET, "replace")
+            if isinstance(value, bytes):
+                headers[idx] = value.decode(
+                    charset or DEFAULT_CHARSET, "replace")
+            elif isinstance(value, str):
+                headers[idx] = value.encode(
+                    charset or DEFAULT_CHARSET, "replace").decode(
+                    charset or DEFAULT_CHARSET, "replace")
         return "".join(headers)
 
 
@@ -101,6 +114,7 @@ def parse_message(raw_message):
     if date:
         parsed_msg["Date"] = date
 
+    # decode some headers that may need that
     for header in ["Subject", "Date", "Message-ID"]:
         if header in parsed_msg:
             parsed_msg[header] = _decode_header(parser_msg.get(header))
@@ -108,13 +122,29 @@ def parse_message(raw_message):
     return parsed_msg
 
 
-def parse_mailbox_list(uids, msg_data):
+def parse_mailbox_list(uids, msg_data, headers):
     """
     Parse list of message previews.
 
     :param uids: list of the given messages uids.
     :param msg_data: raw messages data.
+    :param headers: list of headers to be parsed.
 
     :returns: list of dictionaries containing parsed message previews.
     """
-    return
+    mailbox_list = []
+    for _spec, msg in msg_data[::2]:
+        parsed_msg = {"uid": uids.pop(0)}
+        str_msg = msg.decode(DEFAULT_CHARSET)
+        for header_name in headers:
+            parsed_header = _decode_header(str_msg[
+                str_msg.find(header_name) + len(header_name)+1: ].split("\r\n")[0])
+            if header_name == "Date":
+                parsed_msg[header_name] = _parse_date(parsed_header) or \
+                                          parsed_header
+            elif header_name == "From":
+                parsed_msg[header_name] = _get_addresses(parsed_header, "From")
+            else:
+                parsed_msg[header_name] = parsed_header
+        mailbox_list.append(parsed_msg)
+    return mailbox_list

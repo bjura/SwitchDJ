@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 
-DEFAULT_CHARSET = "utf-8"
+DEFAULT_CHARSET = "us-ascii"
 
 
 def _decode_message(message):
@@ -22,15 +22,18 @@ def _decode_message(message):
     return content.decode(charset)
 
 
-def _get_addresses(value, header):
+def _get_addresses(value, header=None):
     """
     Extract all addresses from a header with the given name.
 
     :params value: single string with raw header value or
-    `email.message.Message` object.
-    :param header: header name.
+    `email.message.Message` instance.
+    :param header: header name, obligatory when 'value' is an
+    `email.message.Message` instance.
 
-    :returns: list of tuples containing name and address for each record.
+    :returns: in case when 'value' param is an `email.message.Message`instance
+    then returns list of tuples containing name and address for each record,
+    if 'value' is a string then returns a single tuple of this kind.
     """
     if isinstance(value, str):
         return email.utils.parseaddr(value)
@@ -38,7 +41,7 @@ def _get_addresses(value, header):
         return email.utils.getaddresses(message.get_all(header, []))
     else:
         _LOG.error("Invalid argument 'value'. Only string or "
-                   "email.message.Message object accepted.")
+                   "'email.message.Message' instance are accepted.")
 
 
 def _parse_date(raw_date):

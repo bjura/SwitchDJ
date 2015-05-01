@@ -47,6 +47,26 @@ def _parse_date(raw_date):
             if date_tuple else None
 
 
+def _decode_header(header):
+    """
+    Decode the given header with charsets supplied within or
+    with the default charset.
+
+    :param header: raw header.
+
+    :returns: single string with a decoded header.
+    """
+    try:
+        headers = email.header.decode_header(header)
+    except email.errors.HeaderParseError:
+        return header.encode(DEFAULT_CHARSET, "replace").decode(
+            DEFAULT_CHARSET)
+    else:
+        for idx, (value, charset) in enumerate(headers):
+            headers[idx] = value.decode(charset or DEFAULT_CHARSET, "replace")
+        return "".join(headers)
+
+
 def parse_message(raw_message):
     """
     Parse the given raw message.
@@ -80,6 +100,10 @@ def parse_message(raw_message):
     date = _parse_date(parsed_msg.get("Date"))
     if date:
         parsed_msg["Date"] = date
+
+    for header in ["Subject", "Date", "Message-ID"]:
+        if header in parsed_msg:
+            parsed_msg[header] = _decode_header(parser_msg.get(header))
 
     return parsed_msg
 

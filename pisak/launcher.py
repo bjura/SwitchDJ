@@ -50,7 +50,7 @@ class _Box(object):
 
 
 class LauncherWindow(configurator.Configurable):
-    def __init__(self, descriptor, stage, application):
+    def __init__(self, application, stage, descriptor):
         super().__init__()
         self.base_application = application
         self.stage = stage
@@ -150,7 +150,7 @@ def run(descriptor):
         '''
 
         def create_window(self, argv):
-            clutter_window = LauncherWindow(descriptor, Clutter.Stage(), self)
+            clutter_window = LauncherWindow(self, Clutter.Stage(), descriptor)
             clutter_window.stage.set_title('Pisak Main')
             if arg_parser.get_args().debug:
                 clutter_window.stage.set_size(800, 600)
@@ -170,7 +170,7 @@ def run(descriptor):
             embed = GtkClutter.Embed()
             gtk_window.add(embed)
             gtk_window.stage = embed.get_stage()
-            clutter_window = LauncherWindow(descriptor, gtk_window.stage, self)
+            clutter_window = LauncherWindow(self, gtk_window.stage, descriptor)
             clutter_window.wrapper = gtk_window
             gtk_window.stage.set_title('Pisak Main')
             if arg_parser.get_args().debug:

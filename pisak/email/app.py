@@ -29,7 +29,7 @@ BUILTIN_CONTACTS = [
 	{
 		"name": "PISAK",
 		"address": "kontakt@pisak.org",
-		"photo": res.get("logo_pisak.jpg")
+		"photo": res.get("logo_pisak.png")
 	}
  ]
 

@@ -98,17 +98,18 @@ def parse_message(raw_message):
     """
     parsed_msg = {}
     msg = email.message_from_string(raw_message)
-    content_type = msg.get_content_maintype()
 
+    content_type = msg.get_content_maintype()
+    body = []
     # look for plain text message body
     if content_type == "multipart":
         for part in msg.walk():
-            content_type = part.get_content_type()
             is_inline = part.get("Content-Disposition") in (None, "inline")
-            if content_type == "text/plain" and is_inline:
-                parsed_msg["Body"] = _decode_message(part)
-    elif content_type == "text/plain":
-        parsed_msg["Body"] = _decode_message(part)
+            if part.get_content_type() == "text/plain" and is_inline:
+                body.append(_decode_message(part))
+    elif content_type in ("text/plain", "text"):
+        body.append(_decode_message(msg))
+    parsed_msg["Body"] = "\n".join(body)
 
     # put all the message fields into a dictionary
     parsed_msg.update(msg.items())

@@ -183,23 +183,22 @@ ApplicationWindow {
         color: "transparent"
         layer.enabled: true
 
-        Grid {
-            anchors.centerIn: parent
-            columns: 3
-            rows: 3
-            spacing: parent.height * 0.4
+        property string pointDeclaration:
+            'import QtQuick 2.2;
 
-            Repeater {
-                model: 9
+            Rectangle {
+                height: parent.height * 0.03;
+                width: height;
+                radius: width * 0.5;
+            }'
 
-                Rectangle {
-                    color: "red"
-                    height: parent.height * 0.02
-                    width: height
-                    radius: width * 0.5
-                }
-            }
-        }
+         Component.onCompleted: {
+             for (var i = 0; i < calibration.points.length; i++) {
+                 var dot Qt.createQmlObject(pointDeclaration, fixationDots, 'fixationDot' + i)
+                 dot.x = calibration.points[i].x
+                 dot.y = calibration.points[i].y
+             }
+         }
     }
 
     Text {

@@ -20,20 +20,20 @@ class SimpleMessage(object):
 
     def __init__(self):
         self.charset = "utf-8"
-        self.recipents = []
+        self.recipients = []
         self.body = ""
         self.subject = ""
 
-    def _add_recipents(self, msg):
+    def _add_recipients(self, msg):
         """
-        Add recipents to the message.
+        Add recipients to the message.
 
         :param msg: internal message object
         """
-        if len(self.recipents) > 0:
-            msg["To"] = Header(",".join(self.recipents), self.charset)
+        if len(self.recipients) > 0:
+            msg["To"] = Header(",".join(self.recipients), self.charset)
         else:
-            e = "No recipents of the new message specified."
+            e = "No recipients of the new message specified."
             _LOG.error(e)
             raise EmailSendingError(e)
 
@@ -49,7 +49,7 @@ class SimpleMessage(object):
         """
         Create new simple message and add its body.
         """
-        # only plain text, not any markups:
+        # only plain text, without any markups:
         return MIMEText(self.body, "plain", self.charset)
 
     def _compose_message(self):
@@ -60,7 +60,7 @@ class SimpleMessage(object):
         """
         msg = self._create_body()
         self._add_subject(msg)
-        self._add_recipents(msg)
+        self._add_recipients(msg)
         return msg
 
     def send(self):
@@ -80,7 +80,7 @@ class SimpleMessage(object):
                 _LOG.warning("Server does not support STARTTLS.")
             server.ehlo_or_helo_if_needed()
             server.login(setup["user_address"], setup["password"])
-            server.sendmail(setup["user_address"], self.recipents, msg.as_string())
+            server.sendmail(setup["user_address"], self.recipients, msg.as_string())
             server.quit()
             _LOG.debug("Email was sent successfully.")
             return True
@@ -93,7 +93,7 @@ class SimpleMessage(object):
         Clear the whole message, all headers etc
         and start creating a new one from the very beginning.
         """
-        self.recipents = []
+        self.recipients = []
         self.body = ""
         self.subject = ""
 
@@ -105,7 +105,7 @@ class SimpleMessage(object):
         :returns: dictionary containing all the separate message fields.
         """
         return {
-            "recipents": self.recipents,
+            "recipients": self.recipients,
             "subject": self.subject,
             "body": self.body
         }

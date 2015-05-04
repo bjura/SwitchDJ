@@ -79,7 +79,7 @@ def prepare_sent_view(stage, script, data):
 def prepare_speller_message_body_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
     handlers.button_to_view(stage, script, "button_proceed",
-                    "email/address_book", {"pick_recipents_mode": True})
+                    "email/address_book", {"pick_recipients_mode": True})
 
 
 def prepare_speller_message_subject_view(stage, script, data):
@@ -104,9 +104,9 @@ def prepare_address_book_view(app, script, data):
         """
         tile.toggled = not tile.toggled
         if tile.toggled:
-            app.box.new_message.recipents.append(contact["address"])
+            app.box.new_message.recipients.append(contact["address"])
         else:
-            app.box.new_message.recipents.remove(contact["address"])
+            app.box.new_message.recipients.remove(contact["address"])
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script, "button_back", "email/main")
@@ -114,7 +114,7 @@ def prepare_address_book_view(app, script, data):
     app.ui.date.set_text(today)
     data_source = script.get_object("data_source")
 
-    if data and data.get("pick_recipents_mode"):
+    if data and data.get("pick_recipients_mode"):
         specific_button= app.ui.button_send_message
         tile_handler = lambda tile, contact: on_contact_select(tile, contact)
         handlers.button_to_view(app, script,

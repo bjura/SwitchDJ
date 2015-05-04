@@ -5,8 +5,13 @@ import email
 import time
 from datetime import datetime
 
+from pisak import logger
 
-DEFAULT_CHARSET = "us-ascii"
+
+_LOG = logger.getLogger(__name__)
+
+
+DEFAULT_CHARSET = "utf-8"
 
 
 def _decode_message(message):

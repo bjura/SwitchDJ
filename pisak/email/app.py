@@ -70,8 +70,11 @@ def prepare_inbox_view(app, script, data):
     data_source.item_handler = lambda tile, message_preview: \
         app.load_view(
             "email/single_message",
-            {"message_preview": message_preview,
-            "message_source": app.box.imap_client.get_message_from_inbox}
+            {
+                "message_uid": message_preview["UID"],
+                "message_source": app.box.imap_client.get_message_from_inbox,
+                "previous_view": "inbox"
+            }
         )
     data_source.data = app.box.imap_client.get_inbox_list()[::-1]
 
@@ -198,9 +201,19 @@ def prepare_viewer_contact_album_view(stage, script, data):
 
 def prepare_single_message_view(app, script, data):
     handlers.button_to_view(app, script, "button_exit")
-    message = data["message_source"](data["message_preview"]["UID"])
-    app.ui.message_body.set_text(message["Body"])
+    handlers.button_to_view(app, script,
+                            "button_back", "email/{}".format(data["previous_view"]))
+    message = data["message_source"](data["message_uid"])
     app.ui.message_subject.set_text(message["Subject"])
+    app.ui.from_content.set_text(
+        "; ".join([record[1] for record in message["From"]]))
+    app.ui.to_content.set_text(
+        ";\n".join([record[1] for record in message["To"]]))
+    app.ui.date_content.set_text(str(message["Date"]))
+    if "Body" in message:
+        app.ui.message_body.set_text(message["Body"])
+
+
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@
         "y-expand": true,
         "ratio-margin-top": 0.02,
         "ratio-margin-bottom": 0.04,
-        "ratio-spacing": 0.015,
+        "ratio-spacing": 0.08,
         "orientation": "vertical",
         "children": ["lower_box", "top_box"]
     },
@@ -39,21 +39,24 @@
         "type": "PisakBoxLayout",
         "x-align": "center",
         "y-align": "center",
+        "ratio-height": 0.08,
+        "clip-to-allocation": true,
         "x-expand": true,
-        "ratio-spacing": 0.015,
-		"children": ["sent_box", "cc_box", "to_box", "from_box"]
+        "ratio-spacing": 0.025,
+		"children": ["date_box", "cc_box", "to_box", "from_box"]
     },
 	{
 		"id": "from_box",
         "type": "PisakBoxLayout",
-		"ratio-spacing": 0.0015,
+		"ratio-spacing": 0.01,
         "orientation": "vertical",
 		"children": ["from_content", "from_label"]
 	},
 	{
 		"id": "from_label",
 		"type": "MxLabel",
-		"style-class": "PisakEmailSingleMessage"
+		"style-class": "PisakEmailSingleMessage",
+        "text": "NADAWCA:"
 	},
 	{
 		"id": "from_content",
@@ -63,14 +66,15 @@
 	{
 		"id": "to_box",
         "type": "PisakBoxLayout",
-		"ratio-spacing": 0.0015,
+		"ratio-spacing": 0.01,
         "orientation": "vertical",
 		"children": ["to_content", "to_label"]
 	},
 	{
 		"id": "to_label",
 		"type": "MxLabel",
-		"style-class": "PisakEmailSingleMessage"
+		"style-class": "PisakEmailSingleMessage",
+        "text": "ODBIORCY:"
 	},
 	{
 		"id": "to_content",
@@ -80,7 +84,7 @@
 	{
 		"id": "cc_box",
         "type": "PisakBoxLayout",
-		"ratio-spacing": 0.0015,
+		"ratio-spacing": 0.01,
         "orientation": "vertical",
 		"children": ["cc_content", "cc_label"]
 	},
@@ -95,19 +99,20 @@
 		"style-class": "PisakEmailSingleMessage"
 	},
 	{
-		"id": "sent_box",
+		"id": "date_box",
         "type": "PisakBoxLayout",
-		"ratio-spacing": 0.0015,
+		"ratio-spacing": 0.01,
         "orientation": "vertical",
-		"children": ["sent_content", "sent_label"]
+		"children": ["date_content", "date_label"]
 	},
 	{
-		"id": "sent_label",
+		"id": "date_label",
 		"type": "MxLabel",
-		"style-class": "PisakEmailSingleMessage"
+		"style-class": "PisakEmailSingleMessage",
+        "text": "DATA:"
 	},
 	{
-		"id": "sent_content",
+		"id": "date_content",
 		"type": "MxLabel",
 		"style-class": "PisakEmailSingleMessage"
 	},
@@ -184,7 +189,7 @@
         "ratio-width": 0.24,
         "ratio-height": 0.09,
         "icon-size": 50,
-        "icon-name": ""
+        "icon-name": "edytuj_opis"
     },
     {
         "id": "button_back",
@@ -232,7 +237,7 @@
         "ratio-width": 0.07,
         "ratio-height": 0.09,
         "icon-size": 50,
-        "icon-name": ""
+        "icon-name": "play"
     },
     {
         "id": "button_response_all",
@@ -242,7 +247,7 @@
         "ratio-width": 0.07,
         "ratio-height": 0.09,
         "icon-size": 50,
-        "icon-name": ""
+        "icon-name": "forth"
     },
     {
         "id": "button_scroll_up",
@@ -272,7 +277,7 @@
         "ratio-width": 0.07,
         "ratio-height": 0.09,
         "icon-size": 50,
-        "icon-name": ""
+        "icon-name": "looped"
     },
     {
         "id": "button_remove",
@@ -287,8 +292,8 @@
     {
 		"id": "message_content",
 		"type": "PisakBoxLayout",
-		"ratio-height": 0.75,
-		"ratio-width": 0.6,
+		"ratio-height": 0.8,
+		"ratio-width": 0.64,
         "ratio-spacing": 0.05,
         "orientation": "vertical",
         "children": ["message_body", "message_subject"]

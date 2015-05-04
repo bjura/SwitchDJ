@@ -38,7 +38,7 @@ def _get_addresses(value, header=None):
     if isinstance(value, str):
         return email.utils.parseaddr(value)
     elif isinstance(value, email.message.Message):
-        return email.utils.getaddresses(message.get_all(header, []))
+        return email.utils.getaddresses(value.get_all(header, []))
     else:
         _LOG.error("Invalid argument 'value'. Only string or "
                    "'email.message.Message' instance are accepted.")
@@ -112,15 +112,15 @@ def parse_message(raw_message):
     parsed_msg["To"] = _get_addresses(msg, "To")
     parsed_msg["From"] = _get_addresses(msg, "From")
 
+    # decode some headers that may need that
+    for header in ["Subject", "Date", "Message-ID"]:
+        if header in parsed_msg:
+            parsed_msg[header] = _decode_header(parsed_msg.get(header))
+
     # convert date into datetime object if possible
     date = _parse_date(parsed_msg.get("Date"))
     if date:
         parsed_msg["Date"] = date
-
-    # decode some headers that may need that
-    for header in ["Subject", "Date", "Message-ID"]:
-        if header in parsed_msg:
-            parsed_msg[header] = _decode_header(parser_msg.get(header))
 
     return parsed_msg
 
@@ -137,7 +137,7 @@ def parse_mailbox_list(uids, msg_data, headers):
     """
     mailbox_list = []
     for _spec, msg in msg_data[::2]:
-        parsed_msg = {"uid": uids.pop(0)}
+        parsed_msg = {"UID": uids.pop(0)}
         str_msg = msg.decode(DEFAULT_CHARSET)
         for header_name in headers:
             parsed_header = _decode_header(str_msg[

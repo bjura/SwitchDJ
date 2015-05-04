@@ -67,8 +67,12 @@ def prepare_inbox_view(app, script, data):
     today = "DATA:   " + time.strftime("%d-%m-%Y")
     app.ui.date.set_text(today)
     data_source = script.get_object("data_source")
-    data_source.item_handler = lambda tile, message: \
-        app.load_view("email/single_message", message)
+    data_source.item_handler = lambda tile, message_preview: \
+        app.load_view(
+            "email/single_message",
+            {"message_preview": message_preview,
+            "message_source": app.box.imap_client.get_message_from_inbox}
+        )
     data_source.data = app.box.imap_client.get_inbox_list()[::-1]
 
 
@@ -192,8 +196,11 @@ def prepare_viewer_contact_album_view(stage, script, data):
     data_source.item_handler = photo_tile_handler
     data_source.data_set_id = album_id
 
-def prepare_single_message_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
+def prepare_single_message_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    message = data["message_source"](data["message_preview"]["UID"])
+    app.ui.message_body.set_text(message["Body"])
+    app.ui.message_subject.set_text(message["Subject"])
 
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@
         "ratio-margin-bottom": 0.04,
         "ratio-spacing": 0.015,
         "orientation": "vertical",
-        "children": ["lower_box", "top_box", "header"]
+        "children": ["lower_box", "top_box"]
     },
     {
         "id": "top_box",
@@ -118,7 +118,7 @@
         "x-expand": true,
         "margin-right": 100,
         "x-align": "end",
-		"label": "TYTUŁ WIADOMOŚCI"
+		"text": "TYTUŁ WIADOMOŚCI"
     },
     {
         "id": "lower_box",
@@ -286,8 +286,21 @@
     },
     {
 		"id": "message_content",
-		"type": "ClutterActor",
+		"type": "PisakBoxLayout",
 		"ratio-height": 0.75,
-		"ratio-width": 0.6
+		"ratio-width": 0.6,
+        "ratio-spacing": 0.05,
+        "orientation": "vertical",
+        "children": ["message_body", "message_subject"]
+    },
+    {
+        "id": "message_subject",
+        "type": "MxLabel",
+        "style-class": "PisakEmailSingleMessageTitle"
+    },
+    {
+        "id": "message_body",
+        "type": "MxLabel",
+        "style-class": "PisakEmailSingleMessage"
     }
 ]

@@ -183,7 +183,9 @@ ApplicationWindow {
         color: "transparent"
         layer.enabled: true
 
-        property string pointDeclaration:
+        property var dots: []
+
+        property string dotDeclaration:
             'import QtQuick 2.2;
 
             Rectangle {
@@ -194,9 +196,9 @@ ApplicationWindow {
 
          Component.onCompleted: {
              for (var i = 0; i < calibration.points.length; i++) {
-                 var dot Qt.createQmlObject(pointDeclaration, fixationDots, 'fixationDot' + i)
-                 dot.x = calibration.points[i].x
-                 dot.y = calibration.points[i].y
+                 dots[i] = Qt.createQmlObject(dotDeclaration, fixationDots, 'fixationDot' + i)
+                 dots[i].x = calibration.points[i].x * width - dots[i].width / 2
+                 dots[i].y = calibration.points[i].y * height - dots[i].height / 2
              }
          }
     }

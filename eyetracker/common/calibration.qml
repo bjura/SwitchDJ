@@ -183,23 +183,24 @@ ApplicationWindow {
         color: "transparent"
         layer.enabled: true
 
-        Grid {
-            anchors.centerIn: parent
-            columns: 3
-            rows: 3
-            spacing: parent.height * 0.4
+        property var dots: []
 
-            Repeater {
-                model: 9
+        property string dotDeclaration:
+            'import QtQuick 2.2;
 
-                Rectangle {
-                    color: "red"
-                    height: parent.height * 0.02
-                    width: height
-                    radius: width * 0.5
-                }
-            }
-        }
+            Rectangle {
+                height: parent.height * 0.03;
+                width: height;
+                radius: width * 0.5;
+            }'
+
+         Component.onCompleted: {
+             for (var i = 0; i < calibration.points.length; i++) {
+                 dots[i] = Qt.createQmlObject(dotDeclaration, fixationDots, 'fixationDot' + i)
+                 dots[i].x = calibration.points[i].x * width - dots[i].width / 2
+                 dots[i].y = calibration.points[i].y * height - dots[i].height / 2
+             }
+         }
     }
 
     Text {
@@ -369,10 +370,10 @@ ApplicationWindow {
 
     Rectangle {
         id: trackingDot
-        width: 15
+        width: 25
         height: width
         visible: false
-        color: "white"
+        color: "orange"
         border.color: "black"
         border.width: 1
         antialiasing: true

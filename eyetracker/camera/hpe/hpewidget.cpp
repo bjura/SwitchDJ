@@ -154,10 +154,10 @@ HpeWidget::HpeWidget(QWidget * parent)
 
     QDir dir(QDir::homePath());
 
-    QString path = dir.filePath("pisak/eyetracker/tracker/hpe/marker-detector/run_detector.py");
+    QString path = dir.filePath("pisak/eyetracker/camera/hpe/marker-detector/run_detector.py");
     m_tracker_process.reset(new redi::ipstream(("python " + path).toLocal8Bit().data(), m_tracker_process_mode));
 
-    QString modelPath = dir.filePath("pisak/eyetracker/tracker/hpe/head-obj.obj");
+    QString modelPath = dir.filePath("pisak/eyetracker/camera/hpe/head-obj.obj");
     m_headObj = glmReadOBJ(modelPath.toLocal8Bit().data());
 
     double avgX = 0;

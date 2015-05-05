@@ -51,6 +51,7 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
     m_pointCalibrationTimer.setSingleShot(true);
     connect(&m_pointCalibrationTimer, SIGNAL(timeout()), this, SLOT(pointCalibrationTimeout()));
 
+    m_hpeWindow = new HpeWidget;
     const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
     m_hpeWindow->setWindowFlags(flags | Qt::WindowStaysOnTopHint);
     m_hpeWindow->show();

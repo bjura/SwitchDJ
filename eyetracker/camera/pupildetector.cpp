@@ -17,7 +17,7 @@
 
 #include "pupildetector.h"
 
-static inline cv::Mat correctGamma(cv::Mat & img, double gamma)
+static cv::Mat correctGamma(cv::Mat & img, double gamma)
 {
     const double inverse_gamma = 1.0 / gamma;
 
@@ -32,7 +32,7 @@ static inline cv::Mat correctGamma(cv::Mat & img, double gamma)
     return result;
 }
 
-cv::Mat equalizeIntensity(const cv::Mat & inputImage)
+static cv::Mat equalizeIntensity(const cv::Mat & inputImage)
 {
     if(inputImage.channels() >= 3)
     {

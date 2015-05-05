@@ -28,6 +28,7 @@
 #include "../common/eyetracker.h"
 #include "pupildetector.h"
 #include "calibration.h"
+#include "hpe/hpewidget.h"
 
 class CameraEyetracker : public Eyetracker
 {
@@ -70,6 +71,7 @@ private:
     QPointer<QThread> m_detectorThread;
 
     QPointer<PupilDetectorSetupWindow> m_cameraSetupWindow;
+    QPointer<HpeWidget> m_hpeWindow;
 
     bool m_tracking;
     bool m_calibrating;

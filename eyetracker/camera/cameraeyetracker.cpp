@@ -19,7 +19,6 @@
 #include "smoother.h"
 
 #include <QFile>
-#include <boost/math/special_functions/fpclassify.hpp>
 
 CameraEyetracker::CameraEyetracker(QObject * parent)
     : Eyetracker(parent)
@@ -51,6 +50,10 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
 
     m_pointCalibrationTimer.setSingleShot(true);
     connect(&m_pointCalibrationTimer, SIGNAL(timeout()), this, SLOT(pointCalibrationTimeout()));
+
+    const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
+    m_hpeWindow->setWindowFlags(flags | Qt::WindowStaysOnTopHint);
+    m_hpeWindow->show();
 }
 
 CameraEyetracker::~CameraEyetracker()

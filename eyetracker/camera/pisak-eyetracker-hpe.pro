@@ -19,7 +19,7 @@ SOURCES += main.cpp \
     cameraeyetracker.cpp \
     calibration.cpp \
     hpe/glm.cpp \
-    hpe/glwidget.cpp
+    hpe/hpewidget.cpp
 
 HEADERS  += \
     opencvcapture.h \
@@ -30,8 +30,8 @@ HEADERS  += \
     cameraeyetracker.h \
     calibration.h \
     hpe/glm.h \
-    hpe/glwidget.h \
-    hpe/pstream.h
+    hpe/pstream.h \
+    hpe/hpewidget.h
 
 FORMS += \
     camera_setup.ui

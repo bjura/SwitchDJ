@@ -42,7 +42,7 @@
  */
 
 #include <QDir>
-#include "glwidget.h"
+#include "hpewidget.h"
 #include "glm.h"
 #include <GL/glu.h>
 
@@ -141,7 +141,7 @@ static void drawAxes()
 
 //--------------------------------------------------------------------------------------------------
 
-GLWidget::GLWidget(QWidget * parent)
+HpeWidget::HpeWidget(QWidget * parent)
     : QOpenGLWidget(parent)
     , m_tv(3)
     , m_rv(3)
@@ -231,7 +231,7 @@ GLWidget::GLWidget(QWidget * parent)
     m_timer.start();
 }
 
-void GLWidget::initializeGL()
+void HpeWidget::initializeGL()
 {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -275,7 +275,7 @@ void GLWidget::initializeGL()
     glLoadIdentity();
 }
 
-void GLWidget::paintGL()
+void HpeWidget::paintGL()
 {
     // draw the image in the back
     int vPort[4];
@@ -344,7 +344,7 @@ void GLWidget::paintGL()
     // glutSwapBuffers();
 }
 
-void GLWidget::resizeGL(int width, int height)
+void HpeWidget::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
 
@@ -358,7 +358,7 @@ void GLWidget::resizeGL(int width, int height)
     glLoadIdentity();
 }
 
-std::vector<cv::Point2f> GLWidget::estimatePose(const std::vector<cv::Point2f> & markers,
+std::vector<cv::Point2f> HpeWidget::estimatePose(const std::vector<cv::Point2f> & markers,
                                                 const cv::Mat & img)
 {
     //std::cout << markers.size() << std::endl;
@@ -551,7 +551,7 @@ std::vector<cv::Point2f> GLWidget::estimatePose(const std::vector<cv::Point2f> &
     return reprojected_points;
 }
 
-void GLWidget::idle()
+void HpeWidget::idle()
 {
     // cap >> frame;
 

@@ -370,10 +370,10 @@ ApplicationWindow {
 
     Rectangle {
         id: trackingDot
-        width: 15
+        width: 25
         height: width
         visible: false
-        color: "white"
+        color: "orange"
         border.color: "black"
         border.width: 1
         antialiasing: true

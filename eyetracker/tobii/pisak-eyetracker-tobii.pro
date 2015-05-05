@@ -1,5 +1,7 @@
 TEMPLATE = app
 
+TARGET = pisak-eyetracker-tobii
+
 QT += qml quick widgets
 CONFIG += c++11
 
@@ -29,4 +31,3 @@ HEADERS += \
     tobiieyetracker.h \
     ../common/etr_main.h \
     ../common/smoother.h
-

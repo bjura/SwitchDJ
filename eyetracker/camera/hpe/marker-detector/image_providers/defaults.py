@@ -1,0 +1,1 @@
+UPDATE_INTERVAL = 50 #ms

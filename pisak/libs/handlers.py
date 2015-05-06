@@ -299,7 +299,7 @@ def start_group(source, _app):
 
 
 @signals.registered_handler("general/kill_group")
-def kill_group(source, _app):
+def kill_group(source, _app=None):
     """
     Stop scanning group
     """

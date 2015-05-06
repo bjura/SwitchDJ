@@ -503,7 +503,7 @@ class Text(Mx.ScrollView, properties.PropertyAdapter, configurator.Configurable,
         self.text.set_height(unit.h(value))
 
 
-class Key(pisak.widgets.Button, configurator.Configurable):
+class Key(pisak.libs.widgets.Button, configurator.Configurable):
     """
     Widget representing speller specific single keyboard key.
     
@@ -715,7 +715,7 @@ class Dictionary(text_tools.Predictor):
             return context.group(1)
 
 
-class Prediction(pisak.widgets.Button, configurator.Configurable):
+class Prediction(pisak.libs.widgets.Button, configurator.Configurable):
     """
     Widget representing a button being a placeholder for predicting
     engine results.
@@ -875,7 +875,7 @@ class Prediction(pisak.widgets.Button, configurator.Configurable):
         self._order_num = value
 
 
-class PopUp(pisak.widgets.DialogWindow):
+class PopUp(pisak.libs.widgets.DialogWindow):
     """
     Dialog window for purposes of saving and loading text documents.
     """
@@ -892,7 +892,7 @@ class PopUp(pisak.widgets.DialogWindow):
                     row = layout.Box()
                     row.spacing = self.spacing
                     self.space.add_child(row)
-                button = pisak.widgets.Button()
+                button = pisak.libs.widgets.Button()
                 button.set_style_class("PisakSpellerButton")
                 button.set_label(file.name)
                 button.ratio_width = self.tile_ratio_width

@@ -1,4 +1,4 @@
-1'''
+'''
 Module with app-specific code for photo viewer.
 '''
 from pisak import launcher

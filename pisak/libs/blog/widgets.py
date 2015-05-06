@@ -7,8 +7,7 @@ from urllib.parse import urlparse
 from gi.repository import Mx, GObject, Pango, Clutter, GtkClutter, WebKit, Gtk
 
 from pisak import logger
-from pisak.libs. import pager, widgets, utils, logger, layout, unit, \
-    properties, dirs
+from pisak.libs import pager, widgets, utils, layout, unit, properties, dirs
 from pisak.libs.blog import wordpress, config, html_parsers
 
 

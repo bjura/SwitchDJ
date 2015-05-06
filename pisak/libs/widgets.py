@@ -699,7 +699,7 @@ class HiliteTool(Clutter.Actor):
     Stylable. Scannable widget should add HiliteTool instance as a descendant
     and call its methods to change highlight state.
 
-    :see: :class:`pisak.widgets.Aperture`
+    :see: :class:`pisak.libs.widgets.Aperture`
     """
 
     def turn_on(self):
@@ -1960,7 +1960,7 @@ class BackgroundPattern(layout.Bin):
 
         See also:
         
-        :see: :property:`pisak.widgets.BackgroundPattern.rgba`
+        :see: :property:`pisak.libs.widgets.BackgroundPattern.rgba`
         """
         self._pattern = value
         self.background_image.invalidate()

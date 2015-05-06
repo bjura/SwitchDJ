@@ -5,7 +5,8 @@ from gi.repository import GObject, Clutter
 import cairo
 
 import pisak
-from pisak import widgets, layout, dirs, properties, utils, res, configurator
+from pisak import res
+from pisak.libs import widgets, layout, dirs, properties, utils, configurator
 
 
 SAVE_FILE_BASENAME = "PISAK_paint_"

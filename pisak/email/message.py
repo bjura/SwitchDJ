@@ -155,7 +155,7 @@ class SimpleMessage(object):
         and start creating a new one from the very beginning.
         """
         self._msg = {
-            "recipents": set(),
+            "recipients": set(),
             "body": "",
             "subject": ""
         }

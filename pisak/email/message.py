@@ -99,28 +99,9 @@ class SimpleMessage(object):
 
         :returns: fully prepared message object for internal use
         """
-        def create_body(self):
-            """
-            Create new simple message and add its body.
-            """
-            # only plain text, without any markups:
-            return MIMEText(self._msg["body"], "plain", self.charset)
-
-        def add_recipients(self):
-            """
-            Add recipients to the message.
-            """
-            msg["To"] = Header(",".join(self._msg["recipients"]), self.charset)
-
-        def add_subject(self):
-            """
-            Set subject of the message.
-            """
-            msg["Subject"] = Header(self._msg["subject"], self.charset)
-
-        msg = create_body(self)
-        add_subject(self)
-        add_recipients(self)
+        msg = MIMEText(self._msg["body"], "plain", self.charset)
+        msg["To"] = Header(",".join(self._msg["recipients"]), self.charset)
+        msg["Subject"] = Header(self._msg["subject"], self.charset)
         return msg
 
     def send(self):

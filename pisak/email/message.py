@@ -77,9 +77,8 @@ class SimpleMessage(object):
                 raise ValueError("Invalid email address: {}.".format(address))
 
     def _validate_address(self, address):
-        return address.count("@") == 1 and \
-               "." in address and "@" in address and \
-               address.rindex(".") > address.index("@")
+        return address.count("@") == 1 and "." in address \
+               and address.rindex(".") > address.index("@")
 
     def remove_recipient(self, recipient):
         """

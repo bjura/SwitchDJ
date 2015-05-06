@@ -36,25 +36,12 @@ class _UI(object):
                 setattr(self, obj.get_id(), obj)
 
 
-class _Box(object):
-    """
-    Box for all the application specific gears.
-    """
-    def register_elements(self, elements):
-        """
-        Register all specific elements that will be used by the application.
-
-        :param elements: dictionary of elements
-        """
-        self.__dict__.update(elements)
-
-
 class LauncherWindow(configurator.Configurable):
     def __init__(self, application, stage, descriptor):
         super().__init__()
         self.base_application = application
         self.stage = stage
-        self.box = _Box()
+        self.box = {}
         self.ui = None
         self.input_group = inputs.InputGroup(self.stage)
         self._init_layout()
@@ -87,10 +74,20 @@ class LauncherWindow(configurator.Configurable):
         app_name = descriptor.get("app")
         app_elements = descriptor.get("elements")
         if app_elements:
-            self.box.register_elements(app_elements)
+            self._register_app_elements(app_elements)
         self._read_config(app_name)
         self._read_views(app_name, view_list)
         self.initial_view = os.path.join(app_name, "main")
+
+    def _register_app_elements(self, elements):
+        """
+        Register all basic elements that will be used by the application. Elements are
+        put inside the 'box' dictionary and then avalaible throughout the entire
+        lifetime of the application.
+
+        :param elements: dictionary with application basic elements
+        """
+        self.box.update(elements)
 
     def _read_config(self, app_name):
         """

@@ -1,8 +1,6 @@
 """
 Email application main module.
 """
-import time
-
 from gi.repository import GObject
 
 from pisak import launcher, handlers, res, logger
@@ -44,7 +42,7 @@ def prepare_main_view(app, script, data):
     handlers.button_to_view(
         app, script, "button_new_message", "email/speller_message_subject")
     for contact in BUILTIN_CONTACTS:
-	    app.box.address_book.add_contact(contact)
+	    app.box["address_book"].add_contact(contact)
 
 
 def prepare_drafts_view(stage, script, data):
@@ -52,9 +50,6 @@ def prepare_drafts_view(stage, script, data):
     handlers.button_to_view(
         stage, script, "button_new_message", "email/speller_message_subject")
     handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
 
 
 def prepare_inbox_view(stage, script, data):
@@ -62,18 +57,13 @@ def prepare_inbox_view(stage, script, data):
     handlers.button_to_view(
         stage, script, "button_new_message", "email/speller_message_subject")
     handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
+
 
 def prepare_sent_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
     handlers.button_to_view(
         stage, script, "button_new_message", "email/speller_message_subject")
     handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
 
 
 def prepare_speller_message_body_view(stage, script, data):
@@ -104,14 +94,12 @@ def prepare_address_book_view(app, script, data):
         """
         tile.toggled = not tile.toggled
         if tile.toggled:
-            app.box.new_message.recipients.append(contact["address"])
+            app.box["new_message"].recipients = contact["address"]
         else:
-            app.box.new_message.recipients.remove(contact["address"])
+            app.box["new_message"].remove_recipient(contact["address"])
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script, "button_back", "email/main")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    app.ui.date.set_text(today)
     data_source = script.get_object("data_source")
 
     if data and data.get("pick_recipients_mode"):

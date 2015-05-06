@@ -7,7 +7,8 @@ from configobj import ConfigObj
 
 from gi.repository import Gtk, GObject, Clutter, Mx, ClutterGst
 
-from pisak import res, sound_effects, configurator, dirs, logger
+from pisak import res, logger, sound_effects
+from pisak.libs import configurator, dirs
 
 _LOG = logger.getLogger(__name__)
 

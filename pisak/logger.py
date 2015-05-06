@@ -3,7 +3,7 @@ import logging
 from logging import handlers
 from datetime import datetime
 
-from pisak import arg_parser, dirs
+from pisak.libs import arg_parser, dirs
 
 
 LEVELS = {'debug': logging.DEBUG,

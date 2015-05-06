@@ -8,12 +8,12 @@ from gi.repository import GtkClutter
 from gi.repository import Gtk, Clutter, Mx
 
 import pisak
-from pisak import application, signals, unit, arg_parser, \
-     configurator, res, dirs, inputs
+from pisak import application, res
+from pisak.libs import signals, unit, arg_parser, configurator, dirs, inputs
 
-import pisak.layout  # @UnusedImport
-import pisak.widgets  # @UnusedImport
-import pisak.handlers  # @UnusedImport
+import pisak.libs.layout  # @UnusedImport
+import pisak.libs.widgets  # @UnusedImport
+import pisak.libs.handlers  # @UnusedImport
 
 
 class LauncherError(Exception):
@@ -24,10 +24,25 @@ class LauncherError(Exception):
     pass
 
 
+class _UI(object):
+    """
+    User interface definition plain container.
+
+    :param script: UI script
+    """
+    def __init__(self, script):
+        for obj in script.list_objects():
+            if hasattr(obj, "get_id"):
+                setattr(self, obj.get_id(), obj)
+
+
 class LauncherWindow(configurator.Configurable):
-    def __init__(self, descriptor, stage):
+    def __init__(self, application, stage, descriptor):
         super().__init__()
+        self.base_application = application
         self.stage = stage
+        self.box = {}
+        self.ui = None
         self.input_group = inputs.InputGroup(self.stage)
         self._init_layout()
         self.type = descriptor["type"]
@@ -57,9 +72,22 @@ class LauncherWindow(configurator.Configurable):
         """
         view_list = descriptor.get("views")
         app_name = descriptor.get("app")
+        app_elements = descriptor.get("elements")
+        if app_elements:
+            self._register_app_elements(app_elements)
         self._read_config(app_name)
         self._read_views(app_name, view_list)
         self.initial_view = os.path.join(app_name, "main")
+
+    def _register_app_elements(self, elements):
+        """
+        Register all basic elements that will be used by the application. Elements are
+        put inside the 'box' dictionary and then avalaible throughout the entire
+        lifetime of the application.
+
+        :param elements: dictionary with application basic elements
+        """
+        self.box.update(elements)
 
     def _read_config(self, app_name):
         """
@@ -97,7 +125,8 @@ class LauncherWindow(configurator.Configurable):
         view_path, prepare = self.views.get(name)
         self.script = Clutter.Script()
         self.script.load_from_file(view_path)
-        self.script.connect_signals_full(signals.connect_registered)
+        self.script.connect_signals_full(signals.connect_registered, self)
+        self.ui = _UI(self.script)
         if prepare:
             prepare(self, self.script, data)
         children = self.stage.get_children()
@@ -118,7 +147,7 @@ def run(descriptor):
         '''
 
         def create_window(self, argv):
-            clutter_window = LauncherWindow(descriptor, Clutter.Stage())
+            clutter_window = LauncherWindow(self, Clutter.Stage(), descriptor)
             clutter_window.stage.set_title('Pisak Main')
             if arg_parser.get_args().debug:
                 clutter_window.stage.set_size(800, 600)
@@ -138,7 +167,7 @@ def run(descriptor):
             embed = GtkClutter.Embed()
             gtk_window.add(embed)
             gtk_window.stage = embed.get_stage()
-            clutter_window = LauncherWindow(descriptor, gtk_window.stage)
+            clutter_window = LauncherWindow(self, gtk_window.stage, descriptor)
             clutter_window.wrapper = gtk_window
             gtk_window.stage.set_title('Pisak Main')
             if arg_parser.get_args().debug:

@@ -9,7 +9,8 @@ from sqlalchemy import Column, String, Table, ForeignKey, Integer, DateTime, \
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declarative_base
 
-from pisak import res, dirs
+from pisak import res
+from pisak.libs import dirs
 
 
 

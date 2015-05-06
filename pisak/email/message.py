@@ -2,7 +2,6 @@ import smtplib
 import socket
 from ssl import SSLError
 from email.mime.text import MIMEText
-from email.message import Message
 from email.header import Header
 
 from pisak import logger
@@ -20,37 +19,80 @@ class SimpleMessage(object):
 
     def __init__(self):
         self.charset = "utf-8"
-        self.recipients = []
-        self.body = ""
-        self.subject = ""
+        self._msg = {
+            "recipients": set(),
+            "body": "",
+            "subject": ""
+        }
 
-    def _add_recipients(self, msg):
+    @property
+    def body(self):
         """
-        Add recipients to the message.
+        Body of the message. Body should be a single string
+        containing only plain text without any markup.
+        """
+        return self._msg["body"]
 
-        :param msg: internal message object
+    @body.setter
+    def body(self, value):
+        assert isinstance(value, str), "Body of an email message should be a string."
+        self._msg["body"] = value
+
+    @property
+    def subject(self):
         """
-        if len(self.recipients) > 0:
-            msg["To"] = Header(",".join(self.recipients), self.charset)
+        Subject of the message. Subject should be a single string.
+        """
+        return self._msg["subject"]
+
+    @subject.setter
+    def subject(self, value):
+        assert isinstance(value, str), "Subject of an email message should be a string."
+        self._msg["subject"] = value
+
+    @property
+    def recipients(self):
+        """
+        Recipients of the message. Recipients are stored as a
+        set of unique email addresses. New recipients  can be added by setting
+        this property with either a single address in a string format or
+        with a list of many addresses.
+        Each new address will be added to the existing set of recipients.
+        Before adding to the set each address is examined and if any of them
+        is not correct then ValueError is raised.
+        Remove recipients using the `remove_recipient` method.
+        """
+        return self._msg["recipients"]
+
+    @recipients.setter
+    def recipients(self, value):
+        assert isinstance(value, str) or isinstance(value, list), \
+            "Recipients can be given as a single string or a list of many strings."
+        if isinstance(value, str):
+            value = [value]
+        for address in value:
+            if self._validate_address(address):
+                self._msg["recipients"].add(address)
+            else:
+                raise ValueError("Invalid email address: {}.".format(address))
+
+    def _validate_address(self, address):
+        return address.count("@") == 1 and \
+               "." in address and "@" in address and \
+               address.rindex(".") > address.index("@")
+
+    def remove_recipient(self, recipient):
+        """
+        Remove recipient from the collection of all recipients. All removings should
+        be performed by using this method.
+
+        :param recipient: recipient to be removed.
+        """
+        if recipient in self._msg["recipients"]:
+            self._msg["recipients"].remove(recipient)
         else:
-            e = "No recipients of the new message specified."
-            _LOG.error(e)
-            raise EmailSendingError(e)
-
-    def _add_subject(self, msg):
-        """
-        Set subject of the message.
-
-        :param msg: internal message object
-        """
-        msg["Subject"] = Header(self.subject, self.charset)
-
-    def _create_body(self):
-        """
-        Create new simple message and add its body.
-        """
-        # only plain text, without any markups:
-        return MIMEText(self.body, "plain", self.charset)
+            _LOG.warning("Trying to remove not existing recipient: {}.".format(
+                recipient))
 
     def _compose_message(self):
         """
@@ -58,9 +100,28 @@ class SimpleMessage(object):
 
         :returns: fully prepared message object for internal use
         """
-        msg = self._create_body()
-        self._add_subject(msg)
-        self._add_recipients(msg)
+        def create_body(self):
+            """
+            Create new simple message and add its body.
+            """
+            # only plain text, without any markups:
+            return MIMEText(self._msg["body"], "plain", self.charset)
+
+        def add_recipients(self):
+            """
+            Add recipients to the message.
+            """
+            msg["To"] = Header(",".join(self._msg["recipients"]), self.charset)
+
+        def add_subject(self):
+            """
+            Set subject of the message.
+            """
+            msg["Subject"] = Header(self._msg["subject"], self.charset)
+
+        msg = create_body(self)
+        add_subject(self)
+        add_recipients(self)
         return msg
 
     def send(self):
@@ -93,9 +154,11 @@ class SimpleMessage(object):
         Clear the whole message, all headers etc
         and start creating a new one from the very beginning.
         """
-        self.recipients = []
-        self.body = ""
-        self.subject = ""
+        self._msg = {
+            "recipents": set(),
+            "body": "",
+            "subject": ""
+        }
 
     def get_pretty(self):
         """
@@ -104,8 +167,4 @@ class SimpleMessage(object):
 
         :returns: dictionary containing all the separate message fields.
         """
-        return {
-            "recipients": self.recipients,
-            "subject": self.subject,
-            "body": self.body
-        }
+        return self._msg

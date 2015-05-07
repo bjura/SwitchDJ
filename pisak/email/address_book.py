@@ -1,10 +1,8 @@
-import configobj
 from contextlib import contextmanager
 
-from sqlalchemy import Column, String, Integer, create_engine
+from sqlalchemy import orm, func, Column, String, Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import orm, func
 
 from pisak import text_tools, logger, dirs
 
@@ -16,10 +14,6 @@ _DB_ENGINE_URL = "sqlite:///" + dirs.HOME_EMAIL_ADDRESS_BOOK
 
 
 _Base = declarative_base()
-
-
-class AddressBookError(Exception):
-    pass
 
 
 class _Contact(_Base):
@@ -49,6 +43,10 @@ def _establish_db_session():
         raise
     finally:
         db_session.close()
+
+
+class AddressBookError(Exception):
+    pass
 
 
 class AddressBook(text_tools.Predictor):
@@ -86,6 +84,14 @@ class AddressBook(text_tools.Predictor):
                 _LOG.error(e)
                 raise AddressBookError(e)
         return wrapper
+
+    def do_prediction(self, text, position):
+        """
+        Implementation of the `text_tools.Predictor` method.
+        """
+        feed = text[0 : position]
+        self.content = self._book_lookup(feed)
+        self.notify_content_update()
 
     @_db_session_handler
     def get_count(self):
@@ -192,11 +198,3 @@ class AddressBook(text_tools.Predictor):
             _Contact.address).all()
         self.sess.expunge_all()
         return match
-
-    def do_prediction(self, text, position):
-        """
-        Implementation of the `text_tools.Predictor` method.
-        """
-        feed = text[0 : position]
-        self.content = self._book_lookup(feed)
-        self.notify_content_update()

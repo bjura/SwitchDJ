@@ -94,9 +94,9 @@ def prepare_address_book_view(app, script, data):
         """
         tile.toggled = not tile.toggled
         if tile.toggled:
-            app.box["new_message"].recipients = contact["address"]
+            app.box["new_message"].recipients = contact.address
         else:
-            app.box["new_message"].remove_recipient(contact["address"])
+            app.box["new_message"].remove_recipient(contact.address)
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script, "button_back", "email/main")
@@ -131,15 +131,14 @@ def prepare_contact_view(app, script, data):
                              "email/speller_message_subject")
     if data:
         contact = data["contact"]
-        if "photo" in contact:
+        if contact.photo:
             try:
-                app.ui.photo.set_from_file(contact["photo"])
+                app.ui.photo.set_from_file(contact.photo)
             except GObject.GError as e:
                 _LOG.error(e)
-        if "name" in contact:
-            app.ui.contact_name_text.set_text(contact["name"])
-        if "address" in contact:
-            app.ui.contact_address_text.set_text(contact["address"])
+        if contact.name:
+            app.ui.contact_name_text.set_text(contact.name)
+        app.ui.contact_address_text.set_text(contact.address)
 
 
 def prepare_speller_contact_name_view(stage, script, data):

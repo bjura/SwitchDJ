@@ -25,8 +25,7 @@ class AddressTileSource(pager.DataSource):
         tile.style_class = "PisakEmailAddressTile"
         tile.hilite_tool = widgets.Aperture()
         tile.connect("clicked", self.item_handler, contact)
-        if contact.name:
-            tile.label_text = contact.name
+        tile.label_text = contact.name if contact.name else contact.address
         if contact.photo:
             tile.preview_path = contact.photo
         return tile

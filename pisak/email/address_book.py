@@ -29,9 +29,9 @@ class _Contact(_Base):
     __tablename__ = "address_book"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    address = Column(String, unique=True, nullable=False)
-    photo = Column(String)
+    name = Column(String, nullable=True)
+    address = Column(String, unique=True)
+    photo = Column(String, nullable=True)
 
 
 @contextmanager
@@ -79,7 +79,7 @@ class AddressBook(text_tools.Predictor):
         def wrapper(obj, *args, **kwargs):
             try:
                 with _establish_db_session() as obj.sess:
-                    ret = func(obj, *args, **kwargs)
+                    ret = method(obj, *args, **kwargs)
                 obj.sess = None
                 return ret
             except SQLAlchemyError as e:
@@ -179,8 +179,8 @@ class AddressBook(text_tools.Predictor):
     def _book_lookup(self, feed=""):
         match = self.sess.query(_Contact.address).filter(
              _Contact.address.startswith(feed) |
-            (_Contact.name & _Contact.name.startswith(feed))
-        ).order_by(_Contact.address).all()
+            (_Contact.name & _Contact.name.startswith(feed))).order_by(
+            _Contact.address).all()
         self.sess.expunge_all()
         return match
 

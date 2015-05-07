@@ -45,6 +45,28 @@ def _establish_db_session():
         db_session.close()
 
 
+def _db_session_handler(function):
+    """
+    Decorator for handling all the database session operations
+    and database API related errors.
+    Provides an access to the database to the object that the decorated
+    function belongs to, by setting its `sess` field with the database
+    session instance.
+
+    :param function: function to be decorated.
+    """
+    def wrapper(obj, *args, **kwargs):
+        try:
+            with _establish_db_session() as obj.sess:
+                ret = function(obj, *args, **kwargs)
+            obj.sess = None
+            return ret
+        except SQLAlchemyError as e:
+            _LOG.error(e)
+            raise AddressBookError(e)
+    return wrapper
+
+
 class AddressBookError(Exception):
     pass
 
@@ -66,24 +88,6 @@ class AddressBook(text_tools.Predictor):
         self.sess = None  # database session instance
         self.basic_content = self._book_lookup()
         self.apply_props()
-
-    def _db_session_handler(method):
-        """
-        Decorator for handling all the database session operations
-        and database API related errors.
-
-        :param method: method to be decorated.
-        """
-        def wrapper(obj, *args, **kwargs):
-            try:
-                with _establish_db_session() as obj.sess:
-                    ret = method(obj, *args, **kwargs)
-                obj.sess = None
-                return ret
-            except SQLAlchemyError as e:
-                _LOG.error(e)
-                raise AddressBookError(e)
-        return wrapper
 
     def do_prediction(self, text, position):
         """

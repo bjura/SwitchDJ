@@ -1,4 +1,10 @@
 import configobj
+from contextlib import contextmanager
+
+from sqlalchemy import Column, String, Integer, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import orm
 
 from pisak import text_tools, logger, dirs
 
@@ -6,38 +12,120 @@ from pisak import text_tools, logger, dirs
 _LOG = logger.getLogger(__name__)
 
 
+_DB_ENGINE_URL = "sqlite:///" + dirs.HOME_EMAIL_ADDRESS_BOOK
+
+
+_Base = declarative_base()
+
+
+class AddressBookError(Exception):
+    pass
+
+
+class _Contact(_Base):
+    """
+    Object representing record in the address book database.
+    """
+    __tablename__ = "address_book"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    address = Column(String, unique=True, nullable=False)
+    photo = Column(String)
+
+
+@contextmanager
+def _establish_db_session():
+    engine = create_engine(_DB_ENGINE_URL)
+    _Base.metadata.create_all(engine)
+    session = orm.sessionmaker(autoflush=False)
+    session.configure(bind=engine)
+    db_session = session()
+    try:
+        yield db_session
+        db_session.commit()
+    except:
+        db_session.rollback()
+        raise
+    finally:
+        db_session.close()
+
+
 class AddressBook(text_tools.Predictor):
     """
     Book of mail contacts. Serves also as a predictor
     for new message address inserts.
+    Internally, the entire address book content is stored
+    inside a database. Database session instance that is used by some of the
+    methods, each time is provided to them by the '_db_session_handler'
+    decorator. After executing one of these methods all changes
+    made to the session  are commited and the session is closed.
     """
     __gtype_name__ = "PisakEmailAddressBook"
 
     def __init__(self):
         super().__init__()
-        self.book = None
-        self._load_book()
-        self.basic_content = sorted([contact["address"]
-                for contact in self.book.values() if "address" in contact])
+        self.sess = None  # database session instance
+        self.basic_content = self._book_lookup()
         self.apply_props()
 
+    def _db_session_handler(method):
+        """
+        Decorator for handling all the database session operations
+        and database API related errors.
+
+        :param method: method to be decorated.
+        """
+        def wrapper(obj, *args, **kwargs):
+            try:
+                with _establish_db_session() as obj.sess:
+                    ret = func(obj, *args, **kwargs)
+                obj.sess = None
+                return ret
+            except SQLAlchemyError as e:
+                _LOG.error(e)
+                raise AddressBookError(e)
+        return wrapper
+
+    @_db_session_handler
+    def get_all_contacts(self):
+        """
+        Retrieve all records from the address book.
+
+        :returns: list of all contacts.
+        """
+        contacts = self.sess.query(_Contact).order_by(_Contact.name).all()
+        self.sess.expunge_all()
+        return contacts
+
+    @_db_session_handler
     def add_contact(self, contact):
         """
-        Add contact to the book.
+        Add new contact to the address book. Contact must contain 'address' key
+        and can contain the following keys: 'name' and 'photo'.
 
-        :param contact: contact dictionary with optional 'name',
-        'address' and 'photo' keys
+        :param contact: dictionary with new contact.
+
+        :returns: True on successfull update of the book with the given
+        contact or False otherwise, for example when address same as the
+        one of the given contact has already been in the book.
         """
-        if contact not in self.book.values():
-            contact_id = str(len(self.book))
-            while contact_id in self.book:
-                contact_id = str(int(contact_id) + 1)
-            self.book[contact_id] = contact
-            self.book.write()
+        address = contact["address"]
+        if not self.sess.query(_Contact).filter(
+                        _Contact.address == address).first():
+            self.sess.add(
+                 _Contact(
+                    name=contact.get("name"),
+                    address=address,
+                    photo=contact.get("photo")))
+            return True
         else:
             _LOG.warning(
-                "Contact {} already in the address book.".format(contact))
+                "Contact with address {} already in the "
+                "address book.".format(address))
+            return False
 
+    @_db_session_handler
     def remove_contact(self, contact_id):
         """
         Remove contact from the book. If the book does not contain
@@ -45,21 +133,13 @@ class AddressBook(text_tools.Predictor):
 
         :param contact: id of the contact to be removed
         """
-        try:
-            self.book.pop(contact_id)
-            self.book.write()
-        except KeyError:
-            _LOG.warning("No contact with id {} in the "
-                         "address book".format(contact_id))
-
-    def edit_contact_photo(self, contact_id, photo_path):
-        """
-        Edit photo path for a contact.
-
-        :param contact_id: id of the contact
-        :param photo_path: path to the new photo
-        """
-        self._edit_contact(contact_id, "photo", photo_path)
+        contact = self.sess.query(_Contact).filter(
+             _Contact.id == contact_id).first()
+        if contact:
+            self.sess.delete(contact)
+        else:
+            _LOG.warning("Trying to delete not existing "
+                            "contact with id: {}.".format(contact_id))
 
     def edit_contact_name(self, contact_id, name):
         """
@@ -70,6 +150,15 @@ class AddressBook(text_tools.Predictor):
         """
         self._edit_contact(contact_id, "name", name)
 
+    def edit_contact_photo(self, contact_id, photo):
+        """
+        Edit photo path for a contact.
+
+        :param contact_id: id of the contact
+        :param photo: path to the new photo
+        """
+        self._edit_contact(contact_id, "photo", photo)
+
     def edit_contact_address(self, contact_id, address):
         """
         Edit email address of a contact.
@@ -79,33 +168,26 @@ class AddressBook(text_tools.Predictor):
         """
         self._edit_contact(contact_id, "address", address)
 
-    def list_all(self):
-        """
-        Get all contacts as a list of dictionaries with contact id as one of the keys.
-
-        :returns: list of contact dictionaries
-        """
-        all = []
-        for contact_id, contact in self.book.items():
-            contact["id"] = contact_id
-            all.append(contact)
-        return all
-
+    @_db_session_handler
     def _edit_contact(self, contact_id, key, value):
-         if contact_id in self.book:
-            self.book[contact_id][key] = value
-            self.book.write()
+        contact = self.sess.query(_Contact).filter(
+             _Contact.id == contact_id).first()
+        if contact:
+            setattr(contact, key, value)
 
-    def _load_book(self):
-        self.book = configobj.ConfigObj(dirs.HOME_EMAIL_ADDRESS_BOOK,
-                                        encoding="UTF-8")
-
-    def _book_lookup(self, feed):
-        return sorted([contact["address"] for contact in self.book.values()
-                if ("address" in contact and contact["address"].startswith(feed))
-                    or ("name" in contact and contact["name"].startswith(feed))])
+    @_db_session_handler
+    def _book_lookup(self, feed=""):
+        match = self.sess.query(_Contact.address).filter(
+             _Contact.address.startswith(feed) |
+            (_Contact.name & _Contact.name.startswith(feed))
+        ).order_by(_Contact.address).all()
+        self.sess.expunge_all()
+        return match
 
     def do_prediction(self, text, position):
+        """
+        Implementation of the `text_tools.Predictor` method.
+        """
         feed = text[0 : position]
         self.content = self._book_lookup(feed)
         self.notify_content_update()

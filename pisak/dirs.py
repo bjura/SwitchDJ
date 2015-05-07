@@ -124,7 +124,7 @@ HOME_EMAIL_SETUP = os.path.join(HOME_PISAK_DIR, "email_setup.ini")
 Path to the file with email application address book.
 """
 HOME_EMAIL_ADDRESS_BOOK = os.path.join(
-    HOME_PISAK_DIR, "email_address_book.ini")
+    HOME_PISAK_DIR, "email_address_book.db")
 
 
 #---------------------------

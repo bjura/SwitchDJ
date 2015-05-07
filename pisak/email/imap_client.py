@@ -16,6 +16,21 @@ class IMAPClientError(Exception):
     pass
 
 
+def imap_errors_handler(func):
+        """
+        Decorator. Handles errors related to IMAP server connection.
+
+        :param func: function that should be provided with the error handling.
+        """
+        def handler(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except (socket.error, imaplib.IMAP4.error) as e:
+                _LOG.error(e)
+                raise IMAPClientError(e)
+        return handler
+
+
 class IMAPClient(object):
     """
     Class representing an email account connection. Used access protocol - IMAP.
@@ -23,20 +38,6 @@ class IMAPClient(object):
     def __init__(self):
         self._conn = None
         self.sent_box_name = None
-
-    def imap_errors_handler(method):
-        """
-        Decorator. Handles errors related to IMAP server connection.
-
-        :param method: method that should be provided with the error handling
-        """
-        def handler(*args, **kwargs):
-            try:
-                return method(*args, **kwargs)
-            except (socket.error, imaplib.IMAP4.error) as e:
-                _LOG.error(e)
-                raise IMAPClientError(e)
-        return handler
 
     @imap_errors_handler
     def login(self):

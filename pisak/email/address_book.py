@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from sqlalchemy import Column, String, Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import orm
+from sqlalchemy import orm, func
 
 from pisak import text_tools, logger, dirs
 
@@ -86,6 +86,15 @@ class AddressBook(text_tools.Predictor):
                 _LOG.error(e)
                 raise AddressBookError(e)
         return wrapper
+
+    @_db_session_handler
+    def get_count(self):
+        """
+        Get number of contacts in the address book.
+
+        :returns: integer with number of contacts in the address book
+        """
+        return self.sess.query(func.count(_Contact.id)).scalar()
 
     @_db_session_handler
     def get_all_contacts(self):

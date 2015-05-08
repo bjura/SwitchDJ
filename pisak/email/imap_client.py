@@ -12,11 +12,7 @@ from pisak.email import config, parsers
 _LOG = logger.getLogger(__name__)
 
 
-class IMAPClientError(Exception):
-    pass
-
-
-def imap_errors_handler(func):
+def _imap_errors_handler(func):
         """
         Decorator. Handles errors related to IMAP server connection.
 
@@ -31,6 +27,10 @@ def imap_errors_handler(func):
         return handler
 
 
+class IMAPClientError(Exception):
+    pass
+
+
 class IMAPClient(object):
     """
     Class representing an email account connection. Used access protocol - IMAP.
@@ -39,7 +39,7 @@ class IMAPClient(object):
         self._conn = None
         self.sent_box_name = None
 
-    @imap_errors_handler
+    @_imap_errors_handler
     def login(self):
         setup = config.get_account_setup()
         server_in = "imap.{}".format(setup["server_address"])
@@ -56,7 +56,7 @@ class IMAPClient(object):
         self._conn.login(setup["user_address"], setup["password"])
         self._find_mailboxes()
 
-    @imap_errors_handler
+    @_imap_errors_handler
     def logout(self):
         """
         Logout from the account.
@@ -126,7 +126,29 @@ class IMAPClient(object):
         """
         return self._get_mailbox_list(self.sent_box_name)
 
-    @imap_errors_handler
+    def delete_message_from_inbox(self, uid):
+        """
+        Permanently delete the given message from the inbox.
+
+        :param uid: unique id of the message.
+        """
+        self._delete_message("INBOX", uid)
+
+    def delete_message_from_sent_box(self, uid):
+        """
+        Permanently delete the given message from the sent box.
+
+        :param uid: unique id of the message.
+        """
+        self._delete_message(self.sent_box_name, uid)
+
+    @_imap_errors_handler
+    def _delete_message(self, mailbox, uid):
+        self._conn.select(mailbox)
+        self._conn.store(uid, "+FLAGS", "\\Deleted")
+        self._conn.expunge()
+
+    @_imap_errors_handler
     def _get_mailbox_list(self, mailbox):
         headers = ["Subject", "From", "Date", "To"]
         self._conn.select(mailbox)
@@ -137,7 +159,7 @@ class IMAPClient(object):
             "(BODY.PEEK[HEADER.FIELDS ({})])".format(" ".join(headers).upper()))
         return parsers.parse_mailbox_list(uids, msg_data, headers)
 
-    @imap_errors_handler
+    @_imap_errors_handler
     def _find_mailboxes(self):
         _ret, mailboxes_data = self._conn.list()
         for mailbox in mailboxes_data:
@@ -145,14 +167,14 @@ class IMAPClient(object):
             if "sent" in str_spec.lower():
                 self.sent_box_name = str_spec.split()[-1].split('"')[1]
 
-    @imap_errors_handler
+    @_imap_errors_handler
     def _get_message(self, mailbox, uid):
         self._conn.select(mailbox)
         _ret, msg_data = self._conn.fetch(uid, '(RFC822)')
         return parsers.parse_message(
             msg_data[0][1].decode(parsers.DEFAULT_CHARSET, "replace"))
 
-    @imap_errors_handler
+    @_imap_errors_handler
     def _get_mailbox_status(self, mailbox):
         _ret, status_data = self._conn.status(mailbox, "(MESSAGES UNSEEN)")
         status = status_data[0].decode(parsers.DEFAULT_CHARSET, "replace")

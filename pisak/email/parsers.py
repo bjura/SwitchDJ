@@ -151,8 +151,8 @@ def parse_mailbox_list(uids, msg_data, headers):
             if header_name == "Date":
                 parsed_msg[header_name] = _parse_date(parsed_header) or \
                                           parsed_header
-            elif header_name == "From":
-                parsed_msg[header_name] = _get_addresses(parsed_header, "From")
+            elif header_name in ("From", "To"):
+                parsed_msg[header_name] = _get_addresses(parsed_header, header_name)
             else:
                 parsed_msg[header_name] = parsed_header
         mailbox_list.append(parsed_msg)

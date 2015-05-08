@@ -98,6 +98,16 @@ class IMAPClient(object):
         """
         return self._get_message("INBOX", uid)
 
+    def get_message_from_sent_box(self, uid):
+        """
+        Get message with the given uid from the box of sent messages.
+
+        :param uid: uid of the message.
+
+        :return: dictionary with the message.
+        """
+        return self._get_message(self.sent_box_name, uid)
+
     def get_inbox_list(self):
         """
         Get list containing previews of all the messages.
@@ -107,9 +117,18 @@ class IMAPClient(object):
         """
         return self._get_mailbox_list("INBOX")
 
+    def get_sent_box_list(self):
+        """
+        Get list containing previews of all the sent messages.
+
+        :returns: list of dictionary with message previews.
+        Each contain: subject, sender and date.
+        """
+        return self._get_mailbox_list(self.sent_box_name)
+
     @imap_errors_handler
     def _get_mailbox_list(self, mailbox):
-        headers = ["Subject", "From", "Date"]
+        headers = ["Subject", "From", "Date", "To"]
         self._conn.select(mailbox)
         _ret, uids_data = self._conn.search(None, "ALL")
         uids = uids_data[0].decode(parsers.DEFAULT_CHARSET, "replace").split()

@@ -24,7 +24,7 @@ def _decode_message(message):
     """
     content = message.get_payload(decode=True)
     charset = message.get_content_charset(DEFAULT_CHARSET)
-    return content.decode(charset)
+    return content.decode(charset, "replace")
 
 
 def _get_addresses(value, header=None):
@@ -75,7 +75,7 @@ def _decode_header(header):
         headers = email.header.decode_header(header)
     except email.errors.HeaderParseError:
         return header.encode(DEFAULT_CHARSET, "replace").decode(
-            DEFAULT_CHARSET)
+            DEFAULT_CHARSET, "replace")
     else:
         for idx, (value, charset) in enumerate(headers):
             if isinstance(value, bytes):
@@ -144,7 +144,7 @@ def parse_mailbox_list(uids, msg_data, headers):
     mailbox_list = []
     for _spec, msg in msg_data[::2]:
         parsed_msg = {"UID": uids.pop(0)}
-        str_msg = msg.decode(DEFAULT_CHARSET)
+        str_msg = msg.decode(DEFAULT_CHARSET, "replace")
         for header_name in headers:
             parsed_header = _decode_header(str_msg[
                 str_msg.find(header_name) + len(header_name)+1: ].split("\r\n")[0])

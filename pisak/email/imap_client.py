@@ -112,7 +112,7 @@ class IMAPClient(object):
         headers = ["Subject", "From", "Date"]
         self._conn.select(mailbox)
         _ret, uids_data = self._conn.search(None, "ALL")
-        uids = uids_data[0].decode(parsers.DEFAULT_CHARSET).split()
+        uids = uids_data[0].decode(parsers.DEFAULT_CHARSET, "replace").split()
         _ret, msg_data = self._conn.fetch(
             ",".join(uids),
             "(BODY.PEEK[HEADER.FIELDS ({})])".format(" ".join(headers).upper()))
@@ -122,7 +122,7 @@ class IMAPClient(object):
     def _find_mailboxes(self):
         _ret, mailboxes_data = self._conn.list()
         for mailbox in mailboxes_data:
-            str_spec = mailbox.decode(parsers.DEFAULT_CHARSET)
+            str_spec = mailbox.decode(parsers.DEFAULT_CHARSET, "replace")
             if "sent" in str_spec.lower():
                 self.sent_box_name = str_spec.split()[-1].split('"')[1]
 
@@ -131,11 +131,11 @@ class IMAPClient(object):
         self._conn.select(mailbox)
         _ret, msg_data = self._conn.fetch(uid, '(RFC822)')
         return parsers.parse_message(
-            msg_data[0][1].decode(parsers.DEFAULT_CHARSET))
+            msg_data[0][1].decode(parsers.DEFAULT_CHARSET, "replace"))
 
     @imap_errors_handler
     def _get_mailbox_status(self, mailbox):
         _ret, status_data = self._conn.status(mailbox, "(MESSAGES UNSEEN)")
-        status = status_data[0].decode(parsers.DEFAULT_CHARSET)
+        status = status_data[0].decode(parsers.DEFAULT_CHARSET, "replace")
         return int(status[status.find("MESSAGES") : ].split()[1]), \
                int(status[status.find("UNSEEN") : ].split()[1].rstrip(")"))

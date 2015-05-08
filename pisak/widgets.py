@@ -4,6 +4,7 @@ Module contains all kinds of widgets to be used by any Pisak application.
 import math
 import os.path
 import random
+import time
 
 import cairo
 from gi.repository import Clutter, Mx, GObject, Rsvg, Cogl, GdkPixbuf, Pango
@@ -15,6 +16,17 @@ from pisak.res import colors
 
 
 _LOG = logger.getLogger(__name__)
+
+
+class Date(Mx.Label):
+    """
+    Display today date.
+    """
+    __gtype_name__ = "PisakDate"
+
+    def __init__(self):
+        today = "DATA:   " + time.strftime("%d-%m-%Y")
+        self.set_text(today)
 
 
 class PisakLogo(Mx.Image, configurator.Configurable):

@@ -11,7 +11,7 @@ class AddressTileSource(pager.DataSource):
 
     def __init__(self):
         super().__init__()
-        self.data = address_book.AddressBook().list_all()
+        self.data = address_book.AddressBook().get_all_contacts()
 
     def _produce_item(self, contact):
         tile = widgets.PhotoTile()
@@ -24,12 +24,9 @@ class AddressTileSource(pager.DataSource):
         tile.style_class = "PisakEmailAddressTile"
         tile.hilite_tool = widgets.Aperture()
         tile.connect("clicked", self.item_handler, contact)
-        name = contact.get("name")
-        if name:
-            tile.label_text = name
-        photo = contact.get("photo")
-        if photo:
-            tile.preview_path = photo
+        tile.label_text = contact.name if contact.name else contact.address
+        if contact.photo:
+            tile.preview_path = contact.photo
         return tile
 
 

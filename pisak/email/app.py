@@ -1,8 +1,6 @@
 """
 Email application main module.
 """
-import time
-
 from gi.repository import GObject
 
 from pisak import launcher, handlers, res, logger
@@ -30,7 +28,7 @@ BUILTIN_CONTACTS = [
 	{
 		"name": "PISAK",
 		"address": "kontakt@pisak.org",
-		"photo": res.get("logo_pisak.jpg")
+		"photo": res.get("logo_pisak.png")
 	}
  ]
 
@@ -45,7 +43,7 @@ def prepare_main_view(app, script, data):
     handlers.button_to_view(
         app, script, "button_new_message", "email/speller_message_subject")
     for contact in BUILTIN_CONTACTS:
-	    app.box.address_book.add_contact(contact)
+        app.box["address_book"].add_contact(contact)
     app.box.imap_client.login()
 
 
@@ -54,9 +52,6 @@ def prepare_drafts_view(stage, script, data):
     handlers.button_to_view(
         stage, script, "button_new_message", "email/speller_message_subject")
     handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
 
 
 def prepare_inbox_view(app, script, data):
@@ -84,15 +79,12 @@ def prepare_sent_view(stage, script, data):
     handlers.button_to_view(
         stage, script, "button_new_message", "email/speller_message_subject")
     handlers.button_to_view(stage, script, "button_back", "email/main")
-    date_widget = script.get_object("date")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    date_widget.set_text(today)
 
 
 def prepare_speller_message_body_view(stage, script, data):
     handlers.button_to_view(stage, script, "button_exit")
     handlers.button_to_view(stage, script, "button_proceed",
-                    "email/address_book", {"pick_recipents_mode": True})
+                    "email/address_book", {"pick_recipients_mode": True})
 
 
 def prepare_speller_message_subject_view(stage, script, data):
@@ -117,17 +109,15 @@ def prepare_address_book_view(app, script, data):
         """
         tile.toggled = not tile.toggled
         if tile.toggled:
-            app.box.new_message.recipents.append(contact["address"])
+            app.box["new_message"].recipients = contact.address
         else:
-            app.box.new_message.recipents.remove(contact["address"])
+            app.box["new_message"].remove_recipient(contact.address)
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script, "button_back", "email/main")
-    today = "DATA:   " + time.strftime("%d-%m-%Y")
-    app.ui.date.set_text(today)
     data_source = script.get_object("data_source")
 
-    if data and data.get("pick_recipents_mode"):
+    if data and data.get("pick_recipients_mode"):
         specific_button= app.ui.button_send_message
         tile_handler = lambda tile, contact: on_contact_select(tile, contact)
         handlers.button_to_view(app, script,
@@ -156,15 +146,14 @@ def prepare_contact_view(app, script, data):
                              "email/speller_message_subject")
     if data:
         contact = data["contact"]
-        if "photo" in contact:
+        if contact.photo:
             try:
-                app.ui.photo.set_from_file(contact["photo"])
+                app.ui.photo.set_from_file(contact.photo)
             except GObject.GError as e:
                 _LOG.error(e)
-        if "name" in contact:
-            app.ui.contact_name_text.set_text(contact["name"])
-        if "address" in contact:
-            app.ui.contact_address_text.set_text(contact["address"])
+        if contact.name:
+            app.ui.contact_name_text.set_text(contact.name)
+        app.ui.contact_address_text.set_text(contact.address)
 
 
 def prepare_speller_contact_name_view(stage, script, data):

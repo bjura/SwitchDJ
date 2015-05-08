@@ -92,7 +92,7 @@
     },
     {
         "id": "date",
-        "type": "MxLabel",
+        "type": "PisakDate",
         "style-class": "PisakEmailDate"
     },
     {

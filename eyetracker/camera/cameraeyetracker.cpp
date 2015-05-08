@@ -31,6 +31,10 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
     , m_measurementsPerPoint(20)
     , m_distStdDevCoeff(1.6)
     , m_pointCalibrationTimeout(5000)
+    , m_headTranslationScaleX(1.0)
+    , m_headTranslationScaleY(1.0)
+    , m_headTranslationOffsetX(0.0)
+    , m_headTranslationOffsetY(0.0)
 {
     m_captureThread = new QThread;
     m_detectorThread = new QThread;
@@ -50,6 +54,10 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
 
     m_pointCalibrationTimer.setSingleShot(true);
     connect(&m_pointCalibrationTimer, SIGNAL(timeout()), this, SLOT(pointCalibrationTimeout()));
+
+    m_smoother = createSmoother(SmoothingMethod::None); // disable output smoothing
+    m_pupilSmoother = createSmoother(SmoothingMethod::Kalman);
+    m_headTranslationSmoother = createSmoother(SmoothingMethod::DoubleMovingAverage);
 
     m_hpeWindow = new HpeWidget;
     const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
@@ -275,20 +283,60 @@ bool CameraEyetracker::addDataPoint(std::vector<cv::Point2d> & v, const cv::Poin
     //    return false;
 }
 
+void CameraEyetracker::headData(bool ok,
+                                double posX, double posY, double posZ,
+                                double rotX, double rotY, double rotZ)
+{
+    Q_UNUSED(posZ);
+
+    if(!ok)
+        return;
+
+    m_headPos = cv::Point2d(posX, posY);
+    m_headRot = cv::Point3d(rotX, rotY, rotZ);
+}
+
 void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
 {
     Q_UNUSED(size);
 
     if(!ok)
+    {
         emit gazeDetectionFailed(tr("Tracker failed in detecting any pupil."));
         return;
+    }
 
     cv::Point2d pos(posX, posY);
 
     if(m_tracking)
     {
-        emitNewPoint(m_calibration.getGazePosition(pos));
+        cv::Point2d gazePos = m_calibration.getGazePosition(pos);
 
+        cv::Point2d currentPos;
+        if(std::isnan(gazePos.x) || std::isnan(gazePos.y))
+            currentPos = m_gazePosLast;
+        else
+            currentPos = gazePos;
+
+        // gazePos is filtered after the next line
+        gazePos = m_pupilSmoother->filter(currentPos);
+
+        // calculate and filter head translation correction
+        cv::Point2d translationCorrection(
+            m_headTranslationScaleX * m_headPos.x + m_headTranslationOffsetX,
+            m_headTranslationScaleY * m_headPos.y + m_headTranslationOffsetY);
+
+        cv::Point2d new_translation;
+        if(std::isnan(translationCorrection.x) || std::isnan(translationCorrection.y))
+            new_translation = m_translationCorrectionLast;
+        else
+            new_translation = translationCorrection;
+        translationCorrection = m_headTranslationSmoother->filter(new_translation);
+        m_translationCorrectionLast = translationCorrection;
+
+        gazePos += translationCorrection;
+
+        emitNewPoint(gazePos);
     }
 
     if(m_calibrating && m_calibrating_point)

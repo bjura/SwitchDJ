@@ -22,9 +22,8 @@
 
 Eyetracker::Eyetracker(QObject * parent)
     : QObject(parent)
-    , m_smoothingMethod(SmoothingMethod::Kalman)
 {
-    createSmoother();
+    m_smoother = createSmoother(SmoothingMethod::Kalman);
 }
 
 Eyetracker::~Eyetracker()
@@ -39,49 +38,42 @@ QString Eyetracker::getBaseConfigPath() const
     return dir.filePath(getBackendCodename());
 }
 
-void Eyetracker::createSmoother()
-{
-    switch (m_smoothingMethod)
-    {
-        case SmoothingMethod::None:
-            m_smoother.reset(new NullSmoother);
-            break;
-        case SmoothingMethod::MovingAverage:
-            m_smoother.reset(new MovingAverageSmoother);
-            break;
-        case SmoothingMethod::DoubleMovingAverage:
-            m_smoother.reset(new DoubleMovingAverageSmoother);
-            break;
-        case SmoothingMethod::Median:
-            m_smoother.reset(new MedianSmoother);
-            break;
-        case SmoothingMethod::DoubleExp:
-            m_smoother.reset(new DoubleExpSmoother);
-            break;
-        case SmoothingMethod::Custom:
-            m_smoother.reset(new CustomSmoother);
-            break;
-        case SmoothingMethod::Kalman:
-            m_smoother.reset(new KalmanSmoother);
-            break;
-        default:
-            m_smoother.reset(new NullSmoother);
-    }
-}
-
 void Eyetracker::emitNewPoint(cv::Point2d point)
 {
-    if(std::isnan(point.x) || std::isnan(point.y) ||
-       point.x < 0 || point.y < 0)
+    if(std::isnan(point.x) || std::isnan(point.y))
     {
-        point.x = m_previousPoint.x();
-        point.y = m_previousPoint.y();
+        point.x = m_previousPoint.x;
+        point.y = m_previousPoint.y;
     }
 
     const cv::Point2d smoothed = m_smoother->filter(point);
-    QPointF ret(smoothed.x, smoothed.y);
-    m_previousPoint = ret;
+    m_previousPoint = smoothed;
 
+    const QPointF ret(smoothed.x, smoothed.y);
     qDebug() << "pos:" << ret;
+
     emit gazeData(ret);
+}
+
+std::unique_ptr<MovementSmoother> Eyetracker::createSmoother(SmoothingMethod smoothingMethod)
+{
+    switch(smoothingMethod)
+    {
+        case SmoothingMethod::None:
+            return std::unique_ptr<MovementSmoother>(new NullSmoother);
+        case SmoothingMethod::MovingAverage:
+            return std::unique_ptr<MovementSmoother>(new MovingAverageSmoother);
+        case SmoothingMethod::DoubleMovingAverage:
+            return std::unique_ptr<MovementSmoother>(new DoubleMovingAverageSmoother);
+        case SmoothingMethod::Median:
+            return std::unique_ptr<MovementSmoother>(new MedianSmoother);
+        case SmoothingMethod::DoubleExp:
+            return std::unique_ptr<MovementSmoother>(new DoubleExpSmoother);
+        case SmoothingMethod::Custom:
+            return std::unique_ptr<MovementSmoother>(new CustomSmoother);
+        case SmoothingMethod::Kalman:
+            return std::unique_ptr<MovementSmoother>(new KalmanSmoother);
+        default:
+            return std::unique_ptr<MovementSmoother>(new NullSmoother);
+    }
 }

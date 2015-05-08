@@ -71,13 +71,13 @@ protected:
     QString getBaseConfigPath() const;
 
     virtual void emitNewPoint(cv::Point2d point);
-    QPointF m_previousPoint;
 
+    // factory function for smoothers
+    static std::unique_ptr<MovementSmoother> createSmoother(SmoothingMethod smoothingMethod);
+
+protected:
     std::unique_ptr<MovementSmoother> m_smoother;
-
-private:
-    SmoothingMethod m_smoothingMethod;
-    void createSmoother();
+    cv::Point2d m_previousPoint;
 };
 
 #endif // EYETRACKER_H

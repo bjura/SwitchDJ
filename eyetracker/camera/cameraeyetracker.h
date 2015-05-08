@@ -71,7 +71,6 @@ private:
     QPointer<QThread> m_detectorThread;
 
     QPointer<PupilDetectorSetupWindow> m_cameraSetupWindow;
-    QPointer<HpeWidget> m_hpeWindow;
 
     bool m_tracking;
     bool m_calibrating;
@@ -86,8 +85,26 @@ private:
     double m_distStdDevCoeff;
     int m_pointCalibrationTimeout;
 
+    std::unique_ptr<MovementSmoother> m_pupilSmoother;
+    cv::Point2d m_gazePosLast;
+
+    // head position correction window and parameters
+    QPointer<HpeWidget> m_hpeWindow;
+
+    cv::Point2d m_headPos;
+    cv::Point3d m_headRot;
+
+    double m_headTranslationScaleX;
+    double m_headTranslationScaleY;
+    double m_headTranslationOffsetX;
+    double m_headTranslationOffsetY;
+
+    std::unique_ptr<MovementSmoother> m_headTranslationSmoother;
+    cv::Point2d m_translationCorrectionLast;
+
 private slots:
     void pupilData(bool, double, double, double);
+    void headData(bool, double, double, double, double, double, double);
     void setCameraIndex(int cameraIndex);
     void cameraSetupDialogFinished(int result);
     void pointCalibrationTimeout();

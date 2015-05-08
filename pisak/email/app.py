@@ -42,16 +42,24 @@ def prepare_main_view(app, script, data):
         app, script, "button_address_book", "email/address_book")
     handlers.button_to_view(
         app, script, "button_new_message", "email/speller_message_subject")
+
     for contact in BUILTIN_CONTACTS:
-        app.box["address_book"].add_contact(contact)
-    app.box.imap_client.login()
+        try:
+            app.box["address_book"].add_contact(contact)
+        except address_book.AddressBookError as e:
+            pass  #TODO: notify the user
+
+    try:
+        app.box["imap_client"].login()
+    except imap_client.IMAPClientError as e:
+        pass  # TODO: display warning and/or try again
 
 
-def prepare_drafts_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
+def prepare_drafts_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(
-        stage, script, "button_new_message", "email/speller_message_subject")
-    handlers.button_to_view(stage, script, "button_back", "email/main")
+        app, script, "button_new_message", "email/speller_message_subject")
+    handlers.button_to_view(app, script, "button_back", "email/main")
 
 
 def prepare_inbox_view(app, script, data):
@@ -69,14 +77,21 @@ def prepare_inbox_view(app, script, data):
                 "previous_view": "inbox"
             }
         )
-    data_source.data = app.box.imap_client.get_inbox_list()[::-1]
+
+    inbox_list = []
+    try:
+        inbox_list = app.box.imap_client.get_inbox_list()[::-1]
+    except address_book.AddressBookError as e:
+        pass   # TODO: react
+
+    data_source.data = inbox_list
 
 
-def prepare_sent_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
+def prepare_sent_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(
-        stage, script, "button_new_message", "email/speller_message_subject")
-    handlers.button_to_view(stage, script, "button_back", "email/main")
+        app, script, "button_new_message", "email/speller_message_subject")
+    handlers.button_to_view(app, script, "button_back", "email/main")
     data_source = script.get_object("data_source")
     data_source.item_handler = lambda tile, message_preview: \
         app.load_view(
@@ -87,27 +102,43 @@ def prepare_sent_view(stage, script, data):
                 "previous_view": "sent"
             }
         )
-    data_source.data = app.box.imap_client.get_sent_box_list()[::-1]
+
+    sent_box_list = []
+    try:
+        sent_box_list = app.box.imap_client.get_sent_box_list()[::-1]
+    except address_book.AddressBookError as e:
+        pass   # TODO: react
+
+    data_source.data = sent_box_list
 
 
-def prepare_speller_message_body_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
-    handlers.button_to_view(stage, script, "button_proceed",
+def prepare_speller_message_body_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_proceed",
                     "email/address_book", {"pick_recipients_mode": True})
 
 
-def prepare_speller_message_subject_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
-    handlers.button_to_view(stage, script, "button_proceed",
+def prepare_speller_message_subject_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_proceed",
                             "email/speller_message_body")
 
 
-def prepare_speller_message_to_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
-    handlers.button_to_view(stage, script, "button_proceed", "email/sent")
+def prepare_speller_message_to_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_proceed", "email/sent")
 
 
 def prepare_address_book_view(app, script, data):
+    data_source = script.get_object("data_source")
+
+    contacts = []
+    try:
+        contacts = app.box["address_book"].get_all_contacts()
+    except address_book.AddressBookError as e:
+        pass  # TODO: display warning and/or try to reload the view
+
+    data_source.data = contacts
 
     def on_contact_select(tile, contact):
         """
@@ -124,7 +155,6 @@ def prepare_address_book_view(app, script, data):
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script, "button_back", "email/main")
-    data_source = script.get_object("data_source")
 
     if data and data.get("pick_recipients_mode"):
         specific_button= app.ui.button_send_message
@@ -150,7 +180,7 @@ def prepare_contact_view(app, script, data):
         try:
             contact = app.box["address_book"].get_contact(data["contact_id"])
         except  address_book.AddressBookError as e:
-            pass
+            pass  # TODO: display warning
         else:
             if contact:
                 app.ui.contact_address_text.set_text(contact.address)
@@ -184,17 +214,18 @@ def prepare_speller_contact_name_view(app, script, data):
             app.box["address_book"].edit_contact_name(
                 contact.id, app.ui.text_box.get_text())
         except  address_book.AddressBookError as e:
-            pass
+            pass  # TODO: display warning
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.connect_button(script, "button_proceed", edit_contact_name)
     handlers.button_to_view(app, script, "button_proceed", "email/contact",
                             "contact_id": contact.id})
+
     if contact.name:
         app.ui.text_box.set_text(contact.name)
 
 
-def prepare_speller_contact_address_view(stage, script, data):
+def prepare_speller_contact_address_view(app, script, data):
     contact = data["contact"]
 
      def edit_contact_address():
@@ -202,21 +233,23 @@ def prepare_speller_contact_address_view(stage, script, data):
             app.box["address_book"].edit_contact_address(
                 contact.id, app.ui.text_box.get_text())
         except  address_book.AddressBookError as e:
-            pass
+            pass  # TODO: display warning
 
-    handlers.button_to_view(stage, script, "button_exit")
+    handlers.button_to_view(app, script, "button_exit")
     handlers.connect_button(script, "button_proceed", edit_contact_address)
-    handlers.button_to_view(stage, script, "button_proceed", "email/contact",
+    handlers.button_to_view(app, script, "button_proceed", "email/contact",
                             {"contact_id": contact.id})
+
     app.ui.text_box.set_text(contact.address)
 
 
-def prepare_viewer_contact_library_view(stage, script, data):
-    handlers.button_to_view(stage, script, "button_exit")
-    handlers.button_to_view(stage, script, "button_back", "email/contact",
+def prepare_viewer_contact_library_view(app, script, data):
+    handlers.button_to_view(app, script, "button_exit")
+    handlers.button_to_view(app, script, "button_back", "email/contact",
                             {"contact_id": data["contact"].id})
+
     tile_source = script.get_object("library_data")
-    tile_source.item_handler = lambda tile, album: stage.load_view(
+    tile_source.item_handler = lambda tile, album: app.load_view(
         "email/viewer_contact_album", {"album_id": album, "contact": data["contact"]})
 
 
@@ -236,7 +269,7 @@ def prepare_viewer_contact_album_view(app, script, data):
             app.box["address_book"].edit_contact_photo(
                 contact.id, library.get_item_by_id(photo_id))
         except address_book.AddressBookError as e:
-            pass
+            pass  # TODO: display warning
         app.load_view("email/contact")
 
     data_source.item_handler = photo_tile_handler
@@ -247,17 +280,20 @@ def prepare_single_message_view(app, script, data):
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script,
                             "button_back", "email/{}".format(data["previous_view"]))
-    message = data["message_source"](data["message_uid"])
-    app.ui.message_subject.set_text(message["Subject"])
-    app.ui.from_content.set_text(
-        "; ".join([record[1] for record in message["From"]]))
-    app.ui.to_content.set_text(
-        ";\n".join([record[1] for record in message["To"]]))
-    app.ui.date_content.set_text(str(message["Date"]))
-    if "Body" in message:
-        app.ui.message_body.set_text(message["Body"])
 
-
+    try:
+        message = data["message_source"](data["message_uid"])
+    except imap_client.IMAPClientError as e:
+        pass  # TODO: display warning
+    else:
+        app.ui.message_subject.set_text(message["Subject"])
+        app.ui.from_content.set_text(
+            "; ".join([record[1] for record in message["From"]]))
+        app.ui.to_content.set_text(
+            ";\n".join([record[1] for record in message["To"]]))
+        app.ui.date_content.set_text(str(message["Date"]))
+        if "Body" in message:
+            app.ui.message_body.set_text(message["Body"])
 
 
 if __name__ == "__main__":

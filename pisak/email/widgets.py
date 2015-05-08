@@ -1,5 +1,4 @@
 from pisak import pager, widgets
-from pisak.email import address_book
 
 
 class AddressTileSource(pager.DataSource):
@@ -11,7 +10,6 @@ class AddressTileSource(pager.DataSource):
 
     def __init__(self):
         super().__init__()
-        self.data = address_book.AddressBook().get_all_contacts()
 
     def _produce_item(self, contact):
         tile = widgets.PhotoTile()

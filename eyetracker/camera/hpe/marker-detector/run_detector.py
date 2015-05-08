@@ -27,8 +27,6 @@ import debug as db
 import marker_detector.marker
 
 class SquareDetector(object):
-    xml_init_fields = ('max_scale', 'flip_H')
-
     def __init__(self, img=None, **kwargs):
         self.init(img, **kwargs)
 
@@ -237,21 +235,6 @@ class SquareDetector(object):
             for mar in self.not_found:
                 if mar.find_corners():
                     self.not_found.remove(mar)
-        return
-
-        if len(self.not_found) == 0:
-            return
-        # if there are some undetected markers, try to find them again. This
-        # time bw_img has more accurate tresholding, so maybe we will find them
-        if len(self.borders) == 0:
-            return
-        (x, y, wx, wy) = cv.BoundingRect(self.borders)
-        cv.ResetImageROI(self.img)
-        rect = correct_rectangle((x - wx / 2, y - wy / 2, wx * 1.5, wy * 1.5),
-                                 self.size)
-        # self.set_ROI(rect)
-        # self.find_new_markers(do_canny=False)
-        # self.set_ROI(None)
 
     def putText(self, text, point, color=(0, 0, 255)):
         '''

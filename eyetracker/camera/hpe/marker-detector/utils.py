@@ -9,8 +9,8 @@ Created on 2010-06-17
 
 from cv2 import cv
 from vectors import det
-win = None
 
+win = None
 
 def standarize_contours(conts):
     '''
@@ -81,5 +81,3 @@ def get_config(name, version, **kwargs):
             self.__dict__.update(dict)
     Struct.__name__ = name
     return Struct(kwargs)
-
-from create_img import *

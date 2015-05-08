@@ -7,11 +7,10 @@ from corner import Corner
 import cv
 from vectors import add,dist_points
 import debug as db
-#from xml.dom.minidom import Document
-from xml_exporter import XMLExporter
 
 MAX_SEEN = 1.0
-class Marker(XMLExporter):
+
+class Marker(object):
     '''
     Object which will be responsible for finding, recognizing and predicting
     position of key points of certain marker
@@ -162,5 +161,3 @@ class Marker(XMLExporter):
     points = property(get_points, None, None, "Square's key points in a defined order")
     name = property(get_identifier, None, "@deprecated: Square's identifier")
     identifier = property(get_identifier, None, "Square's identifier")
-
-XMLExporter.add_class(Marker)

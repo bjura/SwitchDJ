@@ -1,5 +1,0 @@
-<RCC>
-	<qresource prefix="/image_provider">
-        <file alias="disconnected">camera_disconnected.png</file>
-    </qresource>
-</RCC>

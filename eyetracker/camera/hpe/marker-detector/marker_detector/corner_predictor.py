@@ -9,7 +9,7 @@ from corner import Corner
 from vectors import *
 from utils import correct_rectangle
 import debug as db
-import __builtin__
+#import __builtin__
 
 
 class CornerPredictor(object):

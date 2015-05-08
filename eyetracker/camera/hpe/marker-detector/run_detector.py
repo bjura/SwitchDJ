@@ -25,10 +25,8 @@ from utils import rgb2gray, correct_rectangle
 from marker_detector.marker import Marker
 import debug as db
 import marker_detector.marker
-from xml_exporter import XMLExporter
 
-
-class SquareDetector(XMLExporter):
+class SquareDetector(object):
     xml_init_fields = ('max_scale', 'flip_H')
 
     def __init__(self, img=None, **kwargs):
@@ -286,7 +284,6 @@ class SquareDetector(XMLExporter):
     def scale_down(self, point_or_vec):
         return point_or_vec[0] / self.scale_factor, point_or_vec[1] / self.scale_factor
 
-XMLExporter.add_class(SquareDetector)
 
 if __name__ == "__main__":
     from image_providers.cam_image_provider import CamImageProvider

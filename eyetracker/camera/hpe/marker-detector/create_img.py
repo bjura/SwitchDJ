@@ -6,7 +6,9 @@ Created on 01-03-2012
 
 @author: Macias
 '''
+
 import cv
+
 def createImg(img, d=None, c=None, zero=False):
     if isinstance(img, tuple):
         if d is None:

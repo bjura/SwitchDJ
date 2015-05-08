@@ -12,12 +12,13 @@ from marker import Marker, MAX_SEEN
 from corner import Corner, NOT_SIMILLAR,BLACK_WHITE_DIFFERENCE
 import debug as db
 import corner
-from xml_exporter import XMLExporter
+
 PHASES = 1
 SQ_SIZE = 50
 MAX_SIDE_DIFF = 0.5
 REQUIRED_CORRECTNESS = 0.5
 BORDER_ONLY = True
+
 class Square(Marker):
     GRID_SIZE = 3
     TOP_LEFT = 0
@@ -379,7 +380,6 @@ class Square(Marker):
     def get_identifier(self):
         return "sq%d" % self.ident
     identifier = property(get_identifier, None, "Square's identifier")
-XMLExporter.add_class(Square)
 
 if __name__ == '__main__':
     for i in range(32):

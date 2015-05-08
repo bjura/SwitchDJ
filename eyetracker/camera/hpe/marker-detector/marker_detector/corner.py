@@ -7,7 +7,7 @@ import cv
 from vectors import *
 from utils import correct_rectangle
 import debug as db
-#from marker_detector import SquareDetector
+
 MIN_RECT = 1.0 / 12
 MAX_WIDTH = 640
 MOVE_MARGIN = 2

@@ -1,14 +1,13 @@
-# from PySide.QtCore import QObject
+
 from time import time
 import cv
 
-from create_img import createImg
-from image_recorder import ImageRecorder
 from logger import get_logger
 from utils import get_config
 
 FPS_RESET = 3  # after how many seconds fps_counter is reseted/printed
 LOGGER = get_logger('ImageProvider')
+
 class ImageProvider(object):
     """Base class for all image providers, from different sources.
 
@@ -34,7 +33,6 @@ class ImageProvider(object):
         return cls._instance
 
     def __init__(self, p_width=640, p_height=480, *args, **kwargs):
-        self.image_recorder = ImageRecorder(*args, **kwargs)
         self.size = (p_width, p_height)
         self.current_image = None
         self.get_time = time
@@ -90,7 +88,6 @@ class ImageProvider(object):
         """
         self.current_time = self.get_time()
         l_image = self._update_image()
-        self.image_recorder.write_frame(l_image)
         if self.mirrored:
             cv.Flip(l_image, l_image, 1)
         if (self._strict_resize and l_image is not None
@@ -136,4 +133,3 @@ class ImageProviderType:
     NONE = 0
     CAMERA = 1
     MOVIE = 2
-    KINECT = 3

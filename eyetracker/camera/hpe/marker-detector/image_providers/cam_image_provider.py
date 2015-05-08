@@ -4,7 +4,6 @@ import cv
 from cv import (CaptureFromCAM as capture_from_cam,
                 SetCaptureProperty as set_capture_property,
                 QueryFrame as query_frame)
-# from constants import WIDTH, HEIGHT
 
 from .image_provider import ImageProvider
 from image_providers.image_provider import ImageProviderType

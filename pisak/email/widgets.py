@@ -64,9 +64,13 @@ class SentTileSource(pager.DataSource):
     def _produce_item(self, message):
         tile = widgets.PhotoTile()
         self._prepare_item(tile)
+        frame = widgets.Frame()
+        tile.add_frame(frame)
         tile.style_class = "PisakEmailSentTile"
         tile.hilite_tool = widgets.Aperture()
         tile.connect("clicked", self.item_handler, message)
+        tile.label_text = "\n\n".join(
+            [message["To"][1], message["Subject"], str(message["Date"])])
         return tile
 
 

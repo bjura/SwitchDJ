@@ -63,9 +63,8 @@ cv::Point2d DoubleMovingAverageSmoother::filter(const cv::Point2d & point)
     const double secondOrderAverageY =
         std::accumulate(m_bufAveragesY.begin(), m_bufAveragesY.end(), 0.0) / m_bufAveragesY.size();
 
-    return cv::Point2d(
-                2 * m_bufAveragesX.back() - secondOrderAverageX,
-                2 * m_bufAveragesY.back() - secondOrderAverageY);
+    return cv::Point2d(2 * m_bufAveragesX.back() - secondOrderAverageX,
+                       2 * m_bufAveragesY.back() - secondOrderAverageY);
 }
 
 cv::Point2d MedianSmoother::filter(const cv::Point2d & point)
@@ -96,7 +95,8 @@ cv::Point2d DoubleExpSmoother::filter(const cv::Point2d & point)
 
     m_previousTrend = cv::Point2d(
         m_gamma * (smoothedPoint.x - m_previousOutput.x) + (1.0 - m_gamma) * m_previousTrend.x,
-        m_gamma * (smoothedPoint.y - m_previousOutput.y) + (1.0 - m_gamma) * m_previousTrend.y);
+        m_gamma * (smoothedPoint.y - m_previousOutput.y) + (1.0 - m_gamma) * m_previousTrend.y
+    );
 
     m_previousOutput = smoothedPoint;
 
@@ -138,15 +138,18 @@ cv::Point2d CustomSmoother::filter(const cv::Point2d & point)
     return smoothedPoint;
 }
 
- KalmanSmoother::KalmanSmoother()
+KalmanSmoother::KalmanSmoother()
     : m_filter(4, 2, 0)
     , m_input(2, 1)
 {
-    double statePreX = 0.0;
-    double statePreY = 0.0;
+    const double statePreX = 0.0;
+    const double statePreY = 0.0;
 
     m_filter.transitionMatrix = *(cv::Mat_<float>(4, 4) <<
-                                  1,0,1,0,  0,1,0,1,  0,0,1,0,  0,0,0,1);
+                                  1,0,1,0,
+                                  0,1,0,1,
+                                  0,0,1,0,
+                                  0,0,0,1);
     m_input.setTo(cv::Scalar(0));
     m_filter.statePre.at<float>(0) = statePreX;
     m_filter.statePre.at<float>(1) = statePreY;

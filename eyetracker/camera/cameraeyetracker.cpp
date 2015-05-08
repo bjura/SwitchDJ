@@ -59,6 +59,12 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
     m_pupilSmoother = createSmoother(SmoothingMethod::Kalman);
     m_headTranslationSmoother = createSmoother(SmoothingMethod::DoubleMovingAverage);
 
+    // TODO: add calibration controls
+    m_headTranslationScaleX = 1.0;
+    m_headTranslationScaleY = 1.0;
+    m_headTranslationOffsetX = 0.0;
+    m_headTranslationOffsetY = 0.0;
+
     m_hpeWindow = new HpeWidget;
     const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
     m_hpeWindow->setWindowFlags(flags | Qt::WindowStaysOnTopHint);

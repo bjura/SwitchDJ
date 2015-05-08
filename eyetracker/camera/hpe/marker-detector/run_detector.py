@@ -291,7 +291,7 @@ XMLExporter.add_class(SquareDetector)
 if __name__ == "__main__":
     from image_providers.cam_image_provider import CamImageProvider
     i_p = CamImageProvider(0, p_width=640, p_height=480)
-    m = Square(0)
+    m = Square(4) # default is 0
     img = i_p.next()
     #print img.width, img.height
     m_d = SquareDetector(img)
@@ -318,4 +318,4 @@ if __name__ == "__main__":
 
         m_d.draw_markers(img)
         
-        #cv.ShowImage("markers", img)
+        cv.ShowImage("markers", img)

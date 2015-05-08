@@ -5,6 +5,7 @@ Created on 08-03-2011
 '''
 from image_providers.image_provider import ImageProvider
 import cv
+
 class StaticImageProvider(ImageProvider):
     '''
     classdocs

@@ -7,7 +7,6 @@ Created on 2010-06-17
 @author: Macias
 '''
 
-
 from cv2 import cv
 from vectors import det
 win = None

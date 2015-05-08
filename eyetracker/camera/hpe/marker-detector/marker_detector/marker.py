@@ -7,7 +7,7 @@ from corner import Corner
 import cv
 from vectors import add,dist_points
 import debug as db
-from xml.dom.minidom import Document
+#from xml.dom.minidom import Document
 from xml_exporter import XMLExporter
 
 MAX_SEEN = 1.0

@@ -3,19 +3,21 @@ Created on Apr 20, 2010
 
 @author: user
 '''
+
 import math
 import cv
+
 def normalize(v):
     """
     return vectorwith length 1 or (0,0) when v is (0,0)
     """
-    
     (a, b) = v
     c = math.sqrt(a * a + b * b)
     if c == 0.0:
         return (0, 0)
     else:
         return (a / c, b / c)
+
 def add(p1, p2, a=1):
     """
     Add two points or vectors with multiplier (v3=v1+a*v2)
@@ -59,14 +61,17 @@ def vector(a, b):
     Returns vector from points a to b
     """
     return (b[0] - a[0], b[1] - a[1])
+
 def cvrect(r):
     (x, y, wx, wy) = r
     return ((x, y), (x + wx, y + wy))
+
 def length(vec):
     """
     length of vector vec
     """
     return math.sqrt(vec[0] * vec[0] + vec[1] * vec[1])
+
 def r2d(a):
     """
     convert radians to degrees
@@ -78,6 +83,7 @@ def d2r(a):
     convert angle a from degrees to radians
     """
     return a / 180.0 * math.pi
+
 def rotate_point(point, center, angle):
     """
     rotates point by angle (in degrees) around center, returns new point
@@ -86,6 +92,7 @@ def rotate_point(point, center, angle):
     vec = vector(center, point)
     vec = rotateVec(vec, d2r(angle))
     return add(center, vec)
+
 def rotate_points(points, center, angle):
     """
     rotates collection of points by angle around center, returns list of points
@@ -108,7 +115,7 @@ def dist_points(a, b):
     '''
     return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2    
 
-def  solve_linear(v1, v2, p1, p2):
+def solve_linear(v1, v2, p1, p2):
     A = cv.CreateMat(2, 2, cv.CV_32FC1)
     B = cv.CreateMat(2, 1, cv.CV_32FC1)
     X = cv.CreateMat(2, 1, cv.CV_32FC1)
@@ -154,6 +161,3 @@ def point_on_edge(point, rect):
 
 def scale(point, scale_f):
     return point[0] * scale_f, point[1] * scale_f
-
-    
-    

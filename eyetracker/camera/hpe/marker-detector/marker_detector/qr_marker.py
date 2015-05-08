@@ -10,15 +10,14 @@ from marker_detector import SquareDetector
 import debug as db
 import vectors as v
 import math
+
 image=None
+
 MAX_DISTANCE=32*32*4
 BORDER_ACCURACY=0.25
 CONFLICT_THRESHOLD=3
-class QRMarker(Square):
-    '''
-    classdocs
-    '''
 
+class QRMarker(Square):
 
     def __init__(self,name):
         '''

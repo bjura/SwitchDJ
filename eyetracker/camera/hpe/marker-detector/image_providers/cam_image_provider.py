@@ -4,7 +4,7 @@ import cv
 from cv import (CaptureFromCAM as capture_from_cam,
                 SetCaptureProperty as set_capture_property,
                 QueryFrame as query_frame)
-from constants import WIDTH, HEIGHT
+# from constants import WIDTH, HEIGHT
 
 from .image_provider import ImageProvider
 from image_providers.image_provider import ImageProviderType
@@ -14,6 +14,7 @@ class CamImageProviderError(Exception):
 
 class NoCameraConnectedError(CamImageProviderError):
     pass
+
 class CamImageProvider(ImageProvider):
     """Provides image from camera connected to computer."""
     
@@ -79,6 +80,7 @@ class CamImageProvider(ImageProvider):
     
     def get_type(self):
         return ImageProviderType.CAMERA
+
 class CamImageProvider2(CamImageProvider):
     def get_capture(self):
         import cv2

@@ -98,6 +98,22 @@ class AddressBook(text_tools.Predictor):
         self.notify_content_update()
 
     @_db_session_handler
+    def get_contact(self, contact_id):
+        """
+        Get single contact from the address book.
+
+        :param contact_id: identification number of a contact that should
+        be returned.
+
+        :returns: single instance of a `_Contact` with the given id or None if
+        there was no match.
+        """
+        contact = self.sess.query(_Contact).filter(
+            _Contact.id == contact_id).first()
+        self.sess.expunge_all()
+        return contact
+
+    @_db_session_handler
     def get_count(self):
         """
         Get number of contacts in the address book.

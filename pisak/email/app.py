@@ -195,69 +195,74 @@ def prepare_contact_view(app, script, data):
                 def add_recipient():
                     app.box["new_message"].recipients = contact.address
 
-                handlers.button_to_view(script, "button_create_message", add_recipient)
+                handlers.button_to_view(app, script, "button_create_message",
+                                        add_recipient)
                 handlers.button_to_view(app, script, "button_create_message",
                              "email/speller_message_subject")
                 handlers.button_to_view(app, script, "button_edit_name",
-                            "email/speller_contact_name", {"contact": contact})
+                            "email/speller_contact_name",
+                            {"contact_id": contact.id, "contact_name": contact.name})
                 handlers.button_to_view(app, script, "button_edit_address",
-                            "email/speller_contact_address", {"contact": contact})
+                            "email/speller_contact_address",
+                            {"contact_id": contact.id, "contact_address": contact.address})
                 handlers.button_to_view(app, script, "button_edit_photo",
-                            "email/viewer_contact_library", {"contact": contact})
+                            "email/viewer_contact_library",
+                            {"contact_id": contact.id, "contact_photo": contact.photo})
 
 
 def prepare_speller_contact_name_view(app, script, data):
-    contact = data["contact"]
-
     def edit_contact_name():
         try:
             app.box["address_book"].edit_contact_name(
-                contact.id, app.ui.text_box.get_text())
+                data["contact_id"], app.ui.text_box.get_text())
         except  address_book.AddressBookError as e:
             pass  # TODO: display warning
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.connect_button(script, "button_proceed", edit_contact_name)
     handlers.button_to_view(app, script, "button_proceed", "email/contact",
-                            "contact_id": contact.id})
+                            {"contact_id": data["contact_id"]})
 
-    if contact.name:
-        app.ui.text_box.set_text(contact.name)
+    if data["contact_name"]:
+        app.ui.text_box.type_text(data["contact_name"])
 
 
 def prepare_speller_contact_address_view(app, script, data):
-    contact = data["contact"]
 
-     def edit_contact_address():
-         try:
+    def edit_contact_address():
+        try:
             app.box["address_book"].edit_contact_address(
-                contact.id, app.ui.text_box.get_text())
-        except  address_book.AddressBookError as e:
+                data["contact_id"], app.ui.text_box.get_text())
+        except address_book.AddressBookError as e:
             pass  # TODO: display warning
 
     handlers.button_to_view(app, script, "button_exit")
     handlers.connect_button(script, "button_proceed", edit_contact_address)
     handlers.button_to_view(app, script, "button_proceed", "email/contact",
-                            {"contact_id": contact.id})
+                            {"contact_id": data["contact_id"]})
 
-    app.ui.text_box.set_text(contact.address)
+    app.ui.text_box.type_text(data["contact_address"])
 
 
 def prepare_viewer_contact_library_view(app, script, data):
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(app, script, "button_back", "email/contact",
-                            {"contact_id": data["contact"].id})
+                            {"contact_id": data["contact_id"]})
 
     tile_source = script.get_object("library_data")
     tile_source.item_handler = lambda tile, album: app.load_view(
-        "email/viewer_contact_album", {"album_id": album, "contact": data["contact"]})
+        "email/viewer_contact_album",
+        {"album_id": album, "contact_id": data["contact_id"]})
 
 
 def prepare_viewer_contact_album_view(app, script, data):
-    contact = data["contact"]
+    contact_id = data["contact_id"]
+
     handlers.button_to_view(app, script, "button_exit")
     handlers.button_to_view(
-        app, script, "button_library", "email/viewer_contact_library", {"contact": contact})
+        app, script, "button_library", "email/viewer_contact_library",
+        {"contact_id": contact_id})
+
     album_id = data["album_id"]
     library = model.get_library()
     header = script.get_object("header")
@@ -267,10 +272,10 @@ def prepare_viewer_contact_album_view(app, script, data):
     def photo_tile_handler(tile, photo_id, album_id):
         try:
             app.box["address_book"].edit_contact_photo(
-                contact.id, library.get_item_by_id(photo_id))
+                contact_id, library.get_item_by_id(photo_id).path)
         except address_book.AddressBookError as e:
             pass  # TODO: display warning
-        app.load_view("email/contact")
+        app.load_view("email/contact", {"contact_id": contact_id})
 
     data_source.item_handler = photo_tile_handler
     data_source.data_set_id = album_id

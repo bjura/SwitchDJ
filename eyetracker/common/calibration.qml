@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls.Styles 1.1
+import QtQuick.Window 2.1
 
 import pisak.eyetracker 1.0
 
@@ -8,10 +9,14 @@ ApplicationWindow {
     id: applicationWnd
     visible: true
     visibility: "FullScreen"
-    width: 800
-    height: 600
+    width: Screen.width
+    height: Screen.height
     title: qsTr("Eyetracker calibration")
     color: "#555" // background color
+
+    Component.onCompleted: {
+        calibration.initialize()
+    }
 
     onClosing: {
         close.accepted = false
@@ -59,6 +64,12 @@ ApplicationWindow {
             exitText.focus = true
         }
 
+        function runSetup() {
+            calibration.stopTracking()
+            // fullscreen camera setup
+            calibration.runCameraSetup()
+        }
+
         property int pointIdx: 0
         property var points: getCalibrationPoints()
 
@@ -68,8 +79,7 @@ ApplicationWindow {
                 calibrationError(errorMessage)
                 return
             } else {
-                // fullscreen camera setup
-                calibration.runCameraSetup()
+                calibration.startTracking()
             }
         }
 
@@ -88,12 +98,11 @@ ApplicationWindow {
                 return
             }
 
-            if(calibration.saveParameters()) {
-                console.log("tracker parameters saved")
+            if(calibration.saveConfig()) {
+                console.log("tracker config saved")
             } else {
-                console.log("error saving tracker parameters")
+                console.log("error saving tracker config")
             }
-
             infoText.visible = false
             calibrationStartDelayTimer.running = true
         }
@@ -120,11 +129,12 @@ ApplicationWindow {
             trackingDot.visible = true
             exitText.visible = true
             exitText.focus = true
-            if(calibration.saveCalibration()) {
-                console.log("successfully saved calibration")
+            if(calibration.saveConfig()) {
+                console.log("successfully saved config")
             } else {
-                console.log("error saving calibration")
+                console.log("error saving config")
             }
+            fixationDots.visible = true
             calibration.startTracking()
         }
 
@@ -148,19 +158,49 @@ ApplicationWindow {
             calibration.calibrationStop()
         }
 
+        onGazeDetectionFailed: {
+            eyeStatus.change(false)
+        }
+
         onGazeData: {
-            // console.log(right, left)
-            if(right.x !== -1 && right.y !== -1 &&
-               left.x !== -1 && left.y !== -1) {
-                var x = (right.x + left.x) / 2
-                var y = (right.y + left.y) / 2
-                trackingDot.moveTo(x, y)
-            } else if(right.x !== -1 && right.y !== -1) {
-                trackingDot.moveTo(right.x, right.y)
-            } else if(left.x !== -1 && left.y !== -1) {
-                trackingDot.moveTo(left.x, left.y)
+            if(point.x !== -1 && point.y !== -1) {
+                eyeStatus.change(true)
+                if (trackingDot.visible) {
+                    trackingDot.moveTo(point.x, point.y)
+                }
+            } else {
+                eyeStatus.change(false)
             }
         }
+    }
+
+    Rectangle {
+        id: fixationDots
+        width: parent.width
+        height: parent.height
+        visible: false
+        focus: false
+        color: "transparent"
+        layer.enabled: true
+
+        property var dots: []
+
+        property string dotDeclaration:
+            'import QtQuick 2.2;
+
+            Rectangle {
+                height: parent.height * 0.03;
+                width: height;
+                radius: width * 0.5;
+            }'
+
+         Component.onCompleted: {
+             for (var i = 0; i < calibration.points.length; i++) {
+                 dots[i] = Qt.createQmlObject(dotDeclaration, fixationDots, 'fixationDot' + i)
+                 dots[i].x = calibration.points[i].x * width - dots[i].width / 2
+                 dots[i].y = calibration.points[i].y * height - dots[i].height / 2
+             }
+         }
     }
 
     Text {
@@ -179,12 +219,31 @@ ApplicationWindow {
 
         Keys.onPressed: {
             focus = false
-            if(calibration.loadParameters()) {
-                console.log("tracker parameters loaded")
+            eyeStatus.visible = false
+            if(calibration.loadConfig()) {
+                console.log("tracker config loaded")
             } else {
-                console.log("error loading tracker parameters")
+                console.log("error loading tracker config")
             }
-            calibration.initialize()
+            calibration.runSetup()
+        }
+    }
+
+    Image {
+        id: eyeStatus
+        width: 0.08 * parent.height
+        height: width
+        x: 0.5 * (parent.width - width)
+        y: 0.9 * (parent.height - height)
+        visible: true
+        source: "no_eye.svg"
+
+        function change(status) {
+            if (status) {
+                source = "eye.svg"
+            } else {
+                source = "no_eye.svg"
+            }
         }
     }
 
@@ -311,10 +370,10 @@ ApplicationWindow {
 
     Rectangle {
         id: trackingDot
-        width: 15
+        width: 25
         height: width
         visible: false
-        color: "white"
+        color: "orange"
         border.color: "black"
         border.width: 1
         antialiasing: true

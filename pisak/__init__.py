@@ -1,6 +1,7 @@
 import os
 
-from pisak import __version_from_git, settings
+from pisak import __version_from_git
+from pisak.libs import settings
 
 
 """

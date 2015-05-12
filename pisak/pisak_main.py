@@ -2,7 +2,8 @@
 Entry point for the whole Pisak program. Declares descriptor for an application
 launched on the Pisak start and, if executed directly, launches the application.
 """
-from pisak import launcher, logger, inputs
+from pisak import launcher, logger
+from pisak.libs import inputs
 
 from pisak import app_manager #@UnusedImport
 

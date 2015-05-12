@@ -38,6 +38,7 @@ class IMAPClient(object):
     def __init__(self):
         self._conn = None
         self.sent_box_name = None
+        self.positive_response_code = "OK"
 
     @_imap_errors_handler
     def login(self):
@@ -74,7 +75,7 @@ class IMAPClient(object):
         number of the unseen messages.
 
         :returns: tuple with two integers: number of all messages
-        and number of unseen messages
+        and number of unseen messages; or False on query failure.
         """
         return self._get_mailbox_status("INBOX")
 
@@ -84,7 +85,7 @@ class IMAPClient(object):
         number of the unseen messages.
 
         :returns: tuple with two integers: number of all messages
-        and number of unseen messages
+        and number of unseen messages; or False on query failure.
         """
         return self._get_mailbox_status(self.sent_box_name)
 
@@ -94,7 +95,7 @@ class IMAPClient(object):
 
         :param uid: uid of the message.
 
-        :return: dictionary with the message.
+        :return: dictionary with the message; or False on query failure.
         """
         return self._get_message("INBOX", uid)
 
@@ -104,7 +105,7 @@ class IMAPClient(object):
 
         :param uid: uid of the message.
 
-        :return: dictionary with the message.
+        :return: dictionary with the message; or False on query failure.
         """
         return self._get_message(self.sent_box_name, uid)
 
@@ -112,8 +113,8 @@ class IMAPClient(object):
         """
         Get list containing previews of all the messages.
 
-        :returns: list of dictionary with message previews.
-        Each contain: subject, sender and date.
+        :returns: list of dictionary with message previews, each containing:
+        subject, sender and date; or False on query failure.
         """
         return self._get_mailbox_list("INBOX")
 
@@ -121,8 +122,8 @@ class IMAPClient(object):
         """
         Get list containing previews of all the sent messages.
 
-        :returns: list of dictionary with message previews.
-        Each contain: subject, sender and date.
+        :returns: list of dictionary with message previews, each containing:
+        subject, sender and date; or False on query failure.
         """
         return self._get_mailbox_list(self.sent_box_name)
 
@@ -152,31 +153,49 @@ class IMAPClient(object):
     def _get_mailbox_list(self, mailbox):
         headers = ["Subject", "From", "Date", "To"]
         self._conn.select(mailbox)
-        _ret, uids_data = self._conn.search(None, "ALL")
-        uids = uids_data[0].decode(parsers.DEFAULT_CHARSET, "replace").split()
-        _ret, msg_data = self._conn.fetch(
-            ",".join(uids),
-            "(BODY.PEEK[HEADER.FIELDS ({})])".format(" ".join(headers).upper()))
-        return parsers.parse_mailbox_list(uids, msg_data, headers)
+        res, uids_data = self._conn.search(None, "ALL")
+        if res != self.positive_response_code:
+            ret = False
+        else:
+            uids = uids_data[0].decode(parsers.DEFAULT_CHARSET, "replace").split()
+            res, msg_data = self._conn.fetch(
+                ",".join(uids),
+                "(BODY.PEEK[HEADER.FIELDS ({})])".format(" ".join(headers).upper()))
+            if res != self.positive_response_code:
+                ret = False
+            else:
+                ret = parsers.parse_mailbox_list(uids, msg_data, headers)
+        return ret
 
     @_imap_errors_handler
     def _find_mailboxes(self):
-        _ret, mailboxes_data = self._conn.list()
-        for mailbox in mailboxes_data:
-            str_spec = mailbox.decode(parsers.DEFAULT_CHARSET, "replace")
-            if "sent" in str_spec.lower():
-                self.sent_box_name = str_spec.split()[-1].split('"')[1]
+        res, mailboxes_data = self._conn.list()
+        if res != self.positive_response_code:
+            return False
+        else:
+            for mailbox in mailboxes_data:
+                mailbox = mailbox.decode(parsers.DEFAULT_CHARSET, "replace")
+                if "sent" in mailbox.lower():
+                    self.sent_box_name = mailbox.split()[-1].split('"')[1]
 
     @_imap_errors_handler
     def _get_message(self, mailbox, uid):
         self._conn.select(mailbox)
-        _ret, msg_data = self._conn.fetch(uid, '(RFC822)')
-        return parsers.parse_message(
-            msg_data[0][1].decode(parsers.DEFAULT_CHARSET, "replace"))
+        res, msg_data = self._conn.fetch(uid, '(RFC822)')
+        if res != self.positive_response_code:
+            ret = False
+        else:
+            ret =  parsers.parse_message(
+                msg_data[0][1].decode(parsers.DEFAULT_CHARSET, "replace"))
+        return ret
 
     @_imap_errors_handler
     def _get_mailbox_status(self, mailbox):
-        _ret, status_data = self._conn.status(mailbox, "(MESSAGES UNSEEN)")
-        status = status_data[0].decode(parsers.DEFAULT_CHARSET, "replace")
-        return int(status[status.find("MESSAGES") : ].split()[1]), \
+        res, status_data = self._conn.status(mailbox, "(MESSAGES UNSEEN)")
+        if res != self.positive_response_code:
+            ret = False
+        else:
+            status = status_data[0].decode(parsers.DEFAULT_CHARSET, "replace")
+            ret =  int(status[status.find("MESSAGES") : ].split()[1]), \
                int(status[status.find("UNSEEN") : ].split()[1].rstrip(")"))
+        return ret

@@ -4,7 +4,7 @@ import time
 import os
 import pisak
 from pisak import logger
-from pisak.libs import cursor, scanning, handlers
+from pisak.libs import cursor, scanning, handlers, dirs
 
 from gi.repository import Gdk
 
@@ -45,7 +45,12 @@ INPUTS = {
     },
     "tobii": {
         "process": {
-            "command": os.path.expanduser("~/pisak/eyetracker/build-pisak-eyetracker-tobii-Desktop-Debug/pisak-eyetracker-tobii --tracking")
+            "command": os.path.join(
+                dirs.HOME,
+                "pisak/eyetracker/"
+                "build-pisak-eyetracker-tobii-Desktop-Debug/"
+                "pisak-eyetracker-tobii --tracking"
+            )
         },
         "middleware": {
             "name": "sprite",
@@ -53,6 +58,21 @@ INPUTS = {
             "deactivator": "InputGroup.stop_sprite"
         }
     },
+    "eyetracker": {
+        "process": {
+            "command": os.path.join(
+                dirs.HOME,
+                "pisak/eyetracker/"
+                "build-pisak-eyetracker-hpe-Desktop-Debug/"
+                "tracker --tracking"
+            )
+        },
+        "middleware": {
+            "name": "sprite",
+            "activator": "InputGroup.launch_sprite",
+            "deactivator": "InputGroup.stop_sprite"
+        }
+    }
 }
 
 

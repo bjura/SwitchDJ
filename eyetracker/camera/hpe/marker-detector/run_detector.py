@@ -298,4 +298,5 @@ if __name__ == "__main__":
 
         m_d.draw_markers(img)
         
-        cv.ShowImage("markers", img)
+        # cv.ShowImage("markers", img)
+

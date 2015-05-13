@@ -8,7 +8,7 @@ import pisak.eyetracker 1.0
 ApplicationWindow {
     id: applicationWnd
     visible: true
-    visibility: "FullScreen"
+    // visibility: "FullScreen"
     width: Screen.width
     height: Screen.height
     title: qsTr("Eyetracker calibration")

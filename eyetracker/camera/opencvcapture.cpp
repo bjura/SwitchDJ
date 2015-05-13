@@ -19,6 +19,25 @@
 #include <QDebug>
 #include <QPainter>
 
+void matDeleter(void * mat)
+{
+    if(mat)
+        delete static_cast<cv::Mat *>(mat);
+}
+
+QImage convertMatToQImage(const cv::Mat & input_img, bool bgr2rgb)
+{
+    cv::Mat tmp;
+    if(bgr2rgb)
+        cv::cvtColor(input_img, tmp, CV_BGR2RGB);
+    else
+        tmp = input_img;
+    return QImage(tmp.data, tmp.cols, tmp.rows, tmp.step,
+                  QImage::Format_RGB888, &matDeleter, new cv::Mat(tmp));
+}
+
+//-----------------------------------------------------------------------------
+
 Capture::Capture(QObject * parent)
     : QObject(parent)
 {
@@ -96,11 +115,6 @@ void FrameReceiver::processFrame(cv::Mat & mat)
     Q_UNUSED(mat); // do nothing
 }
 
-void FrameReceiver::matDeleter(void * mat)
-{
-    delete static_cast<cv::Mat *>(mat);
-}
-
 void FrameReceiver::queue(const cv::Mat & frame)
 {
     if(!m_frame.empty())
@@ -116,15 +130,7 @@ void FrameReceiver::process(cv::Mat frame)
 
     cv::cvtColor(frame, frame, CV_BGR2RGB);
 
-    const QImage image(
-        frame.data,
-        frame.cols,
-        frame.rows,
-        frame.step,
-        QImage::Format_RGB888,
-        &matDeleter,
-        new cv::Mat(frame)
-    );
+    const QImage image = convertMatToQImage(frame, false);
 
     Q_ASSERT(image.constBits() == frame.data);
 

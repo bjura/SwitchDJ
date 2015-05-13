@@ -23,6 +23,8 @@
 
 #include <QOpenGLWidget>
 #include <QTimer>
+#include <QLabel>
+
 #include <opencv/cv.h>
 #include "glm.h"
 
@@ -30,11 +32,14 @@
 
 #include "pstream.h"
 
-class HpeWidget : public QOpenGLWidget
+class HpeHeadWidget : public QOpenGLWidget
 {
     Q_OBJECT
 public:
-    explicit HpeWidget(QWidget * parent = 0);
+    explicit HpeHeadWidget(QWidget * parent = 0);
+
+    std::vector<cv::Point2f> estimatePose(const std::vector<cv::Point2f> & markers,
+                                          const cv::Mat & img);
 
 signals:
 
@@ -59,15 +64,24 @@ private:
     cv::Mat m_tvec;
 
     GLMmodel * m_headObj = nullptr;
+};
 
+class HpeWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit HpeWidget(QWidget * parent = 0);
+
+    HpeHeadWidget headWidget;
+    QLabel markerDetectorWidget;
+
+private:
+    void idle();
+
+private:
     QTimer m_timer;
-
     const redi::pstreams::pmode m_tracker_process_mode = redi::pstreams::pstdout | redi::pstreams::pstderr;
     std::unique_ptr<redi::ipstream> m_tracker_process;
-
-    std::vector<cv::Point2f> estimatePose(const std::vector<cv::Point2f> & markers,
-                                          const cv::Mat & img);
-    void idle();
 };
 
 #endif // GLWIDGET_H

@@ -28,6 +28,8 @@
 
 Q_DECLARE_METATYPE(cv::Mat)
 
+QImage convertMatToQImage(const cv::Mat & img, bool bgr2rgb = true);
+
 class Capture : public QObject
 {
     Q_OBJECT
@@ -69,8 +71,6 @@ protected:
     virtual void processFrame(cv::Mat & mat);
 
 private:
-    static void matDeleter(void * mat);
-
     void queue(const cv::Mat & frame);
     void process(cv::Mat frame);
     void timerEvent(QTimerEvent * ev);

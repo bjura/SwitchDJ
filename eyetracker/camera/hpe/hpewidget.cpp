@@ -42,9 +42,17 @@
  */
 
 #include <QDir>
+#include <QDebug>
+#include <QHBoxLayout>
+
 #include "hpewidget.h"
 #include "glm.h"
+
+#include "opencvcapture.h"
+
 #include <GL/glu.h>
+
+#include <boost/algorithm/string.hpp>
 
 static void drawSolidCylinder(GLdouble radius,
                               GLdouble height,
@@ -141,7 +149,7 @@ static void drawAxes()
 
 //--------------------------------------------------------------------------------------------------
 
-HpeWidget::HpeWidget(QWidget * parent)
+HpeHeadWidget::HpeHeadWidget(QWidget * parent)
     : QOpenGLWidget(parent)
     , m_tv(3)
     , m_rv(3)
@@ -153,9 +161,6 @@ HpeWidget::HpeWidget(QWidget * parent)
     //measurements.setTo(cv::Scalar(0));
 
     QDir dir(QDir::homePath());
-
-    QString path = dir.filePath("pisak/eyetracker/camera/hpe/marker-detector/run_detector.py");
-    m_tracker_process.reset(new redi::ipstream(("python " + path).toLocal8Bit().data(), m_tracker_process_mode));
 
     QString modelPath = dir.filePath("pisak/eyetracker/camera/hpe/head-obj.obj");
     m_headObj = glmReadOBJ(modelPath.toLocal8Bit().data());
@@ -221,17 +226,9 @@ HpeWidget::HpeWidget(QWidget * parent)
     //tex_l = MakeOpenCVGLTexture(cv::Mat());
     //tex_r = MakeOpenCVGLTexture(cv::Mat());
 
-    m_timer.setInterval(10);
-    m_timer.setSingleShot(false);
-
-    QObject::connect(&m_timer, &QTimer::timeout, [=]() {
-        idle();
-    });
-
-    m_timer.start();
 }
 
-void HpeWidget::initializeGL()
+void HpeHeadWidget::initializeGL()
 {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -275,7 +272,7 @@ void HpeWidget::initializeGL()
     glLoadIdentity();
 }
 
-void HpeWidget::paintGL()
+void HpeHeadWidget::paintGL()
 {
     // draw the image in the back
     int vPort[4];
@@ -344,7 +341,7 @@ void HpeWidget::paintGL()
     // glutSwapBuffers();
 }
 
-void HpeWidget::resizeGL(int width, int height)
+void HpeHeadWidget::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
 
@@ -358,15 +355,12 @@ void HpeWidget::resizeGL(int width, int height)
     glLoadIdentity();
 }
 
-std::vector<cv::Point2f> HpeWidget::estimatePose(const std::vector<cv::Point2f> & markers,
-                                                const cv::Mat & img)
+std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point2f> & markers,
+                                                 const cv::Mat & img)
 {
     //std::cout << markers.size() << std::endl;
 
-    if(markers.size() < 4)
-        return std::vector<cv::Point2f>();
-
-    if(markers.size() > 4)
+    if(markers.size() < 4 || markers.size() > 4)
         return std::vector<cv::Point2f>();
 
     const double max_d = std::max(img.rows, img.cols);
@@ -479,7 +473,7 @@ std::vector<cv::Point2f> HpeWidget::estimatePose(const std::vector<cv::Point2f> 
     cv::Mat rotM(3,3,CV_64FC1, m_rot);
     cv::Rodrigues(m_rvec, rotM);
 
-    std::cout << "rot vec:" << m_rvec << std::endl;
+    //std::cout << "rot vec:" << m_rvec << std::endl;
 
     double * _r = rotM.ptr<double>();
 
@@ -551,52 +545,115 @@ std::vector<cv::Point2f> HpeWidget::estimatePose(const std::vector<cv::Point2f> 
     return reprojected_points;
 }
 
+HpeWidget::HpeWidget(QWidget * parent)
+    : QWidget(parent)
+{
+    QDir dir(QDir::homePath());
+
+    QString path = dir.filePath("pisak/eyetracker/camera/hpe/marker-detector/run_detector.py");
+    QString cmd = "python \"" + path + "\"";
+    qDebug() << cmd;
+    m_tracker_process.reset(new redi::ipstream(cmd.toLocal8Bit().data(), m_tracker_process_mode));
+
+    {
+        std::string tmp;
+        *m_tracker_process >> tmp;
+        std::cout << tmp << std::endl;
+    }
+
+    if(!m_tracker_process->is_open())
+        std::cerr << "AAAA!" << std::endl;
+    else
+        std::cout << "YEAH!" << std::endl;
+
+    markerDetectorWidget.setScaledContents(true);
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->addWidget(&headWidget);
+    layout->addWidget(&markerDetectorWidget);
+    setLayout(layout);
+
+    m_timer.setInterval(10);
+    m_timer.setSingleShot(false);
+
+    QObject::connect(&m_timer, &QTimer::timeout, [=]() {
+        idle();
+    });
+
+    m_timer.start();
+
+    resize(900, 200);
+}
+
 void HpeWidget::idle()
 {
     // cap >> frame;
 
     std::string str;
 
-    *m_tracker_process >> str;
+    if(m_tracker_process && m_tracker_process->is_open())
+        *m_tracker_process >> str;
 
     static std::vector<cv::Point2f> points;
 
-    if(str != "none")
+    points.clear();
+
+    if(!str.empty() && str != "none")
     {
-        //std::cout << "xx: " << str << std::endl;
-        points.clear();
-        float x1, x2, x3, x4, y1, y2, y3, y4;
-        sscanf(str.c_str(), "%f;%f|%f;%f|%f;%f|%f;%f", &x1, &y1, &x2, &y2, &x3, &y3, &x4, &y4);
-        points.push_back(cv::Point2f(x4, y4));
-        points.push_back(cv::Point2f(x3, y3));
-        points.push_back(cv::Point2f(x2, y2));
-        points.push_back(cv::Point2f(x1, y1));
+        //std::cout << "input line: " << str << std::endl;
+
+        std::vector<std::string> vals;
+        boost::split(vals, str, boost::is_any_of("|;"));
+
+        if(vals.size() >= 8)
+        {
+            float x1, x2, x3, x4, y1, y2, y3, y4;
+            x1 = std::stof(vals[0]);
+            y1 = std::stof(vals[1]);
+            x2 = std::stof(vals[2]);
+            y2 = std::stof(vals[3]);
+            x3 = std::stof(vals[4]);
+            y3 = std::stof(vals[5]);
+            x4 = std::stof(vals[6]);
+            y4 = std::stof(vals[7]);
+
+            points.push_back(cv::Point2f(x4, y4));
+            points.push_back(cv::Point2f(x3, y3));
+            points.push_back(cv::Point2f(x2, y2));
+            points.push_back(cv::Point2f(x1, y1));
+        }
     }
 
     cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC3);
 
-    if(points.size() >= 4)
+    if(points.size() == 4)
     {
         cv::circle(frame, points[0], 3, cv::Scalar(0,   255, 0  ), -1, CV_AA, 0); // g - top right
         cv::circle(frame, points[1], 3, cv::Scalar(255, 255, 255), -1, CV_AA, 0); // w - bottom right
         cv::circle(frame, points[2], 3, cv::Scalar(255, 0,   0  ), -1, CV_AA, 0); // r - top left
         cv::circle(frame, points[3], 3, cv::Scalar(0,   0,   255), -1, CV_AA, 0); // b - bottom left
+
+        std::cout << "p0: " << points[0].x << ' ' << points[0].y << std::endl;
+        std::cout << "p1: " << points[1].x << ' ' << points[1].y << std::endl;
+        std::cout << "p2: " << points[2].x << ' ' << points[2].y << std::endl;
+        std::cout << "p3: " << points[3].x << ' ' << points[3].y << std::endl;
     }
 
-    const std::vector<cv::Point2f> reprojected_markers = estimatePose(points, frame);
+    const std::vector<cv::Point2f> reprojected_markers = headWidget.estimatePose(points, frame);
 
-    if(reprojected_markers.size() >= 4)
+    if(reprojected_markers.size() == 4)
     {
         cv::circle(frame, reprojected_markers[0], 9, cv::Scalar(0,   255, 0  ), 1, CV_AA, 0); // g - top right
         cv::circle(frame, reprojected_markers[1], 9, cv::Scalar(255, 255, 255), 1, CV_AA, 0); // w - bottom right
         cv::circle(frame, reprojected_markers[2], 9, cv::Scalar(255, 0,   0  ), 1, CV_AA, 0); // r - top left
         cv::circle(frame, reprojected_markers[3], 9, cv::Scalar(0,   0,   255), 1, CV_AA, 0); // b - bottom left
+
+        std::cout << "m0: " << reprojected_markers[0].x << ' ' << reprojected_markers[0].y << std::endl;
+        std::cout << "m1: " << reprojected_markers[1].x << ' ' << reprojected_markers[1].y << std::endl;
+        std::cout << "m2: " << reprojected_markers[2].x << ' ' << reprojected_markers[2].y << std::endl;
+        std::cout << "m3: " << reprojected_markers[3].x << ' ' << reprojected_markers[3].y << std::endl;
     }
 
-    //tex_r.set(frame);
-
-    //fps(); // calulate and periodically print FPS
-
-    //glutPostRedisplay();
+    QImage image = convertMatToQImage(frame);
+    markerDetectorWidget.setPixmap(QPixmap::fromImage(image));
 }
-

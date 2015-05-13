@@ -32,6 +32,7 @@ static cv::Mat correctGamma(cv::Mat & img, double gamma)
     return result;
 }
 
+/*
 static cv::Mat equalizeIntensity(const cv::Mat & inputImage)
 {
     if(inputImage.channels() >= 3)
@@ -54,6 +55,7 @@ static cv::Mat equalizeIntensity(const cv::Mat & inputImage)
     }
     return cv::Mat();
 }
+*/
 
 static inline void drawPupil(cv::Mat & img,
                              const cv::RotatedRect & box,

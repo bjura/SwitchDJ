@@ -114,7 +114,9 @@ void CameraEyetracker::cameraSetupDialogFinished(int result)
         emit cameraSetupFinished(true, QString());
     }
     else
+    {
         emit cameraSetupFinished(false, tr("camera setup cancelled"));
+    }
 }
 
 void CameraEyetracker::setCameraIndex(int cameraIndex)

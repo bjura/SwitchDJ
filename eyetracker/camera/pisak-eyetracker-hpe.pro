@@ -6,7 +6,13 @@ QT += core gui widgets qml quick
 
 CONFIG += c++11
 
-LIBS += -lGL -lGLU -lpthread -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_calib3d -lopencv_video
+LIBS += -lGL -lGLU \
+    -lpthread \
+    -lopencv_core \
+    -lopencv_highgui \
+    -lopencv_imgproc \
+    -lopencv_calib3d \
+    -lopencv_video
 
 # remove possible other optimization flags
 QMAKE_CXXFLAGS_RELEASE -= -O

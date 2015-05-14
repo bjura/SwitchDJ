@@ -151,6 +151,7 @@ static void drawAxes()
 
 HpeHeadWidget::HpeHeadWidget(QWidget * parent)
     : QOpenGLWidget(parent)
+    , m_rot{0}
     , m_tv(3)
     , m_rv(3)
     , m_rvec(m_rv)
@@ -165,9 +166,7 @@ HpeHeadWidget::HpeHeadWidget(QWidget * parent)
     QString modelPath = dir.filePath("pisak/eyetracker/camera/hpe/head-obj.obj");
     m_headObj = glmReadOBJ(modelPath.toLocal8Bit().data());
 
-    double avgX = 0;
-    double avgY = 0;
-    double avgZ = 0;
+    double avgX = 0, avgY = 0, avgZ = 0;
     for(GLuint i = 1; i <= m_headObj->numvertices; i++)
     {
         avgX += m_headObj->vertices[3 * i + 0];
@@ -196,7 +195,9 @@ HpeHeadWidget::HpeHeadWidget(QWidget * parent)
     modelPoints.push_back(cv::Point3f(-8.02, 140.93, 20.02));
     modelPoints.push_back(cv::Point3f(80.74, 140.93, 20.02));
 
-    m_modelPoints3d = cv::Mat(modelPoints);
+    // NOTE: modelPoints will be destroyed when this scope ends.
+    //       We MUST copy the data.
+    m_modelPoints3d = cv::Mat(modelPoints).clone();
 
     const cv::Scalar mean_point = cv::mean(cv::Mat(modelPoints));
     std::cout << "Mean point: " << mean_point << std::endl;
@@ -205,7 +206,7 @@ HpeHeadWidget::HpeHeadWidget(QWidget * parent)
     //assert(norm(mean(model_points_3d)) < 1e-05); //make sure is centered
     m_modelPoints3d = m_modelPoints3d + cv::Scalar(0, 0, 20.02);
 
-    // std::cout << "model points " << model_points_3d << std::endl;
+    //std::cout << "model points:\n" << m_modelPoints3d << std::endl;
 
     m_rvec = cv::Mat(m_rv);
 
@@ -220,12 +221,6 @@ HpeHeadWidget::HpeHeadWidget(QWidget * parent)
     m_tv[2] = 1;
 
     m_tvec = cv::Mat(m_tv);
-
-    //init_glut(argc, argv);
-
-    //tex_l = MakeOpenCVGLTexture(cv::Mat());
-    //tex_r = MakeOpenCVGLTexture(cv::Mat());
-
 }
 
 void HpeHeadWidget::initializeGL()
@@ -277,6 +272,8 @@ void HpeHeadWidget::paintGL()
     // draw the image in the back
     int vPort[4];
     glGetIntegerv(GL_VIEWPORT, vPort);
+
+    glClear(GL_COLOR_BUFFER_BIT);
 
     //glEnable2D();
     //drawOpenCVImageInGL(tex_l);
@@ -355,8 +352,9 @@ void HpeHeadWidget::resizeGL(int width, int height)
     glLoadIdentity();
 }
 
-std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point2f> & markers,
-                                                 const cv::Mat & img)
+std::vector<cv::Point2f> HpeHeadWidget::estimatePose(
+        const std::vector<cv::Point2f> & markers,
+        const cv::Mat & img)
 {
     //std::cout << markers.size() << std::endl;
 
@@ -387,34 +385,34 @@ std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point
 
     cv::Mat ip(markers);
 
-    if(1)
-    {
-        cv::solvePnP(
-            m_modelPoints3d,
-            ip,
-            camMatrix,
-            cv::Mat(1, 4, CV_64FC1, _dc),
-            m_rvec,
-            m_tvec,
-            true,
-            CV_P3P
-        );
+    //std::cout << "ip: " << ip << std::endl;
+    //std::cout << "m_modelPoints3d: " << m_modelPoints3d << std::endl;
 
-        // second, iterative run
-        cv::solvePnP(
-            m_modelPoints3d,
-            ip,
-            camMatrix,
-            cv::Mat(1, 4, CV_64FC1, _dc),
-            m_rvec,
-            m_tvec,
-            true,
-            CV_ITERATIVE
-        );
-    }
-    else
-    {
-        solvePnPRansac(
+    cv::solvePnP(
+        m_modelPoints3d,
+        ip,
+        camMatrix,
+        cv::Mat(1, 4, CV_64FC1, _dc),
+        m_rvec,
+        m_tvec,
+        true,
+        CV_P3P
+    );
+
+    // second, iterative run
+    cv::solvePnP(
+        m_modelPoints3d,
+        ip,
+        camMatrix,
+        cv::Mat(1, 4, CV_64FC1, _dc),
+        m_rvec,
+        m_tvec,
+        true,
+        CV_ITERATIVE
+    );
+
+    /*
+     solvePnPRansac(
             m_modelPoints3d,
             ip,
             camMatrix,
@@ -425,7 +423,7 @@ std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point
             CV_EPNP
         );
 
-        /*solvePnPRansac(
+        solvePnPRansac(
             m_modelPoints3d,
             ip,
             camMatrix,
@@ -434,8 +432,11 @@ std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point
             m_tvec,
             true,
             CV_ITERATIVE
-        );*/
-    }
+        );
+    */
+
+    //std::cout << "rvec: " << m_rvec << std::endl;
+    //std::cout << "tvec: " << m_tvec << std::endl;
 
     // fix rotation
     //std::cout << rvec << std::endl;
@@ -469,6 +470,8 @@ std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point
     //if(rv[2] < 0)
     //	rv[2] = -rv[2];
 
+    emit headData(true, m_tv[0], m_tv[1], m_tv[2], m_rv[0], m_rv[1], m_rv[2]);
+
     // convert rotation vector to rotation matrix
     cv::Mat rotM(3,3,CV_64FC1, m_rot);
     cv::Rodrigues(m_rvec, rotM);
@@ -477,8 +480,8 @@ std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point
 
     double * _r = rotM.ptr<double>();
 
-    printf("rot mat: \n %.3f %.3f %.3f\n%.3f %.3f %.3f\n%.3f %.3f %.3f\n",
-        _r[0],_r[1],_r[2],_r[3],_r[4],_r[5],_r[6],_r[7],_r[8]);
+    //printf("rot mat: \n %.3f %.3f %.3f\n%.3f %.3f %.3f\n%.3f %.3f %.3f\n",
+    //    _r[0],_r[1],_r[2],_r[3],_r[4],_r[5],_r[6],_r[7],_r[8]);
 
     //printf("trans vec: \n %.3f %.3f %.3f\n",tv[0],tv[1],tv[2]);
 
@@ -533,10 +536,10 @@ std::vector<cv::Point2f> HpeHeadWidget::estimatePose(const std::vector<cv::Point
     {
         cv::Mat_<double> X = (cv::Mat_<double>(4,1) <<
             m_modelPoints3d.at<float>(i,0), m_modelPoints3d.at<float>(i,1), m_modelPoints3d.at<float>(i,2), 1.0);
-        // cout << "object point " << X << endl;
+        // std::cout << "object point " << X << std::endl;
         cv::Mat_<double> opt_p = KP * X;
         cv::Point2f opt_p_img(opt_p(0)/opt_p(2), opt_p(1)/opt_p(2));
-        // cout << "object point reproj " << opt_p_img << endl;
+        // std::cout << "object point reproj " << opt_p_img << std::endl;
         reprojected_points[i] = opt_p_img;
     }
 
@@ -582,13 +585,11 @@ HpeWidget::HpeWidget(QWidget * parent)
 
     m_timer.start();
 
-    resize(900, 200);
+    resize(1200, 200);
 }
 
 void HpeWidget::idle()
 {
-    // cap >> frame;
-
     std::string str;
 
     if(m_tracker_process && m_tracker_process->is_open())
@@ -596,11 +597,10 @@ void HpeWidget::idle()
 
     static std::vector<cv::Point2f> points;
 
-    points.clear();
-
     if(!str.empty() && str != "none")
     {
         //std::cout << "input line: " << str << std::endl;
+        points.clear();
 
         std::vector<std::string> vals;
         boost::split(vals, str, boost::is_any_of("|;"));
@@ -626,34 +626,35 @@ void HpeWidget::idle()
 
     cv::Mat frame = cv::Mat::zeros(480, 640, CV_8UC3);
 
-    if(points.size() == 4)
+    if(points.size() >= 4)
     {
         cv::circle(frame, points[0], 3, cv::Scalar(0,   255, 0  ), -1, CV_AA, 0); // g - top right
         cv::circle(frame, points[1], 3, cv::Scalar(255, 255, 255), -1, CV_AA, 0); // w - bottom right
         cv::circle(frame, points[2], 3, cv::Scalar(255, 0,   0  ), -1, CV_AA, 0); // r - top left
         cv::circle(frame, points[3], 3, cv::Scalar(0,   0,   255), -1, CV_AA, 0); // b - bottom left
 
-        std::cout << "p0: " << points[0].x << ' ' << points[0].y << std::endl;
-        std::cout << "p1: " << points[1].x << ' ' << points[1].y << std::endl;
-        std::cout << "p2: " << points[2].x << ' ' << points[2].y << std::endl;
-        std::cout << "p3: " << points[3].x << ' ' << points[3].y << std::endl;
+        //std::cout << "p0: " << points[0].x << ' ' << points[0].y << std::endl;
+        //std::cout << "p1: " << points[1].x << ' ' << points[1].y << std::endl;
+        //std::cout << "p2: " << points[2].x << ' ' << points[2].y << std::endl;
+        //std::cout << "p3: " << points[3].x << ' ' << points[3].y << std::endl;
     }
 
     const std::vector<cv::Point2f> reprojected_markers = headWidget.estimatePose(points, frame);
 
-    if(reprojected_markers.size() == 4)
+    if(reprojected_markers.size() >= 4)
     {
         cv::circle(frame, reprojected_markers[0], 9, cv::Scalar(0,   255, 0  ), 1, CV_AA, 0); // g - top right
         cv::circle(frame, reprojected_markers[1], 9, cv::Scalar(255, 255, 255), 1, CV_AA, 0); // w - bottom right
         cv::circle(frame, reprojected_markers[2], 9, cv::Scalar(255, 0,   0  ), 1, CV_AA, 0); // r - top left
         cv::circle(frame, reprojected_markers[3], 9, cv::Scalar(0,   0,   255), 1, CV_AA, 0); // b - bottom left
 
-        std::cout << "m0: " << reprojected_markers[0].x << ' ' << reprojected_markers[0].y << std::endl;
-        std::cout << "m1: " << reprojected_markers[1].x << ' ' << reprojected_markers[1].y << std::endl;
-        std::cout << "m2: " << reprojected_markers[2].x << ' ' << reprojected_markers[2].y << std::endl;
-        std::cout << "m3: " << reprojected_markers[3].x << ' ' << reprojected_markers[3].y << std::endl;
+        //std::cout << "m0: " << reprojected_markers[0].x << ' ' << reprojected_markers[0].y << std::endl;
+        //std::cout << "m1: " << reprojected_markers[1].x << ' ' << reprojected_markers[1].y << std::endl;
+        //std::cout << "m2: " << reprojected_markers[2].x << ' ' << reprojected_markers[2].y << std::endl;
+        //std::cout << "m3: " << reprojected_markers[3].x << ' ' << reprojected_markers[3].y << std::endl;
     }
 
-    QImage image = convertMatToQImage(frame);
-    markerDetectorWidget.setPixmap(QPixmap::fromImage(image));
+    markerDetectorWidget.setPixmap(QPixmap::fromImage(convertMatToQImage(frame)));
+
+    headWidget.update();
 }

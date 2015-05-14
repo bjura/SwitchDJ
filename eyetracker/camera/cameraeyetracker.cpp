@@ -66,8 +66,10 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
     m_headTranslationOffsetY = 0.0;
 
     m_hpeWindow = new HpeWidget;
-    const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
-    m_hpeWindow->setWindowFlags(flags | Qt::WindowStaysOnTopHint);
+    connect(&m_hpeWindow->headWidget, SIGNAL(headData(bool, double, double, double, double, double, double)),
+            this, SLOT(headData(bool, double, double, double, double, double, double)));
+    //const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
+    //m_hpeWindow->setWindowFlags(flags | Qt::WindowStaysOnTopHint);
     m_hpeWindow->show();
 }
 
@@ -302,6 +304,7 @@ void CameraEyetracker::headData(bool ok,
 
     m_headPos = cv::Point2d(posX, posY);
     m_headRot = cv::Point3d(rotX, rotY, rotZ);
+    //std::cout << "head data received" << std::endl;
 }
 
 void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
@@ -341,6 +344,10 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
             new_translation = translationCorrection;
         translationCorrection = m_headTranslationSmoother->filter(new_translation);
         m_translationCorrectionLast = translationCorrection;
+
+        std::cout << "gazePos: " << gazePos << std::endl;
+        std::cout << "headPos: " << m_headPos << std::endl;
+        std::cout << "translationCorrection: " << translationCorrection << std::endl;
 
         gazePos += translationCorrection;
 

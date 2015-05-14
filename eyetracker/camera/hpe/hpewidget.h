@@ -42,8 +42,7 @@ public:
                                           const cv::Mat & img);
 
 signals:
-
-public slots:
+    void headData(bool, double, double, double, double, double, double);
 
 protected:
     void initializeGL() override;
@@ -59,7 +58,6 @@ private:
     double m_rot[9] = { 0 }; // opengl rotation matrix
     std::vector<double> m_tv; // opengl translation vector
     std::vector<double> m_rv;
-
     cv::Mat m_rvec;
     cv::Mat m_tvec;
 

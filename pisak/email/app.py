@@ -180,34 +180,33 @@ def prepare_contact_view(app, script, data):
         try:
             contact = app.box["address_book"].get_contact(data["contact_id"])
         except  address_book.AddressBookError as e:
-            pass  # TODO: display warning
-        else:
-            if contact:
-                app.ui.contact_address_text.set_text(contact.address)
-                if contact.name:
-                    app.ui.contact_name_text.set_text(contact.name)
-                if contact.photo:
-                    try:
-                        app.ui.photo.set_from_file(contact.photo)
-                    except GObject.GError as e:
-                        _LOG.error(e)
+            contact = None  # TODO: display warning
+        if contact:
+            app.ui.contact_address_text.set_text(contact.address)
+            if contact.name:
+                app.ui.contact_name_text.set_text(contact.name)
+            if contact.photo:
+                try:
+                    app.ui.photo.set_from_file(contact.photo)
+                except GObject.GError as e:
+                    _LOG.error(e)
 
-                def add_recipient():
-                    app.box["new_message"].recipients = contact.address
+            def add_recipient():
+                app.box["new_message"].recipients = contact.address
 
-                handlers.button_to_view(app, script, "button_create_message",
-                                        add_recipient)
-                handlers.button_to_view(app, script, "button_create_message",
-                             "email/speller_message_subject")
-                handlers.button_to_view(app, script, "button_edit_name",
-                            "email/speller_contact_name",
-                            {"contact_id": contact.id, "contact_name": contact.name})
-                handlers.button_to_view(app, script, "button_edit_address",
-                            "email/speller_contact_address",
-                            {"contact_id": contact.id, "contact_address": contact.address})
-                handlers.button_to_view(app, script, "button_edit_photo",
-                            "email/viewer_contact_library",
-                            {"contact_id": contact.id, "contact_photo": contact.photo})
+            handlers.button_to_view(app, script, "button_create_message",
+                                    add_recipient)
+            handlers.button_to_view(app, script, "button_create_message",
+                         "email/speller_message_subject")
+            handlers.button_to_view(app, script, "button_edit_name",
+                        "email/speller_contact_name",
+                        {"contact_id": contact.id, "contact_name": contact.name})
+            handlers.button_to_view(app, script, "button_edit_address",
+                        "email/speller_contact_address",
+                        {"contact_id": contact.id, "contact_address": contact.address})
+            handlers.button_to_view(app, script, "button_edit_photo",
+                        "email/viewer_contact_library",
+                        {"contact_id": contact.id, "contact_photo": contact.photo})
 
 
 def prepare_speller_contact_name_view(app, script, data):

@@ -3,7 +3,7 @@ Email application specific signal handlers.
 """
 from pisak.libs import signals
 
-from pisak.email import message
+from pisak.libs.email import message
 
 
 @signals.registered_handler("email/new_message_add_subject")

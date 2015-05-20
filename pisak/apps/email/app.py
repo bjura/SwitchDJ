@@ -74,14 +74,14 @@ def prepare_inbox_view(app, script, data):
             "email/single_message",
             {
                 "message_uid": message_preview["UID"],
-                "message_source": app.box.imap_client.get_message_from_inbox,
+                "message_source": app.box["imap_client"].get_message_from_inbox,
                 "previous_view": "inbox"
             }
         )
 
     inbox_list = []
     try:
-        inbox_list = app.box.imap_client.get_inbox_list()[::-1]
+        inbox_list = app.box["imap_client"].get_inbox_list()[::-1]
     except address_book.AddressBookError as e:
         pass   # TODO: react
 
@@ -99,14 +99,14 @@ def prepare_sent_view(app, script, data):
             "email/single_message",
             {
                 "message_uid": message_preview["UID"],
-                "message_source": app.box.imap_client.get_message_from_sent_box,
+                "message_source": app.box["imap_client"].get_message_from_sent_box,
                 "previous_view": "sent"
             }
         )
 
     sent_box_list = []
     try:
-        sent_box_list = app.box.imap_client.get_sent_box_list()[::-1]
+        sent_box_list = app.box["imap_client"].get_sent_box_list()[::-1]
     except address_book.AddressBookError as e:
         pass   # TODO: react
 

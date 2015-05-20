@@ -4,7 +4,7 @@
         "type": "PisakBinLayout",
         "x-expand": true,
         "y-expand": true,
-        "children": ["main_box_group", "background_box"]
+        "children": ["main_box", "background_box"]
     },
     {
         "id": "background_box",
@@ -32,7 +32,7 @@
         "ratio-margin-bottom": 0.04,
         "ratio-spacing": 0.015,
         "orientation": "vertical",
-        "children": ["middle_box", "header"]
+        "children": ["middle_box_group", "header"]
     },
     {
         "id": "header",
@@ -46,17 +46,11 @@
     {
         "id": "middle_box_group",
         "type": "PisakScanningGroup",
+         "scanning-hilite": true,
         "children": ["middle_box"],
         "strategy": {
-            "type": "PisakArbitraryOrderStrategy",
-            "subgroup-order": "button_menu, post_menu"
-        },
-        "signals": [
-                       {
-                           "name": "notify::mapped",
-                           "handler": "general/start_group"
-                       }
-                    ]
+            "type": "PisakRowStrategy"
+        }
     },
 
     {
@@ -71,7 +65,8 @@
         "children": ["button_menu_box"],
         "strategy": {
             "id": "menu_group_strategy",
-            "type": "PisakRowStrategy"
+            "type": "PisakRowStrategy",
+            "unwind-to": "middle_box_group"
         }
     },
     {
@@ -129,9 +124,10 @@
         "id": "post_menu",
         "type": "PisakScanningGroup",
         "children": ["post_menu_box"],
+        "scanning-hilite": true,
         "strategy": {
-            "id": "menu_group_strategy",
-            "type": "PisakRowStrategy"
+            "type": "PisakRowStrategy",
+            "unwind-to": "middle_box_group"
         }
     },
     {

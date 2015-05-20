@@ -1,3 +1,20 @@
+/*
+ * This file is part of PISAK project.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "tobiieyetracker.h"
 
 #include <QFile>
@@ -68,13 +85,12 @@ void TobiiEyetracker::initialize()
         return;
     }
 
-    QString url(m_params["tobii_url"].value<QString>());
-    if(url.isEmpty())
-        url = getConnectedEyeTracker();
+    if(m_tobiiUrl.isEmpty())
+        m_tobiiUrl = getConnectedEyeTracker();
 
-    qDebug() << "Tobii URL:" << url;
+    qDebug() << "Tobii URL:" << m_tobiiUrl;
 
-    if(url.isEmpty())
+    if(m_tobiiUrl.isEmpty())
     {
         emit initialized(false, tr("no eyetracker detected"));
         return;
@@ -82,7 +98,7 @@ void TobiiEyetracker::initialize()
 
     tobiigaze_error_code error_code;
 
-    m_eye_tracker = tobiigaze_create(url.toUtf8().data(), &error_code);
+    m_eye_tracker = tobiigaze_create(m_tobiiUrl.toUtf8().data(), &error_code);
     if(error_code)
     {
         if(m_eye_tracker)
@@ -156,12 +172,12 @@ void TobiiEyetracker::shutdown()
     }
 }
 
-bool TobiiEyetracker::loadCalibration()
+bool TobiiEyetracker::loadConfig()
 {
     if(!m_eye_tracker)
         return false;
 
-    const QString fileName(getCalibrationFilePath());
+    const QString fileName(getBaseConfigPath() + ".bin");
 
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly))
@@ -198,12 +214,12 @@ bool TobiiEyetracker::loadCalibration()
     }
 }
 
-bool TobiiEyetracker::saveCalibration()
+bool TobiiEyetracker::saveConfig() const
 {
     if(!m_eye_tracker)
         return false;
 
-    const QString fileName(getCalibrationFilePath());
+    const QString fileName(getBaseConfigPath() + ".bin");
 
     tobiigaze_calibration calib;
     tobiigaze_error_code error_code;
@@ -311,6 +327,31 @@ bool TobiiEyetracker::stopTracking()
     return false;
 }
 
+cv::Point2d TobiiEyetracker::calculateSinglePoint(QPointF right, QPointF left)
+{
+    cv::Point2d pt(std::numeric_limits<double>::quiet_NaN(),
+                   std::numeric_limits<double>::quiet_NaN());
+    if(!std::isnan(right.x()) &&
+       !std::isnan(right.y()) &&
+       !std::isnan(left.x()) &&
+       !std::isnan(left.y()))
+    {
+        pt.x = 0.5 * (right.x() + left.x());
+        pt.y = 0.5 * (right.y() + left.y());
+    }
+    else if(!std::isnan(right.x()) && !std::isnan(right.y()))
+    {
+        pt.x = right.x();
+        pt.y = right.y();
+    }
+    else if(!std::isnan(left.x()) && !std::isnan(left.y()))
+    {
+        pt.x = left.x();
+        pt.y = left.y();
+    }
+    return pt;
+}
+
 // private implementation details
 
 void TobiiEyetracker::cleanup()
@@ -352,5 +393,5 @@ void TobiiEyetracker::privComputeAndSetCalibrationFinished(int error_code)
 
 void TobiiEyetracker::privGazeData(QPointF right, QPointF left)
 {
-    emit gazeData(right, left);
+    emitNewPoint(calculateSinglePoint(right, left));
 }

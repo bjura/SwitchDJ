@@ -1,3 +1,20 @@
+/*
+ * This file is part of PISAK project.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "eyetracker.h"
 
 #include <QDir>
@@ -6,62 +23,11 @@
 Eyetracker::Eyetracker(QObject * parent)
     : QObject(parent)
 {
+    m_smoother = createSmoother(SmoothingMethod::Kalman);
 }
 
 Eyetracker::~Eyetracker()
 {
-}
-
-void Eyetracker::setParameter(QString name, QVariant value)
-{
-    m_params[name] = value;
-}
-
-QVariant Eyetracker::getParameter(QString name) const
-{
-    if(m_params.contains(name))
-       return m_params[name];
-    else
-        return QVariant();
-}
-
-bool Eyetracker::saveParameters() const
-{
-    QSettings settings(getConfigFilePath(), QSettings::IniFormat);
-    if(settings.status() != QSettings::NoError)
-        return false;
-
-    settings.clear();
-
-    auto i = m_params.constBegin();
-    while(i != m_params.constEnd())
-    {
-        settings.setValue(i.key(), i.value());
-        ++i;
-    }
-
-    settings.sync();
-
-    if(settings.status() != QSettings::NoError)
-        return false;
-    else
-        return true;
-}
-
-bool Eyetracker::loadParameters()
-{
-    QSettings settings(getConfigFilePath(), QSettings::IniFormat);
-    if(settings.status() != QSettings::NoError)
-        return false;
-
-    m_params.clear();
-
-    QStringList keys = settings.allKeys();
-
-    for(int i = 0; i < keys.size(); i++)
-        m_params[keys[i]] = settings.value(keys[i]);
-
-    return true;
 }
 
 QString Eyetracker::getBaseConfigPath() const
@@ -72,12 +38,42 @@ QString Eyetracker::getBaseConfigPath() const
     return dir.filePath(getBackendCodename());
 }
 
-QString Eyetracker::getConfigFilePath() const
+void Eyetracker::emitNewPoint(cv::Point2d point)
 {
-    return tr("%1.ini").arg(getBaseConfigPath());
+    if(std::isnan(point.x) || std::isnan(point.y))
+    {
+        point.x = m_previousPoint.x;
+        point.y = m_previousPoint.y;
+    }
+
+    const cv::Point2d smoothed = m_smoother->filter(point);
+    m_previousPoint = smoothed;
+
+    const QPointF ret(smoothed.x, smoothed.y);
+    qDebug() << "pos:" << ret;
+
+    emit gazeData(ret);
 }
 
-QString Eyetracker::getCalibrationFilePath() const
+std::unique_ptr<MovementSmoother> Eyetracker::createSmoother(SmoothingMethod smoothingMethod)
 {
-    return tr("%1.calibration").arg(getBaseConfigPath());
+    switch(smoothingMethod)
+    {
+        case SmoothingMethod::None:
+            return std::unique_ptr<MovementSmoother>(new NullSmoother);
+        case SmoothingMethod::MovingAverage:
+            return std::unique_ptr<MovementSmoother>(new MovingAverageSmoother);
+        case SmoothingMethod::DoubleMovingAverage:
+            return std::unique_ptr<MovementSmoother>(new DoubleMovingAverageSmoother);
+        case SmoothingMethod::Median:
+            return std::unique_ptr<MovementSmoother>(new MedianSmoother);
+        case SmoothingMethod::DoubleExp:
+            return std::unique_ptr<MovementSmoother>(new DoubleExpSmoother);
+        case SmoothingMethod::Custom:
+            return std::unique_ptr<MovementSmoother>(new CustomSmoother);
+        case SmoothingMethod::Kalman:
+            return std::unique_ptr<MovementSmoother>(new KalmanSmoother);
+        default:
+            return std::unique_ptr<MovementSmoother>(new NullSmoother);
+    }
 }

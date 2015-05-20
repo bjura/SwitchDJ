@@ -13,7 +13,8 @@ import sys
 from gi.repository import GObject, Clutter, Mx
 
 import pisak
-from pisak import launcher, configurator, properties, widgets, arg_parser
+from pisak import launcher
+from pisak.libs import configurator, properties, widgets, arg_parser
 
 
 class LoadingStage(Clutter.Stage):
@@ -128,5 +129,5 @@ class AppManager(Clutter.Actor,
         self.current_app = None
 
     def _get_exec_path(self, module_name):
-        return importlib.import_module(".".join(["pisak",
+        return importlib.import_module(".".join(["pisak.apps",
                                                  module_name])).EXEC_PATH

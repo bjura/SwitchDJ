@@ -1,3 +1,20 @@
+/*
+ * This file is part of PISAK project.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef TOBIIEYETRACKER_H
 #define TOBIIEYETRACKER_H
 
@@ -29,13 +46,13 @@ public:
 
     Q_INVOKABLE QString getBackend() const override;
 
+    Q_INVOKABLE bool loadConfig() override;
+    Q_INVOKABLE bool saveConfig() const override;
+
     Q_INVOKABLE void runCameraSetup() override;
 
     Q_INVOKABLE bool startTracking() override;
     Q_INVOKABLE bool stopTracking() override;
-
-    Q_INVOKABLE bool loadCalibration() override;
-    Q_INVOKABLE bool saveCalibration() override;
 
 public slots:
     void initialize() override;
@@ -65,6 +82,9 @@ private slots:
 private:
     void cleanup();
 
+    cv::Point2d calculateSinglePoint(QPointF right, QPointF left);
+
+    QString m_tobiiUrl;
     tobiigaze_eye_tracker * m_eye_tracker = nullptr;
     EyetrackerEventLoopWorker * m_worker = nullptr;
 };
@@ -159,8 +179,9 @@ private:
     {
         Q_UNUSED(extensions);
 
-        QPointF right(-1, -1);
-        QPointF left(-1, -1);
+        const qreal nan = std::numeric_limits<qreal>::quiet_NaN();
+        QPointF right(nan, nan);
+        QPointF left(nan, nan);
 
         if(gazedata)
         {

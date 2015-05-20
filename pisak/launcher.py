@@ -8,12 +8,12 @@ from gi.repository import GtkClutter
 from gi.repository import Gtk, Clutter, Mx
 
 import pisak
-from pisak import application, signals, unit, arg_parser, \
-     configurator, res, dirs, inputs
+from pisak import application, res
+from pisak.libs import signals, unit, arg_parser, configurator, dirs, inputs
 
-import pisak.layout  # @UnusedImport
-import pisak.widgets  # @UnusedImport
-import pisak.handlers  # @UnusedImport
+import pisak.libs.layout  # @UnusedImport
+import pisak.libs.widgets  # @UnusedImport
+import pisak.libs.handlers  # @UnusedImport
 
 
 class LauncherError(Exception):

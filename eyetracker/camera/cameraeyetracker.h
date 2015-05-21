@@ -99,8 +99,16 @@ private:
     double m_headTranslationOffsetX;
     double m_headTranslationOffsetY;
 
+    double m_headRotationScaleX;
+    double m_headRotationScaleY;
+    double m_headRotationOffsetX;
+    double m_headRotationOffsetY;
+
     std::unique_ptr<MovementSmoother> m_headTranslationSmoother;
     cv::Point2d m_translationCorrectionLast;
+
+    std::unique_ptr<MovementSmoother> m_headRotationSmoother;
+    cv::Point2d m_rotationCorrectionLast;
 
 private slots:
     void pupilData(bool, double, double, double);

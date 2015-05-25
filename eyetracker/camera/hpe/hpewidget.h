@@ -41,8 +41,7 @@ public:
     std::vector<cv::Point2f> estimatePose(const std::vector<cv::Point2f> & markers,
                                           const cv::Mat & img);
 
-signals:
-    void headData(bool, double, double, double, double, double, double);
+    friend class HpeWidget;
 
 protected:
     void initializeGL() override;
@@ -72,6 +71,9 @@ public:
 
     HpeHeadWidget headWidget;
     QLabel markerDetectorWidget;
+
+signals:
+    void headData(double, double, double, double, double);
 
 private:
     void idle();

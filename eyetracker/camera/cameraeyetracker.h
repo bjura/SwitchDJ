@@ -105,14 +105,14 @@ private:
     double m_headRotationOffsetY;
 
     std::unique_ptr<MovementSmoother> m_headTranslationSmoother;
-    cv::Point2d m_translationCorrectionLast;
+    cv::Point2d m_translationCorrection;
 
     std::unique_ptr<MovementSmoother> m_headRotationSmoother;
-    cv::Point2d m_rotationCorrectionLast;
+    cv::Point2d m_rotationCorrection;
 
 private slots:
     void pupilData(bool, double, double, double);
-    void headData(bool, double, double, double, double, double, double);
+    void headData(double, double, double, double, double);
     void setCameraIndex(int cameraIndex);
     void cameraSetupDialogFinished(int result);
     void pointCalibrationTimeout();

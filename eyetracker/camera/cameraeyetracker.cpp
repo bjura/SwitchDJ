@@ -64,12 +64,10 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
     m_headTranslationSmoother = createSmoother(SmoothingMethod::DoubleMovingAverage);
     m_headRotationSmoother = createSmoother(SmoothingMethod::DoubleMovingAverage);
 
-    // TODO: add calibration controls
-
-    m_headTranslationScaleX = 1.0;
-    m_headTranslationScaleY = 1.0;
-    m_headTranslationOffsetX = 0.0;
-    m_headTranslationOffsetY = 0.0;
+    m_headTranslationOffsetX = 640.0 / 2.0;
+    m_headTranslationOffsetY = 480.0 / 2.0;
+    m_headTranslationScaleX = 1.0 / (0.9 * 640.0);
+    m_headTranslationScaleY = 1.0 / (0.9 * 480.0);
 
     m_headRotationScaleX = 1.0;
     m_headRotationScaleY = 1.0;
@@ -77,8 +75,8 @@ CameraEyetracker::CameraEyetracker(QObject * parent)
     m_headRotationOffsetY = 0.0;
 
     m_hpeWindow = new HpeWidget;
-    connect(&m_hpeWindow->headWidget, SIGNAL(headData(bool, double, double, double, double, double, double)),
-            this, SLOT(headData(bool, double, double, double, double, double, double)));
+    connect(m_hpeWindow, SIGNAL(headData(double, double, double, double, double)),
+            this, SLOT(headData(double, double, double, double, double)));
     //const Qt::WindowFlags flags = m_hpeWindow->windowFlags();
     //m_hpeWindow->setWindowFlags(flags | Qt::WindowStaysOnTopHint);
     m_hpeWindow->show();
@@ -304,18 +302,44 @@ bool CameraEyetracker::addDataPoint(std::vector<cv::Point2d> & v, const cv::Poin
     //    return false;
 }
 
-void CameraEyetracker::headData(bool ok,
-                                double posX, double posY, double posZ,
+void CameraEyetracker::headData(double posX, double posY,
                                 double rotX, double rotY, double rotZ)
 {
-    Q_UNUSED(posZ);
-
-    if(!ok)
-        return;
-
     m_headPos = cv::Point2d(posX, posY);
     m_headRot = cv::Point3d(rotX, rotY, rotZ);
-    //std::cout << "head data received" << std::endl;
+
+    // calculate and filter head translation correction
+    cv::Point2d translationCorrection(
+        m_headTranslationScaleX * (m_headPos.x - m_headTranslationOffsetX),
+        m_headTranslationScaleY * (m_headPos.y - m_headTranslationOffsetY)
+    );
+
+    cv::Point2d newTranslation;
+    if(std::isnan(translationCorrection.x) || std::isnan(translationCorrection.y))
+        newTranslation = m_translationCorrection;
+    else
+        newTranslation = translationCorrection;
+    translationCorrection = m_headTranslationSmoother->filter(newTranslation);
+    m_translationCorrection = translationCorrection;
+
+    // calculate and filter head rotation correction
+    cv::Point2d rotationCorrection(
+        m_headRotationScaleX * (m_headRot.x - m_headRotationOffsetX),
+        m_headRotationScaleY * (m_headRot.y - m_headRotationOffsetY)
+    );
+
+    cv::Point2d newRotation;
+    if(std::isnan(rotationCorrection.x) || std::isnan(rotationCorrection.y))
+        newRotation = m_rotationCorrection;
+    else
+        newRotation = rotationCorrection;
+    rotationCorrection = m_headRotationSmoother->filter(newRotation);
+    m_rotationCorrection = rotationCorrection;
+
+    std::cout << "headPos: " << m_headPos << std::endl;
+    //std::cout << "headRot: " << m_headRot << std::endl;
+    std::cout << "translationCorrection: " << m_translationCorrection << std::endl;
+    //std::cout << "rotationCorrection: " << m_rotationCorrection << std::endl;
 }
 
 void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
@@ -340,45 +364,18 @@ void CameraEyetracker::pupilData(bool ok, double posX, double posY, double size)
         else
             currentPos = gazePos;
 
+        // in 0-1 coordinates
         // gazePos is filtered after the next line
         gazePos = m_pupilSmoother->filter(currentPos);
 
-        // calculate and filter head translation correction
-        cv::Point2d translationCorrection(
-            m_headTranslationScaleX * m_headPos.x + m_headTranslationOffsetX,
-            m_headTranslationScaleY * m_headPos.y + m_headTranslationOffsetY
-        );
-
-        cv::Point2d newTranslation;
-        if(std::isnan(translationCorrection.x) || std::isnan(translationCorrection.y))
-            newTranslation = m_translationCorrectionLast;
-        else
-            newTranslation = translationCorrection;
-        translationCorrection = m_headTranslationSmoother->filter(newTranslation);
-        m_translationCorrectionLast = translationCorrection;
-
-        // calculate and filter head rotation correction
-        cv::Point2d rotationCorrection(
-            m_headRotationScaleX * m_headRot.x + m_headRotationOffsetX,
-            m_headRotationScaleY * m_headRot.y + m_headRotationOffsetY
-        );
-
-        cv::Point2d newRotation;
-        if(std::isnan(rotationCorrection.x) || std::isnan(rotationCorrection.y))
-            newRotation = m_rotationCorrectionLast;
-        else
-            newRotation = rotationCorrection;
-        rotationCorrection = m_headRotationSmoother->filter(newRotation);
-        m_rotationCorrectionLast = rotationCorrection;
-
         std::cout << "gazePos: " << gazePos << std::endl;
         std::cout << "headPos: " << m_headPos << std::endl;
-        std::cout << "headRot: " << m_headRot << std::endl;
-        std::cout << "translationCorrection: " << translationCorrection << std::endl;
-        std::cout << "rotationCorrection: " << rotationCorrection << std::endl;
+        //std::cout << "headRot: " << m_headRot << std::endl;
+        //std::cout << "translationCorrection: " << translationCorrection << std::endl;
+        //std::cout << "rotationCorrection: " << rotationCorrection << std::endl;
 
-        gazePos += translationCorrection;
-        //gazePos += rotationCorrection;
+        gazePos += m_translationCorrection;
+        //gazePos += m_rotationCorrection;
 
         std::cout << "corrected gazePos: " << gazePos << std::endl;
 

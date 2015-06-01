@@ -1,0 +1,204 @@
+[
+    {
+        "id": "main",
+        "type": "PisakBinLayout",
+        "x-expand": true,
+        "y-expand": true,
+        "children": ["main_group", "background_box"]
+    },
+    {
+        "id": "background_box",
+        "type": "PisakBackgroundPattern",
+        "x-expand": true,
+        "y-expand": true
+    },
+    {
+        "id": "main_group",
+        "type": "PisakScanningGroup",
+        "children": ["main_box"],
+        "strategy": {
+            "id": "main_group_strategy",
+            "type": "PisakRowStrategy"
+        }
+    },
+    {
+        "id": "main_box",
+        "type": "PisakBoxLayout",
+        "x-align": "start",
+        "y-align": "center",
+        "x-expand": true,
+        "y-expand": true,
+        "ratio-margin-top": 0.08,
+        "ratio-margin-bottom": 0.04,
+        "ratio-spacing": 0.02,
+        "orientation": "horizontal",
+        "children": ["middle_box", "left_box"]
+    },
+
+    {
+        "id": "middle_box",
+        "type": "PisakBoxLayout",
+	    "x-align": "start",
+        "x-expand": true,
+	    "orientation": "vertical",
+        "ratio-spacing": 0.05,
+        "children": ["middle_lower_box", "middle_top_box"]
+    },
+    {
+        "id": "left_box",
+        "type": "PisakBoxLayout",
+	    "orientation": "vertical",
+        "ratio-spacing": 0.005,
+        "children": ["menu_group"]
+    },
+    {
+        "id": "middle_lower_box",
+        "type": "PisakBoxLayout",
+        "x-align": "center",
+	    "orientation": "vertical",
+        "ratio-spacing": 0.005,
+        "children": ["track_group", "track_label"]
+    },
+    {
+        "id": "middle_top_box",
+        "type": "PisakBoxLayout",
+	    "orientation": "vertical",
+        "x-align": "center",
+        "ratio-spacing": 0.01,
+        "children": ["pool_group", "pool_label", "pool_icon"]
+    },
+    {
+        "id": "pool_icon",
+        "type": "PisakMenuHeader",
+	    "ratio-width": 0.1,
+        "ratio-height": 0.1,
+        "name": "piano"
+    },
+    {
+        "id": "pool_label",
+        "type": "MxLabel",
+        "style-class": "PisakDJLabel",
+	    "x-align": "center",
+        "text": "DŹWIĘKI"
+    },
+    {
+        "id": "pool_group",
+        "type": "PisakScanningGroup",
+        "children": ["pool"],
+        "strategy": {
+            "id": "pool_group_strategy",
+            "type": "PisakRowStrategy"
+        }
+    },
+    {
+        "id": "pool",
+        "type": "PisakDJSoundPoolBox",
+		"ratio-width": 0.6,
+        "ratio-height": 0.3,
+        "orientation": "horizontal",
+        "target_box": "track_box"
+    },
+    {
+        "id": "track_group",
+        "type": "PisakScanningGroup",
+        "children": ["track_box"],
+        "strategy": {
+            "id": "track_group_strategy",
+            "type": "PisakRowStrategy"
+        }
+    },
+    {
+        "id": "track_box",
+        "type": "PisakDJTrackBox",
+        "orientation": "vertical",
+        "ratio-width": 0.7,
+        "ratio-height": 0.3
+    },
+    {
+        "id": "menu_group",
+        "type": "PisakScanningGroup",
+        "children": ["menu_box"],
+        "strategy": {
+            "id": "menu_group_strategy",
+            "type": "PisakRowStrategy"
+        }
+    },
+    {
+        "id": "menu_box",
+        "type": "PisakBoxLayout",
+        "orientation": "vertical",
+        "ratio-spacing": 0.015,
+	    "x-align": "start",
+        "x-expand": true,
+        "y-align": "center",
+        "children": ["button_exit", "button_new_track", "button_play_song",
+		     "button_switch_type", "button_save"]
+    },
+    {
+        "id": "button_exit",
+        "type": "PisakButton",
+        "style-class": "PisakDJButton",
+        "label": "PANEL STARTOWY",
+        "ratio-width": 0.25,
+        "ratio-height": 0.10,
+        "icon-name": "exit"
+    },
+    {
+        "id": "button_new_track",
+        "type": "PisakButton",
+        "style-class": "PisakDJButton",
+        "label": "NOWA ŚCIEŻKA",
+        "ratio-width": 0.25,
+        "ratio-height": 0.10,
+        "icon-size": 50,
+        "signals": [
+                       {
+                           "name": "clicked",
+                           "handler": "dj/new_track",
+                           "object": "track_box"
+                       }
+                    ]
+    },
+    {
+        "id": "button_play_song",
+        "type": "PisakButton",
+        "style-class": "PisakDJButton",
+        "label": "GRAJ",
+        "ratio-width": 0.25,
+        "ratio-height": 0.10,
+        "icon-size": 50,
+        "signals": [
+                       {
+                           "name": "clicked",
+                           "handler": "dj/play",
+                           "object": "track_box"
+                       }
+                    ]
+    },
+    {
+        "id": "button_switch_type",
+        "type": "PisakButton",
+        "style-class": "PisakDJButton",
+        "label": "ZMIEŃ DŹWIĘKI",
+        "ratio-width": 0.25,
+        "ratio-height": 0.10,
+        "icon-size": 50
+    },
+    {
+        "id": "button_save",
+        "type": "PisakButton",
+        "style-class": "PisakDJButton",
+        "label": "ZAPISZ",
+        "ratio-width": 0.25,
+        "ratio-height": 0.10,
+        "icon-size": 50
+    },
+    {
+        "id": "track_label",
+        "type": "MxLabel",
+        "style-class": "PisakDJLabel",
+	    "x-align": "end",
+	    "x-expand": true,
+        "text": "ŚCIEŻKI"
+    }
+]

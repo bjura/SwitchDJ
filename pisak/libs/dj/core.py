@@ -29,7 +29,7 @@ from pisak import res
 
 BACKEND = 'pydub'
 
-PLAYER = "avplay"
+PLAYER = ("avplay", ("-nodisp", "-autoexit"))
 
 
 #------------------------------------------------
@@ -78,12 +78,15 @@ class Player:
         self._play(audio_segment.filename)
 
     def _play(self, filename):
-        subprocess.Popen([self._engine, filename])
+        command = [self._engine[0], filename] + [opt for opt in self._engine[1]]
+        subprocess.Popen(command)
 
 
 class AudioSegment:
     def __init__(self):
         self._player = Player()
+        self.temp_filename = res.get(
+            os.path.join("sounds", "dj", "pisakDJ_temp_file.wav"))
         self.filename = None
         self.segment = None
 
@@ -91,7 +94,9 @@ class AudioSegment:
         save_segment(self.segment, filename)
 
     def play(self):
-        if not os.path.isfile(self.filename):
+        if not self.filename or not os.path.isfile(self.filename):
+            if not self.filename:
+                self.filename = self.temp_filename
             self.save(self.filename)
         self._player.play_audio_segment(self)
 
@@ -144,9 +149,8 @@ class ElectricGuitarSound(InstrumentalSound):
 
 class Repeater(AudioSegment):
     def __init__(self, sound):
+        super().__init__()
         self.sound = sound
-
-        self.segment = None
 
         # how many times the sound should be repeated
         self.count = 2
@@ -167,6 +171,8 @@ class Repeater(AudioSegment):
 
 class Track(AudioSegment):
     def __init__(self):
+        super().__init__()
+
         # temp filename
         self.filename = os.path.join(os.path.expanduser('~'),
                                           "switch_DJ_temp_track.wav")
@@ -190,15 +196,16 @@ class Track(AudioSegment):
         self._content.append(repeater)
         self._concatenate_segment(repeater.segment)
 
-    def _contatenate_segment(self, segment):
-        concatenate_segments(self.segment, segment)
+    def _concatenate_segment(self, segment):
+        self.segment = concatenate_segments(self.segment, segment)
 
 
 class Song(AudioSegment):
     def __init__(self):
+        super().__init__()
         self.filename = None
         self._tracks = []
-        self.segment = get_empty_segment()
+        self.segment = None
 
     def add_track(self, track):
         assert isinstance(track, Track), "Song can be composed of the `Track` instances only."
@@ -213,7 +220,9 @@ class Song(AudioSegment):
         Mix all the ingredients in order to create a song.
         """
         # sort from the longest to the shortest as overlaid tracks are truncated
-        self._tracks.sort(key=lambda track: get_segment_duration(track.segment)).reverse()
+        self._tracks.sort(key=lambda track: get_segment_duration(track.segment))
+        self._tracks.reverse()
+        self.segment = get_silent_segment(get_segment_duration(self._tracks[0].segment))
         for track in self._tracks:
             self._mix_track(track)
 
@@ -221,7 +230,8 @@ class Song(AudioSegment):
         """
         Get duration of the song.
         """
-        return get_segment_duration(self.segment)
+        return get_segment_duration(self.segment) if self.segment \
+            is not None else 0
 
     def done(self):
         """
@@ -235,6 +245,7 @@ class SoundPool:
     Pool of avalaible sounds of the given type. Sounds should be ordered according to their tones.
     """
     def __init__(self, category, sound_type):
+        super().__init__()
         self.sound_type = sound_type
         self.category = category
         self.sounds = []
@@ -244,4 +255,4 @@ class SoundPool:
         loc = res.get(os.path.join("sounds", "dj", self.category))
         for file in os.listdir(loc):
             self.sounds.append(self.sound_type(os.path.join(loc, file),
-                                               os.path.stripext(file)[0]))
+                                               os.path.splitext(file)[0]))

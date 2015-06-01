@@ -1487,3 +1487,52 @@ MxLabel.PisakEmailDate {
   font-family: Kelson Sans;
   color: black;
 }
+
+
+/* DJ */
+
+MxLabel.PisakDJSound {
+  font-family: Kelson Sans;
+  font-size: 20pt;
+  color: black;
+}
+
+PisakFrame.PisakDJSound {
+    border-image: url("black_frame.png") 5;
+}
+
+MxLabel.PisakDJLabel {
+  font-size: 30pt;
+  font-family: Kelson Sans;
+  font-weight: lighter;
+  color: black;
+}
+
+PisakButton.PisakDJButton {
+  color: white;
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  font-weight: bold;
+  border-image: url("black_flat.png");
+}
+
+PisakButton.PisakDJButton:hover {
+  color: white;
+  font-size: 20pt;
+  font-family: Kelson Sans;
+  font-weight: bold;
+  border-image: url("purple_flat.png");
+}
+
+PisakButton.PisakDJButton:lag_hilite {
+    border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakDJButton:frozen {
+  border-image: url("cyan_flat.png");
+}
+
+PisakButton.PisakDJButton:disabled{
+    color: grey;
+    border-image: url("grey_frame.png") 5;
+}

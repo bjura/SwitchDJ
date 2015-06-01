@@ -1,5 +1,7 @@
-Compose music with binary-choice switch.
+SwitchDJ
+========
 
+Compose music with binary-choice switch.
 
 ----------------------------------------
 

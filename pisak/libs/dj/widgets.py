@@ -43,9 +43,11 @@ class TrackBox(layout.Box):
         self.add_track()
 
     def add_track(self):
-        self.current_track = Track()
-        self.tracks.append(self.current_track)
-        self.add_child(self.current_track)
+        if self.current_track is None or \
+                len(self.current_track.tiles) > 0:
+            self.current_track = Track()
+            self.tracks.append(self.current_track)
+            self.add_child(self.current_track)
 
     def add_sound(self, sound_tile):
         self.current_track.add_sound(sound_tile)

@@ -29,7 +29,7 @@ from pisak import res
 
 BACKEND = 'pydub'
 
-PLAYER = ("avplay", ("-nodisp", "-autoexit"))
+PLAYER = ('avplay', ('-nodisp', '-autoexit', '-v', 'fatal'))
 
 
 #------------------------------------------------
@@ -85,8 +85,10 @@ class Player:
 class AudioSegment:
     def __init__(self):
         self._player = Player()
-        self.temp_filename = res.get(
-            os.path.join("sounds", "dj", "pisakDJ_temp_file.wav"))
+        self.temp_filename = os.path.join(
+              os.path.expanduser('~'),
+              ".pisak", "pisakDJ_temp_file.wav"
+        )
         self.filename = None
         self.segment = None
 

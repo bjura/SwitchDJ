@@ -5,6 +5,8 @@ Compose and play music using a binary-choice switch.
 
 Notes or just some TODOs:
 
+- use some software audio synthesizer for sounds generation - not audio file manipulations.
+- find some really reliable and stable python audio lib.
 - all the sounds displayed in GUI should be ordered properly.
 - each sound should be labeled.
 - picked sounds should be displayed properly.
@@ -17,10 +19,13 @@ Notes or just some TODOs:
 - erase, pop and modify sounds on each track.
 - autosave after each new modification.
 
-(GAME IDEA:
-    play sounds - different types and different tones - and player has to find the correct one;
-    display type and tone or a symbol of the sound and player has to play or react to the correct one.)
+
+GAME IDEAS:
+    play sounds - different types and different tones - and player has to find and replay the correct one;
+    display type and tone or a symbol of the sound and player has to play or react to the correct one.
+	play animal sounds and player has to guess the animal.
 """
+
 import os
 import subprocess
 
@@ -34,7 +39,7 @@ PLAYER = ('avplay', ('-nodisp', '-autoexit', '-v', 'fatal'))
 
 #------------------------------------------------
 
-# -----   backend specific stuff ---------------
+# -----   backend specific stuff ----------------
 
 
 # PYDUB:

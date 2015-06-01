@@ -7,6 +7,12 @@ Compose music with binary-choice switch.
 ----------------------------------------
 
 
+TODOs and some ideas in 'pisak/libs/dj/core.py'
+
+
+-----------------------------------------------
+
+
 pisak core forked from https://github.com/BrainTech/pisak
 
 
